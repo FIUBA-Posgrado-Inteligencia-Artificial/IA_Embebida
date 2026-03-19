@@ -1,0 +1,88 @@
+<!-- 11. Fundamentos de IA Embebida -->
+<section>
+    <section>
+        <h2 class="gradient-text">11. Fundamentos de la IA Embebida</h2>
+        <p>El porqué matemático y físico del Edge AI</p>
+    </section>
+
+    <!-- 1. El Colapso de la Nube -->
+    <section>
+        <h3>El Colapso del Paradigma en la Nube</h3>
+        <p style="font-size: 0.65em; text-align: left; margin-bottom: 0.8rem;">Enviar datos masivos a clústeres centrales choca con 4 cuellos de botella insalvables:</p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 0.65em; text-align: left;">
+            <div style="background: rgba(255,85,85,0.1); border-radius: 0.5rem; padding: 12px;">
+                <strong style="color: #ff5555;">1. Latencia Estricta (Determinismo)</strong>
+                <p style="margin: 0.3rem 0 0;">En robótica o conducción autónoma, no se permite depender del RTT del 4G/5G. El freno debe calcularse en milisegundos ininterrumpidamente.</p>
+            </div>
+            <div style="background: rgba(139,233,253,0.1); border-radius: 0.5rem; padding: 12px;">
+                <strong style="color: #8be9fd;">2. Límite de Ancho de Banda</strong>
+                <p style="margin: 0.3rem 0 0;">Transmitir videos crudos desde 1000 cámaras 4K industriales hacia el servidor saturaría la red de extremo a extremo e incurriría en altísimo costo.</p>
+            </div>
+            <div style="background: rgba(80,250,123,0.1); border-radius: 0.5rem; padding: 12px;">
+                <strong style="color: #50fa7b;">3. Privacidad y Seguridad</strong>
+                <p style="margin: 0.3rem 0 0;">Regulaciones (GDPR, HIPAA). Audios en el hogar o imágenes médicas no deben abandonar el dispositivo anfitrión, aboliendo los vectores de ataque.</p>
+            </div>
+            <div style="background: rgba(189,147,249,0.1); border-radius: 0.5rem; padding: 12px;">
+                <strong style="color: #bd93f9;">4. La Física de la Energía</strong>
+                <p style="margin: 0.3rem 0 0;">Transmitir inalámbricamente 1 simple bit consume magnitudes insalvables de energía extras respecto a realizar la operación analítica localmente.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. Evolución Histórica -->
+    <section>
+        <h3>Evolución: El Camino al Extremo</h3>
+        <div style="font-size: 0.7em; text-align: left;">
+            <ul style="line-height: 1.5;">
+                <li style="margin-bottom: 0.8rem;">
+                    <strong style="color: #bd93f9;">2016 - Miniaturización Teórica:</strong> SqueezeNet logra la misma precisión que AlexNet pero con 50x menos parámetros al percatarse de la masiva sobreparametrización latente.
+                </li>
+                <li style="margin-bottom: 0.8rem;">
+                    <strong style="color: #8be9fd;">2017 a 2019 - La Explosión Móvil:</strong> Dominio del smartphone. MobileNetV1 en CPUs ARM marca la era. La inferencia local se hace el estándar comercial.
+                </li>
+                <li style="margin-bottom: 0.8rem;">
+                    <strong style="color: #50fa7b;">2020 a Presente - La Era TinyML:</strong> Descenso disruptivo al silicio básico. La IA abandona el ecosistema Linux para infiltrar MCUs <em>bare-metal</em>/RTOS de bajo costo ($1) y fracciones de vatios (mW).
+                </li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- 3. Optimización Restringida -->
+    <section>
+        <h3>El Núcleo Matemático: Optimización Restringida</h3>
+        <div style="font-size: 0.7em; text-align: left;">
+            <p>A diferencia del Cloud (hardware virtualmente infinito), en la IA Embebida debemos maximizar el acierto sujeto a estrictos límites restrictivos del hardware físico:</p>
+            <div style="background: rgba(255,255,255,0.1); padding: 0.8rem; border-radius: 0.5rem; text-align: center; margin: 0.8rem 0; font-size: 1.1em;">
+                <code>max Performance(Model)</code><br>
+                <code>sujeto a R(Model) ≤ H_limits</code>
+            </div>
+            <p style="color: #ffb86c; margin-bottom: 0.3rem;"><strong>Las tres principales restricciones (R):</strong></p>
+            <ul style="margin-top: 0.5rem; padding-left: 1.2rem; line-height: 1.4;">
+                <li style="margin-bottom: 0.4rem;"><strong>Complejidad (FLOPs/MACs):</strong> Dictamina severamente la <em>latencia</em> del dispositivo.</li>
+                <li style="margin-bottom: 0.4rem;"><strong>Presupuesto Energético:</strong> Energía finita drenada de baterías (crítico para IoT).</li>
+                <li><strong>Huella de Memoria (Footprint):</strong> 
+                    <ul style="margin-top: 0.2rem; font-size: 0.9em;">
+                        <li><strong>Flash/ROM:</strong> Peso estático de los parámetros (W).</li>
+                        <li><strong style="color: #ff5555;">SRAM (Peak Memory):</strong> El <em>verdadero cuello de botella</em>. Memoria RAM requerida en el punto más ancho para almacenar activaciones intermedias (el sobrepasamiento reinicia el sistema).</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- 4. Frontera de Pareto -->
+    <section>
+        <h3>La Frontera de Pareto</h3>
+        <div style="display: flex; gap: 2rem; align-items: center; margin-top: 1rem;">
+            <div style="flex: 1; font-size: 0.7em; text-align: left;">
+                <p>En el diseño real de modelos de IAE (y mediante compresión), <strong>no existe el "modelo perfecto" absoluto</strong>.</p>
+                <p style="margin-top: 0.8rem;">Los algoritmos forjan en su lugar una <em>Frontera de Pareto</em>: una plétora de puntos óptimos.</p>
+                <div style="background: rgba(255,255,255,0.05); padding: 0.8rem; border-radius: 0.5rem; margin-top: 1rem;">
+                    <strong style="color: #50fa7b;">El compromiso vital:</strong>
+                    <p style="margin: 0.3rem 0 0;">Si eliges un punto curvo, resulta matemáticamente imposible aumentar la precisión sin castigar al mismo instante latencia, peso o batería.</p>
+                    <p style="margin: 0.3rem 0 0; color: #8be9fd;">Es la tarea cumbre del arquitecto discernir el <em>Trade-off</em> idóneo al <code>H_limits</code>.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</section>

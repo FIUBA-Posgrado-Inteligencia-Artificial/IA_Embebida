@@ -1,0 +1,78 @@
+<svg viewBox="0 0 600 200"
+    style="width: 100%; display: block; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3)); border-radius: 0.5rem; background: rgba(255,255,255,0.05);">
+    <defs>
+        <marker id="arrow-resnt" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6"
+            orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="rgba(248, 248, 242, 0.4)" />
+        </marker>
+        <filter id="glow-resnt">
+            <feGaussianBlur stdDeviation="2" result="blur" />
+            <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+            </feMerge>
+        </filter>
+    </defs>
+
+    <text x="300" y="25" fill="#f8f8f2" font-size="14" font-weight="bold" font-family="sans-serif"
+        text-anchor="middle">ResNet Architecture Stack</text>
+
+    <path d="M 40 100 L 70 100" stroke="rgba(248, 248, 242, 0.4)" stroke-width="2" marker-end="url(#arrow-resnt)" />
+
+    <!-- Intro block -->
+    <rect x="80" y="60" width="20" height="80" rx="4" fill="rgba(68, 71, 90, 0.6)" stroke="#44475a"
+        filter="url(#glow-resnt)" />
+    <text x="90" y="100" fill="#f8f8f2" font-size="10" font-family="sans-serif" text-anchor="middle"
+        transform="rotate(-90 90,100)">Conv 1</text>
+
+    <!-- Block 1 -->
+    <line x1="100" y1="100" x2="130" y2="100" stroke="rgba(248, 248, 242, 0.4)" stroke-width="2"
+        marker-end="url(#arrow-resnt)" />
+    <rect x="140" y="70" width="40" height="60" rx="6" fill="rgba(189, 147, 249, 0.6)" stroke="#bd93f9" />
+    <text x="160" y="100" fill="#bd93f9" font-size="10" font-weight="bold" font-family="sans-serif"
+        text-anchor="middle">Res</text>
+    <path d="M 120 100 L 120 150 L 195 150 L 195 108" fill="none" stroke="#ff79c6" stroke-width="2" stroke-dasharray="4"
+        marker-end="url(#arrow-resnt)" />
+
+    <!-- Block 2 -->
+    <line x1="180" y1="100" x2="210" y2="100" stroke="rgba(248, 248, 242, 0.4)" stroke-width="2"
+        marker-end="url(#arrow-resnt)" />
+    <rect x="220" y="70" width="40" height="60" rx="6" fill="rgba(189, 147, 249, 0.6)" stroke="#bd93f9" />
+    <text x="240" y="100" fill="#f8f8f2" font-size="10" font-weight="bold" font-family="sans-serif"
+        text-anchor="middle">Res</text>
+    <path d="M 200 100 L 200 150 L 275 150 L 275 108" fill="none" stroke="#ff79c6" stroke-width="2" stroke-dasharray="4"
+        marker-end="url(#arrow-resnt)" />
+
+    <!-- Block N -->
+    <line x1="260" y1="100" x2="290" y2="100" stroke="rgba(248, 248, 242, 0.4)" stroke-width="2"
+        marker-end="url(#arrow-resnt)" />
+    <text x="320" y="105" fill="#f8f8f2" font-size="18" font-family="sans-serif" text-anchor="middle">. . . .</text>
+    <line x1="350" y1="100" x2="380" y2="100" stroke="rgba(248, 248, 242, 0.4)" stroke-width="2"
+        marker-end="url(#arrow-resnt)" />
+
+    <!-- Block M -->
+    <rect x="390" y="50" width="40" height="100" rx="6" fill="rgba(189, 147, 249, 0.8)" stroke="#bd93f9" />
+    <text x="410" y="100" fill="#f8f8f2" font-size="10" font-weight="bold" font-family="sans-serif"
+        text-anchor="middle">Res</text>
+    <path d="M 370 100 L 370 170 L 445 170 L 445 108" fill="none" stroke="#ff79c6" stroke-width="2" stroke-dasharray="4"
+        marker-end="url(#arrow-resnt)" />
+
+    <text x="300" y="170" fill="#ff79c6" font-size="12" font-weight="bold" font-family="sans-serif"
+        text-anchor="middle">Decenas a cientas de conexiones "Skip"</text>
+
+    <!-- Avg Pool / FC Softmax -->
+    <line x1="430" y1="100" x2="460" y2="100" stroke="rgba(248, 248, 242, 0.4)" stroke-width="2"
+        marker-end="url(#arrow-resnt)" />
+    <rect x="470" y="70" width="20" height="60" rx="4" fill="rgba(80, 250, 123, 0.8)" stroke="#50fa7b" />
+    <text x="480" y="100" fill="#f8f8f2" font-size="8" font-family="sans-serif" text-anchor="middle"
+        transform="rotate(-90 480,100)">Avg Pool</text>
+
+    <line x1="490" y1="100" x2="510" y2="100" stroke="rgba(248, 248, 242, 0.4)" stroke-width="2"
+        marker-end="url(#arrow-resnt)" />
+    <rect x="520" y="50" width="20" height="100" rx="4" fill="rgba(255, 184, 108, 0.8)" stroke="#ffb86c" />
+    <text x="530" y="100" fill="#f8f8f2" font-size="8" font-family="sans-serif" text-anchor="middle"
+        transform="rotate(-90 530,100)">FC Softmax</text>
+
+    <line x1="540" y1="100" x2="570" y2="100" stroke="rgba(248, 248, 242, 0.4)" stroke-width="2"
+        marker-end="url(#arrow-resnt)" />
+</svg>

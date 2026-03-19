@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <style>
+        body {
+            background: transparent;
+            font-family: sans-serif;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #f8f8f2;
+        }
+
+        .container {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            transform: scale(0.9);
+        }
+
+        .grid-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            position: relative;
+        }
+
+        .grid {
+            display: grid;
+            gap: 1px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1px;
+            border-radius: 2px;
+        }
+
+        .cell {
+            width: 12px;
+            height: 12px;
+            border-radius: 1px;
+            transition: all 0.4s;
+        }
+
+        .vector {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            max-height: 300px;
+        }
+
+        .v-cell {
+            width: 20px;
+            height: 4px;
+            border-radius: 1px;
+            transition: all 0.4s;
+            position: relative;
+        }
+
+        .arrow {
+            font-size: 30px;
+            color: #6272a4;
+        }
+
+        .label {
+            font-size: 12px;
+            color: #6272a4;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .ch0 {
+            background: #ff5555;
+        }
+
+        .ch1 {
+            background: #50fa7b;
+        }
+
+        .ch2 {
+            background: #8be9fd;
+        }
+
+        .dim {
+            opacity: 0.4 !important;
+            transform: scale(0.85);
+        }
+
+        .highlight {
+            filter: brightness(1.5);
+            box-shadow: 0 0 10px currentColor;
+            transform: scale(1.4);
+            z-index: 10;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="grid-stack">
+            <div class="label">Tensor (4x4x3)</div>
+            <div id="g2" class="grid" style="grid-template-columns: repeat(4, 1fr);"></div>
+            <div id="g1" class="grid" style="grid-template-columns: repeat(4, 1fr);"></div>
+            <div id="g0" class="grid" style="grid-template-columns: repeat(4, 1fr);"></div>
+        </div>
+        <div class="arrow">&rarr;</div>
+        <div style="display: flex; flex-direction: column; align-items: center;">
+            <div class="label">Vector (48x1)</div>
+            <div id="vector" class="vector"></div>
+        </div>
+    </div>
+
+    <script>
+        const grids = [document.getElementById('g0'), document.getElementById('g1'), document.getElementById('g2')];
+        const vector = document.getElementById('vector');
+        const total = 4 * 4 * 3;
+
+        // Create cells in main grids
+        for (let ch = 0; ch < 3; ch++) {
+            for (let i = 0; i < 16; i++) {
+                const div = document.createElement('div');
+                // Dim them initially to avoid visual flash
+                div.className = `cell ch${ch} dim`;
+                div.id = `c-${ch}-${i}`;
+                grids[ch].appendChild(div);
+            }
+        }
+
+        // Create flattened vector cells: Order Top (ch2) -> Middle (ch1) -> Bottom (ch0)
+        for (let ch = 2; ch >= 0; ch--) {
+            for (let i = 0; i < 16; i++) {
+                const currentStep = (2 - ch) * 16 + i;
+                const div = document.createElement('div');
+                div.className = `v-cell ch${ch} dim`;
+                div.id = `v-${currentStep}`;
+                vector.appendChild(div);
+            }
+        }
+
+        let current = 0;
+        function animate() {
+            // Reset all to dim
+            document.querySelectorAll('.cell, .v-cell').forEach(el => el.className = el.className.replace(' highlight', '') + ' dim');
+
+            const ch = 2 - Math.floor(current / 16);
+            const idx = current % 16;
+
+            const gridCell = document.getElementById(`c-${ch}-${idx}`);
+            const vecCell = document.getElementById(`v-${current}`);
+
+            gridCell.className = gridCell.className.replace(' dim', '') + ' highlight';
+            vecCell.className = vecCell.className.replace(' dim', '') + ' highlight';
+
+            current = (current + 1) % total;
+            setTimeout(animate, current === 0 ? 1500 : 150);
+        }
+        animate();
+    </script>
+</body>
+
+</html>

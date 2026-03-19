@@ -1,0 +1,71 @@
+<!-- 10. Knowledge Distillation -->
+<section>
+    <section>
+        <h2 class="gradient-text">10. Knowledge Distillation (KD)</h2>
+        <p>Transfiriendo sabiduría: del Profesor al Alumno</p>
+    </section>
+
+    <!-- 1. Concepto y Temperatura -->
+    <section>
+        <h3>El Concepto: Más allá del Hard Target</h3>
+        <div style="font-size: 0.75em; text-align: left;">
+            <p>Si NAS construye la casa, Pruning quita los muros y Factorización comprime, KD es el proceso de transferir "los apuntes resumidos" del modelo gigante al modelo minúsculo.</p>
+            <p style="margin-top: 1rem;"><strong style="color: #8be9fd;">Soft Targets y el "Dark Knowledge"</strong></p>
+            <p>Las etiquetas duras o <em>Hard Targets</em> (ej. 100% Perro, 0% Gato) destruyen información relacional. Un Profesor destila <em>Soft Targets</em> (90% Perro, 9% Gato), revelando similitudes de características.</p>
+            <div style="background: rgba(255,255,255,0.1); padding: 0.8rem; border-radius: 0.5rem; text-align: center; margin: 0.8rem 0; font-size: 1em;">
+                <code>q<sub>i</sub> = exp(z<sub>i</sub> / T) / Σ exp(z<sub>j</sub> / T)</code>
+            </div>
+            <p>Para amplificar esto se usa la <strong>Temperatura (T)</strong>. Al subir <em>T</em>, la distribución de probabilidad se suaviza, permitiendo al Alumno percibir las conexiones diminutas y estructurales entre clases.</p>
+            <p style="color: #50fa7b; margin-top: 0.8rem;">El Alumno entrena minimizando el error contra las etiquetas reales <strong>+</strong> imitando la distribución de soft-targets del Profesor.</p>
+        </div>
+    </section>
+
+    <!-- 2. Formas de aplicar KD -->
+    <section>
+        <h3>Formas Prácticas en CNNs</h3>
+        <div style="font-size: 0.65em; text-align: left;">
+            <div style="display: grid; grid-template-columns: 1fr; gap: 12px;">
+                <div style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px;">
+                    <strong style="color: #ff79c6;">A. Response-Based KD (Destilación de Salidas)</strong>
+                    <p style="margin: 0.3rem 0 0;">El método clásico. El Alumno imita únicamente los Logits finales del Profesor. Barato computacionalmente, ideal para condensar múltiples modelos en la nube (<em>Ensembles</em>) en un solo modelo.</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px;">
+                    <strong style="color: #50fa7b;">B. Feature-Based KD (Mapas de Características)</strong>
+                    <p style="margin: 0.3rem 0 0;">El Alumno imita los tensores internos convolucionales (pide el "procedimiento" y no solo el resultado). <strong>Solución al diferente tamaño de capas:</strong> se insertan convoluciones 1x1 en el Alumno para igualar canales (ej. de 64 a 256) posibilitando el error MSE con el Profesor.</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px;">
+                    <strong style="color: #8be9fd;">C. Relation-Based KD (Destilación de Relaciones)</strong>
+                    <p style="margin: 0.3rem 0 0;">El alumno imita la <em>topología espacial</em> o relación entre distintas imágenes del lote (ej. usando matrices de Gram). Genera un entendimiento del espacio latente y extrema robustez al ruido.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. Problemas Reales -->
+    <section>
+        <h3>Problemas de la Realidad y Soluciones</h3>
+        <div style="display: flex; gap: 1.5rem; margin-top: 1rem; font-size: 0.7em; text-align: left;">
+            <div style="flex: 1; background: rgba(255,85,85,0.1); padding: 0.8rem; border-radius: 0.5rem;">
+                <h4 style="color: #ff5555; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.1em;">1. El "Capacity Gap"</h4>
+                <p>Destilar un profesor enorme (ResNet-152) directo a un alumno diminuto (MobileNet-V1) suele <strong>fracasar</strong>: el Alumno no tiene rango matemático para captar el modelo previo.</p>
+                <p style="margin-top: 0.8rem;"><strong style="color: #50fa7b;">Solución:</strong> <em>Teacher Assistants (TA)</em>. Se destila en pasos graduales mediante redes puente (Gigante → Mediano → Diminuto).</p>
+            </div>
+            <div style="flex: 1; background: rgba(189,147,249,0.1); padding: 0.8rem; border-radius: 0.5rem;">
+                <h4 style="color: #bd93f9; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.1em;">2. KD como "Pegamento" (Ortogonalidad)</h4>
+                <p>KD es acumulable sinérgicamente con otras metodologías de compresión de bajo nivel.</p>
+                <p style="margin-top: 0.8rem;"><strong style="color: #50fa7b;">En la realidad industrial:</strong> Se aplica KD <strong>al mismo tiempo</strong> que se cuantiza (QAT) o se poda el modelo, haciendo que el Profesor guíe la degradación hacia un límite seguro.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. Cloud vs Edge -->
+    <section>
+        <h3>Resumen (Cloud vs. Edge)</h3>
+        <div style="font-size: 0.75em; text-align: left;">
+            <ul style="line-height: 1.5;">
+                <li style="margin-bottom: 0.8rem;"><strong style="color: #bd93f9;">En el Cloud (HPC):</strong> El empleo primordial del KD es unificar engranajes (<strong>Ensembles</strong>). En vez de costear 10 modelos concurrentes, se condensan abaratando el balance final de la ejecución en la granja de servidores.</li>
+                <li style="margin-bottom: 0.8rem;"><strong style="color: #50fa7b;">En la IA Embebida (Edge):</strong> Se erige como la herramienta cumbre. Exprimimos el silicio local con un <em>HW-NAS</em> para lograr compresión, y luego usamos <em>Feature-based KD</em> para inculcarle a ese pequeñísimo chip las intuiciones del modelo original de las mega-GPUs.</li>
+            </ul>
+        </div>
+    </section>
+</section>

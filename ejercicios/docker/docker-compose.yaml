@@ -1,0 +1,27 @@
+services:
+  cuda:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.cuda
+    image: eamta_ml:cuda
+    ipc: host
+    volumes:
+      - ../:/workspace
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
+    command: /bin/bash
+
+  cpu:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.cpu
+    image: eamta_ml:cpu
+    ipc: host
+    volumes:
+      - ../:/workspace
+    command: /bin/bash

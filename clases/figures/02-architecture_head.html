@@ -1,0 +1,115 @@
+<svg viewBox="0 0 800 300"
+    style="width: 100%; max-width: 800px; margin: 0 auto; display: block; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3)); border-radius: 0.5rem; background: rgba(255,255,255,0.05);">
+    <defs>
+        <filter id="glow-arch-head" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="3" result="blur" />
+            <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+            </feMerge>
+        </filter>
+        <marker id="arrow-arch-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6"
+            orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="rgba(248, 248, 242, 0.4)" />
+        </marker>
+    </defs>
+
+    <!-- BACKBONE SECTION (Dimmed) -->
+    <g style="opacity: 0.2; transition: opacity 0.5s;">
+        <!-- Bounding box representing Backbone -->
+        <rect x="20" y="20" width="460" height="260" rx="10" fill="rgba(139, 233, 253, 0.05)" stroke="#8be9fd"
+            stroke-width="2" stroke-dasharray="8 4" />
+        <text x="250" y="45" fill="#8be9fd" font-size="18" font-family="sans-serif" font-weight="bold"
+            text-anchor="middle">Feature Extractor (Backbone)</text>
+
+        <!-- Input Image -->
+        <rect x="50" y="100" width="60" height="60" fill="rgba(248, 248, 242, 0.2)" stroke="#f8f8f2" stroke-width="2" />
+        <text x="80" y="180" fill="#f8f8f2" font-size="12" font-family="sans-serif" text-anchor="middle">Input
+            Image</text>
+
+        <path d="M 120 130 L 140 130" stroke="rgba(248, 248, 242, 0.4)" stroke-width="2"
+            marker-end="url(#arrow-arch-head)" />
+
+        <!-- Conv Block 1 -->
+        <rect x="150" y="80" width="30" height="100" fill="rgba(189, 147, 249, 0.3)" stroke="#bd93f9"
+            stroke-width="2" />
+        <rect x="160" y="90" width="30" height="100" fill="rgba(189, 147, 249, 0.5)" stroke="#bd93f9"
+            stroke-width="2" />
+        <rect x="170" y="100" width="30" height="100" fill="rgba(189, 147, 249, 0.7)" stroke="#bd93f9" stroke-width="2"
+            filter="url(#glow-arch-head)" />
+        <text x="175" y="220" fill="#bd93f9" font-size="12" font-family="sans-serif" text-anchor="middle">Conv /
+            Pool</text>
+
+        <path d="M 210 130 L 250 130" stroke="rgba(248, 248, 242, 0.4)" stroke-width="2"
+            marker-end="url(#arrow-arch-head)" />
+
+        <!-- Conv Block 2 -->
+        <rect x="260" y="90" width="20" height="80" fill="rgba(189, 147, 249, 0.3)" stroke="#bd93f9" stroke-width="2" />
+        <rect x="270" y="100" width="20" height="80" fill="rgba(189, 147, 249, 0.5)" stroke="#bd93f9"
+            stroke-width="2" />
+        <rect x="280" y="110" width="20" height="80" fill="rgba(189, 147, 249, 0.7)" stroke="#bd93f9" stroke-width="2"
+            filter="url(#glow-arch-head)" />
+        <text x="285" y="210" fill="#bd93f9" font-size="12" font-family="sans-serif" text-anchor="middle">Conv /
+            Pool</text>
+
+        <path d="M 310 130 L 350 130" stroke="rgba(248, 248, 242, 0.4)" stroke-width="2"
+            marker-end="url(#arrow-arch-head)" />
+
+        <!-- Conv Block 3 (Deepest features) -->
+        <rect x="360" y="105" width="15" height="50" fill="rgba(189, 147, 249, 0.5)" stroke="#bd93f9"
+            stroke-width="2" />
+        <rect x="370" y="115" width="15" height="50" fill="rgba(189, 147, 249, 0.7)" stroke="#bd93f9"
+            stroke-width="2" />
+        <rect x="380" y="125" width="15" height="50" fill="rgba(189, 147, 249, 0.9)" stroke="#bd93f9" stroke-width="2"
+            filter="url(#glow-arch-head)" />
+        <text x="385" y="195" fill="#bd93f9" font-size="12" font-family="sans-serif"
+            text-anchor="middle">Features</text>
+    </g>
+
+    <!-- Connections between Backbone and Head -->
+    <path d="M 405 130 L 490 130" stroke="rgba(248, 248, 242, 0.4)" stroke-width="2"
+        marker-end="url(#arrow-arch-head)" />
+
+    <!-- HEAD SECTION (Highlighted) -->
+    <g style="opacity: 1.0; transition: opacity 0.5s;">
+        <!-- Bounding box representing Head -->
+        <rect x="500" y="20" width="280" height="260" rx="10" fill="rgba(80, 250, 123, 0.05)" stroke="#50fa7b"
+            stroke-width="2" stroke-dasharray="8 4" />
+        <text x="640" y="45" fill="#50fa7b" font-size="18" font-family="sans-serif" font-weight="bold"
+            text-anchor="middle">Classifier (Head)</text>
+
+        <!-- Flatten / Dense 1 -->
+        <circle cx="530" cy="80" r="8" fill="rgba(80, 250, 123, 0.6)" stroke="#50fa7b" filter="url(#glow-arch-head)" />
+        <circle cx="530" cy="110" r="8" fill="rgba(80, 250, 123, 0.6)" stroke="#50fa7b" />
+        <circle cx="530" cy="140" r="8" fill="rgba(80, 250, 123, 0.6)" stroke="#50fa7b" />
+        <circle cx="530" cy="170" r="8" fill="rgba(80, 250, 123, 0.6)" stroke="#50fa7b" />
+        <circle cx="530" cy="200" r="8" fill="rgba(80, 250, 123, 0.6)" stroke="#50fa7b" />
+        <text x="530" y="230" fill="#50fa7b" font-size="12" font-family="sans-serif" text-anchor="middle">Dense</text>
+
+        <!-- Dense Connections -->
+        <path
+            d="M 538 80 L 612 110 M 538 80 L 612 150 M 538 110 L 612 110 M 538 110 L 612 150 M 538 140 L 612 110 M 538 140 L 612 150 M 538 170 L 612 110 M 538 170 L 612 150 M 538 200 L 612 110 M 538 200 L 612 150"
+            stroke="rgba(248, 248, 242, 0.15)" stroke-width="1" />
+
+        <!-- Dense 2 -->
+        <circle cx="620" cy="110" r="8" fill="rgba(80, 250, 123, 0.6)" stroke="#50fa7b" filter="url(#glow-arch-head)" />
+        <circle cx="620" cy="150" r="8" fill="rgba(80, 250, 123, 0.6)" stroke="#50fa7b" />
+        <text x="620" y="190" fill="#50fa7b" font-size="12" font-family="sans-serif" text-anchor="middle">Dense</text>
+
+        <!-- Output Connections -->
+        <path d="M 628 110 L 702 130 M 628 150 L 702 130" stroke="rgba(248, 248, 242, 0.15)" stroke-width="1" />
+
+        <!-- Output Softmax -->
+        <circle cx="710" cy="130" r="10" fill="rgba(255, 85, 85, 0.8)" stroke="#ff5555" stroke-width="2"
+            filter="url(#glow-arch-head)" />
+        <text x="710" y="160" fill="#ff5555" font-size="12" font-family="sans-serif" text-anchor="middle">Output</text>
+        <rect x="730" y="100" width="40" height="60" rx="4" fill="rgba(40, 42, 54, 0.8)" stroke="#f8f8f2"
+            stroke-width="1" />
+        <text x="750" y="115" fill="#f8f8f2" font-size="10" font-family="sans-serif" text-anchor="middle">Dog:
+            0.1</text>
+        <text x="750" y="132" fill="#50fa7b" font-size="10" font-family="sans-serif" font-weight="bold"
+            text-anchor="middle">Cat: 0.8</text>
+        <text x="750" y="149" fill="#f8f8f2" font-size="10" font-family="sans-serif" text-anchor="middle">Bird:
+            0.1</text>
+    </g>
+</svg>

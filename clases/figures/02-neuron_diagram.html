@@ -1,0 +1,76 @@
+<svg viewBox="0 0 600 320"
+    style="width: 100%; max-width: 600px; margin: 0 auto; display: block; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3)); border-radius: 0.5rem; background: rgba(255,255,255,0.05);">
+    <defs>
+        <marker id="arrowHead" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#8be9fd" />
+        </marker>
+    </defs>
+
+    <!-- Inputs -->
+    <g font-size="22" fill="#f8f8f2" font-family="math, sans-serif">
+        <text x="30" y="70">x₁</text>
+        <text x="30" y="158">x₂</text>
+        <text x="36" y="215">⋮</text>
+        <text x="30" y="260">xₙ</text>
+    </g>
+
+    <!-- Input Arrows -->
+    <path d="M 60 65 L 120 65" stroke="#8be9fd" stroke-width="2" marker-end="url(#arrowHead)" />
+    <path d="M 60 150 L 120 150" stroke="#8be9fd" stroke-width="2" marker-end="url(#arrowHead)" />
+    <path d="M 60 252 L 120 252" stroke="#8be9fd" stroke-width="2" marker-end="url(#arrowHead)" />
+
+    <!-- Multipliers -->
+    <g fill="rgba(189,147,249,0.1)" stroke="#bd93f9" stroke-width="2">
+        <circle cx="140" cy="65" r="16" />
+        <circle cx="140" cy="150" r="16" />
+        <circle cx="140" cy="252" r="16" />
+    </g>
+    <g font-size="20" fill="#bd93f9" text-anchor="middle">
+        <text x="140" y="71">×</text>
+        <text x="140" y="156">×</text>
+        <text x="140" y="258">×</text>
+    </g>
+
+    <!-- Weights -->
+    <g font-size="18" fill="#ff79c6" font-family="math, sans-serif" text-anchor="middle">
+        <text x="140" y="35">w₁</text>
+        <text x="140" y="120">w₂</text>
+        <text x="140" y="222">wₙ</text>
+    </g>
+
+    <!-- Arrows to Sum -->
+    <path d="M 160 65 Q 260 65 260 115" stroke="#8be9fd" stroke-width="2" fill="none" marker-end="url(#arrowHead)" />
+    <path d="M 160 150 L 250 150" stroke="#8be9fd" stroke-width="2" marker-end="url(#arrowHead)" />
+    <path d="M 160 252 Q 260 252 260 185" stroke="#8be9fd" stroke-width="2" fill="none" marker-end="url(#arrowHead)" />
+
+    <!-- Bias -->
+    <text x="280" y="60" fill="#f1fa8c" font-size="18" text-anchor="middle" font-family="math, sans-serif">b
+        (bias)</text>
+    <path d="M 280 70 L 280 115" stroke="#8be9fd" stroke-width="2" marker-end="url(#arrowHead)" />
+
+    <!-- Summer -->
+    <circle cx="280" cy="150" r="28" fill="rgba(80,250,123,0.1)" stroke="#50fa7b" stroke-width="2" />
+    <text x="280" y="161" fill="#50fa7b" font-size="32" text-anchor="middle" font-family="math, sans-serif">∑</text>
+
+    <!-- Arrow to Activation -->
+    <path d="M 312 150 L 370 150" stroke="#8be9fd" stroke-width="2" marker-end="url(#arrowHead)" />
+
+    <!-- Activation Node -->
+    <rect x="380" y="122" width="56" height="56" rx="8" fill="rgba(255,184,108,0.1)" stroke="#ffb86c"
+        stroke-width="2" />
+    <text x="408" y="160" fill="#ffb86c" font-size="28" text-anchor="middle" font-family="math, sans-serif">&phi;</text>
+    <text x="408" y="200" fill="#f8f8f2" font-size="14" text-anchor="middle" font-family="sans-serif">Activación</text>
+
+    <!-- Arrow to Output -->
+    <path d="M 440 150 L 500 150" stroke="#8be9fd" stroke-width="2" marker-end="url(#arrowHead)" />
+
+    <!-- Output -->
+    <text x="520" y="158" fill="#ff5555" font-size="26" font-family="math, sans-serif">y</text>
+
+    <!-- Equation -->
+    <text x="280" y="300" fill="#f8f8f2" font-size="22" text-anchor="middle" font-family="math, sans-serif">
+        y = f(x; &theta;) = &phi;(&sum;<tspan baseline-shift="sub" font-size="0.75em">i &isin; {1,...,n}</tspan>
+        x<tspan baseline-shift="sub" font-size="0.75em">i</tspan> w<tspan baseline-shift="sub" font-size="0.75em">i
+        </tspan> + b)
+    </text>
+</svg>

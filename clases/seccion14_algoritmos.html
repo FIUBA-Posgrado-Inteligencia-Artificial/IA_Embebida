@@ -1,0 +1,119 @@
+<!-- 14. Algoritmos para Sistemas Embebidos -->
+<section>
+    <section>
+        <h2 class="gradient-text">14. Algoritmos para Sistemas Embebidos</h2>
+        <p>Arquitecturas ligeras por diseño: No puedes meter un elefante en un Volkswagen</p>
+    </section>
+
+    <!-- 1. El Problema de las Clásicas -->
+    <section>
+        <h3>El Problema de las Redes Clásicas</h3>
+        <div style="font-size: 0.7em; text-align: left;">
+            <p>Antes de 2017, la máxima indiscutible para elevar precisión exigía redes masivamente anchas o profundas (AlexNet, VGG).</p>
+            <div style="background: rgba(255,85,85,0.1); padding: 0.8rem; border-radius: 0.5rem; margin-top: 1rem;">
+                <strong style="color: #ff5555;">El Costo Fundamental (Convolución Estándar)</strong>
+                <p style="margin: 0.4rem 0;">Exigen multiplicar exhaustivamente todos los canales espaciales contra todos los canales de entrada ininterrumpidamente.</p>
+                <ul style="margin-top: 0.5rem; padding-left: 1.5rem; line-height: 1.4;">
+                    <li style="margin-bottom: 0.3rem;">Detonan un crecimiento paramétrico/matemático <strong>exponencial</strong> e intratable.</li>
+                    <li>Centenares de megabytes y miles de millones de FLOPs invertidos en una sola inferencia de imagen.</li>
+                    <li>Sistemáticamente imposibles de desplegar dentro del microscópico embudo de una SRAM nativa.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. Convoluciones Eficientes -->
+    <section>
+        <h3>La Revolución de las Convoluciones Eficientes</h3>
+        <p style="font-size: 0.65em; text-align: left; margin-bottom: 0.8rem;">El rediseño estructural fundacional en la era embrionaria móvil.</p>
+        <div style="display: flex; gap: 1.2rem; font-size: 0.6em; text-align: left;">
+            <div style="flex: 1; background: rgba(80,250,123,0.1); padding: 0.8rem; border-radius: 0.5rem;">
+                <h4 style="color: #50fa7b; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.1em;">SqueezeNet (Pionero de Compresión Espacial)</h4>
+                <p style="margin-bottom: 0.4rem;">Empató la precisión de AlexNet exigiendo asombrosamente 50x menos parámetros al aislar su bloque maestro conceptual: el <strong>Fire Module</strong>.</p>
+                <ul style="margin-top: 0.5rem; padding-left: 1.2rem;">
+                    <li style="margin-bottom: 0.3rem;"><strong>Squeeze:</strong> Estrangula subcanales usando diminutos inyectores 1x1.</li>
+                    <li><strong>Expand:</strong> Mezcla robustamente paralelizables 1x1 y 3x3 aliviando brutalmente memorias sin distorsionar campos.</li>
+                </ul>
+            </div>
+            <div style="flex: 1; background: rgba(139,233,253,0.1); padding: 0.8rem; border-radius: 0.5rem;">
+                <h4 style="color: #8be9fd; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.1em;">MobileNetV1 (Depthwise Separable Conv)</h4>
+                <p style="margin-bottom: 0.4rem;">La hecatombe académica de Google que subyugó la Convolución Estándar fragmentándola algorítmicamente en dos ejes ajenos cruzados:</p>
+                <ol style="margin-top: 0.5rem; padding-left: 1.2rem; line-height: 1.4;">
+                    <li style="margin-bottom: 0.3rem;"><strong>Depthwise:</strong> Tamizaje plano 3x3 operado puramente de forma islólatra (no interactúan cruce de canales).</li>
+                    <li><strong>Pointwise:</strong> Tamizaje profundo de interpolación 1x1 sellando linealmente el volumen.</li>
+                </ol>
+            </div>
+        </div>
+        <div style="font-size: 0.6em; background: rgba(255,255,255,0.05); padding: 0.6rem; border-radius: 0.5rem; margin-top: 1rem;">
+            <strong style="color: #ffb86c;">El Impacto Físico y Matemático Cuantificable (Factor reductivo):</strong>
+            <code style="display: block; text-align: center; font-size: 1.2em; margin: 0.4rem 0;">1/N + 1/D<sub>K</sub><sup>2</sup></code>
+            <p style="margin-top: 0.2rem; text-align: center;">Bajo un clásico Kernel (D<sub>K</sub>) de 3x3 y varianza en (N), el cruce algorítmico <strong>evapora entre 8 y 9 veces</strong> la masa latente arrojando Accuracies milimétricamente equitativos.</p>
+        </div>
+    </section>
+
+    <!-- 3. Hardware-Aware -->
+    <section>
+        <h3>El Diseño Consciente del Hardware (Hardware-Aware)</h3>
+        <p style="font-size: 0.65em; text-align: left; margin-bottom: 0.8rem;">Mitigar los FLOPs analíticos en la pizarra palidece al contrastar el asedio sobre el Bus (Silicio Real).</p>
+        <div style="display: flex; gap: 1.2rem; font-size: 0.6em; text-align: left;">
+            <div style="flex: 1; background: rgba(189,147,249,0.1); padding: 0.8rem; border-radius: 0.5rem;">
+                <h4 style="color: #bd93f9; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.1em;">MobileNetV2 (Residuales Invertidos)</h4>
+                <p style="margin-bottom: 0.4rem;">Las activaciones no-lineales subyacentes (esencialmente ReLUs) aniquilaban los tensores estrangulados en bajísimas dimensiones prexistentes.</p>
+                <ul style="margin-top: 0.5rem; padding-left: 1.2rem;">
+                    <li style="margin-bottom: 0.3rem;">Expandió inversamente el vientre central del bloque temporal.</li>
+                    <li>Condensó abruptamente proyecciones sumidero puramente empíricas carentes de ReLU (*Proyección Lineal Pura*) conjurando la memoria volátil real.</li>
+                </ul>
+            </div>
+            <div style="flex: 1; background: rgba(255,184,108,0.1); padding: 0.8rem; border-radius: 0.5rem;">
+                <h4 style="color: #ffb86c; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.1em;">ShuffleNet (Combatiendo Costeos MAC-RAM)</h4>
+                <p style="margin-bottom: 0.4rem;">Optimizó la redención basamentándose en denotar de que las ráfagas FLOP asisten, mas extenuantes peticiones R/W RAM agotan ciegamente los nanosegundos.</p>
+                <ul style="margin-top: 0.5rem; padding-left: 1.2rem;">
+                    <li style="margin-bottom: 0.3rem;">Incorporó <em>Group Convolutions</em> en guisas dispersivas y ahorradoras.</li>
+                    <li>Desglosó magistralmente la maniobra <strong>Channel Shuffle</strong>: cruzando puentes localísimos que ligan integralmente visiones dispersas omitiendo accesos hostiles al Memory Wall grueso.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. Automatización -->
+    <section>
+        <h3>Automatización y Escalado Algorítmico Sintético</h3>
+        <div style="display: flex; gap: 1.5rem; font-size: 0.65em; text-align: left; margin-top: 1rem;">
+            <div style="flex: 1;">
+                <strong style="color: #50fa7b;">EfficientNet (Compound Scaling)</strong>
+                <p style="margin-top: 0.3rem; line-height: 1.4;">Unificó algorítmicamente lo inabarcable empleando iterativas regresiones heurísticas arrojando una fórmula universal y armónica para inflar anchuras, sumideros y proyecciones de una sola vez bajo topologías empáticas destrozando hegemonías tipo ResNet en eficiencias parametrales.</p>
+            </div>
+            <div style="flex: 1; background: rgba(255,255,255,0.05); padding: 0.8rem; border-radius: 0.5rem;">
+                <strong style="color: #8be9fd;">MobileNetV3 y V4 (Asistidos por NAS)</strong>
+                <p style="margin-top: 0.3rem;">Sus bloques no descienden primariamente de sesgos humanos predispuestos.</p>
+                <ul style="margin-top: 0.4rem; padding-left: 1.2rem; line-height: 1.4;">
+                    <li style="margin-bottom: 0.3rem;">Emplean metodologías HW-NAS cronometrando masivos lotes contra núcleos silíceos físicos para escudar cuellos.</li>
+                    <li>Implementación selecta sobre las activaciones de fricción leve (Ej: <em>h-swish</em>) dotado al apéndice topológico *Squeeze-and-Excitation* (SE) livianos.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. Híbridos Modernos y Takeaways -->
+    <section>
+        <h3>Híbridos Modernos: La Última Frontera del Edge</h3>
+        <div style="display: flex; gap: 1.5rem; font-size: 0.65em; text-align: left; margin-bottom: 1rem;">
+            <div style="flex: 1;">
+                <strong style="color: #ff79c6;">GhostNet (Evadiendo Redundancia Local)</strong>
+                <p style="margin-top: 0.3rem;">Extrae mapas de base pesadas fraccionando costosas interacciones convencionales. Restituye subconjuntos (las apariciones "Fantasmagóricas") adosando puramente cálculos y combinadores lineales despreciables matemáticamente dotando altísima compresión virtual a costo base nulo.</p>
+            </div>
+            <div style="flex: 1;">
+                <strong style="color: #50fa7b;">MobileViT (Transformers en Inserción de Bolsillo)</strong>
+                <p style="margin-top: 0.3rem;">Aniquila latencias cuadráticas de ViT puras reordenando tensores a Convoluciones ultralivianas base, forzando un exiguo pero concentrado transformador en las profundidades que exprime drásticamente correlaciones semánticas globales rebasando barreras sin exceder SRAMs de pulso.</p>
+            </div>
+        </div>
+        <div style="font-size: 0.65em; text-align: left; background: rgba(255,255,255,0.05); padding: 0.6rem; border-radius: 0.5rem;">
+            <strong style="color: #bd93f9;">Takeaways Maestros de la Academia (Frontera de Pareto):</strong>
+            <ul style="margin-top: 0.4rem; padding-left: 1.2rem; line-height: 1.4;">
+                <li style="margin-bottom: 0.3rem;"><strong>Co-evolución indisoluble:</strong> La matemática pura acude hoy ineludiblemente al diseño auxiliado cibernéticamente por HW-NAS.</li>
+                <li style="margin-bottom: 0.3rem;"><strong>FLOPs no ampara Latencias:</strong> Aligerar matemáticas fútilmente agrava si embestimos cruentamente y ciegamente el Bus RAM/MAC subyacente.</li>
+                <li><strong>No subyace hegemonía empírica:</strong> El diseñador pergeña curvas (Frontera de Pareto) comprometiendo mVs frente a FPS de latencia de requerimiento.</li>
+            </ul>
+        </div>
+    </section>
+</section>

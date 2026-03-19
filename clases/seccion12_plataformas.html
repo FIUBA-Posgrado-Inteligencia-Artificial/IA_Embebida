@@ -1,0 +1,104 @@
+<!-- 12. Plataformas de Hardware -->
+<section>
+    <section>
+        <h2 class="gradient-text">12. Plataformas de Hardware</h2>
+        <p>Ecosistema físico: donde la matemática choca con el silicio</p>
+    </section>
+
+    <!-- 1. MCU y MPU -->
+    <section>
+        <h3>Microprocesadores vs. Microcontroladores</h3>
+        <div style="display: flex; gap: 1.5rem; font-size: 0.7em; text-align: left;">
+            <div style="flex: 1; background: rgba(80,250,123,0.1); padding: 0.8rem; border-radius: 0.5rem;">
+                <h4 style="color: #50fa7b; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.1em;">MCUs (TinyML)</h4>
+                <p style="margin-bottom: 0.4rem;">Bare-metal o RTOS. Volumen gigantesco en sensores IoT.</p>
+                <ul style="margin-top: 0.5rem; padding-left: 1.2rem;">
+                    <li style="margin-bottom: 0.3rem;"><strong>Restricciones:</strong> Fracciones de mW de consumo. SRAM limitadas a decenas/cientos de KB.</li>
+                    <li style="margin-bottom: 0.3rem;"><strong>Ejecución IA:</strong> Dependen de núcleos (ej. ARM Cortex-M) con extensiones DSP/SIMD (como Helium) para acelerar sumas y MACs.</li>
+                    <li><strong style="color: #ff5555;">El Reto:</strong> Cuantización obligatoria a INT8.</li>
+                </ul>
+            </div>
+            <div style="flex: 1; background: rgba(139,233,253,0.1); padding: 0.8rem; border-radius: 0.5rem;">
+                <h4 style="color: #8be9fd; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.1em;">MPUs (El Punto Intermedio)</h4>
+                <p style="margin-bottom: 0.4rem;">Sistemas operativos completos (Linux) con RAM externa (GB).</p>
+                <ul style="margin-top: 0.5rem; padding-left: 1.2rem;">
+                    <li style="margin-bottom: 0.3rem;"><strong>Ejecución IA:</strong> Optimizaciones con extensiones como ARM NEON (motor SIMD matricial).</li>
+                    <li><strong style="color: #ff5555;">El Reto:</strong> Demasiado ineficientes energéticamente si su propósito exclusivo es la inferencia continua (Vs. aceleradores dedicados).</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. GPUs -->
+    <section>
+        <h3>GPUs y Paralelismo Masivo</h3>
+        <div style="font-size: 0.7em; text-align: left;">
+            <p>Vitales para conducción autónoma y analítica in situ de multicámaras.</p>
+            <div style="margin-top: 1rem;">
+                <ul style="line-height: 1.4; padding-left: 1.2rem;">
+                    <li style="margin-bottom: 0.8rem;"><strong>Arquitectura:</strong> Miles de núcleos ALU simples que despachan de forma concurrente sobre inmensos volúmenes de datos uniformes.</li>
+                    <li style="margin-bottom: 0.8rem;"><strong style="color: #50fa7b;">La Revolución de los Tensor Cores:</strong> Bloques físicos manufacturados <em>exclusivamente</em> para ejecutar multiplicaciones de matrices en bloque por ciclo de reloj.
+                        <p style="margin-top: 0.4rem; color: #8be9fd;">Su soporte nativo a la esparsidad (Pruning 2:4) duplica el rendimiento algorítmico libremente.</p>
+                    </li>
+                    <li style="margin-bottom: 0.8rem;"><strong>Ejemplos Reales:</strong> Familia NVIDIA Jetson (Nano, TX2, Orin) fuertemente apoyada por el ecosistema CUDA/TensorRT.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. FPGAs -->
+    <section>
+        <h3>FPGAs: Hardware a la Medida</h3>
+        <div style="font-size: 0.7em; text-align: left;">
+            <p>Arreglos de compuertas lógicas programables. El diseñador sintetiza virtualmente su propio chip.</p>
+            <div style="background: rgba(189,147,249,0.1); padding: 0.8rem; border-radius: 0.5rem; margin-top: 1rem;">
+                <strong style="color: #bd93f9; font-size: 1.1em;">El Superpoder para la IA</strong>
+                <p style="margin: 0.4rem 0;">En una GPU la red se adapta al silicio. En una FPGA, <strong>es el silicio el que se forja a la medida y enrutamiento de la red</strong>.</p>
+                <ul style="margin-top: 0.5rem; padding-left: 1.5rem; line-height: 1.4;">
+                    <li style="margin-bottom: 0.3rem;"><em>Data paths</em> directos y pipelines paralelos sin cuellos de SRAM centralizados.</li>
+                    <li style="margin-bottom: 0.3rem;">Manejo nativo de anchos de bits sub-estándar (ej. INT3 o Redes Neuronales Binarias XNOR).</li>
+                    <li>Ausencia neta de interrupciones o sobrecargas de Sistema Operativo (Latencia hiper-determinista).</li>
+                </ul>
+                <p style="margin-top: 0.6rem;"><strong style="color: #ff5555;">El Reto:</strong> Tiempos monstruosos de compilación (Place & Route) y lenguajes HDL (Verilog/VHDL) de alta fricción.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. ASICs y SoCs -->
+    <section>
+        <h3>ASICs y AI SoCs: El Estándar Actual</h3>
+        <div style="font-size: 0.7em; text-align: left;">
+            <p>Silicio fotolitografiado específicamente para correr operaciones neuronales con máxima eficiencia.</p>
+            <div style="display: flex; gap: 1.5rem; margin-top: 1rem;">
+                <div style="flex: 1;">
+                    <strong style="color: #50fa7b;">NPUs / KPUs</strong>
+                    <p style="margin-top: 0.3rem; line-height: 1.4;">SoC generalista que incorpora aceleradores discretos NPU (Neural Processing Unit).</p>
+                    <p style="margin-top: 0.6rem;"><strong>Ejemplos:</strong> Google TPU, Rockchip RV series, Apple Neural Engine.</p>
+                </div>
+                <div style="flex: 1; background: rgba(255,184,108,0.1); padding: 0.8rem; border-radius: 0.5rem;">
+                    <strong style="color: #ffb86c;">Arreglos Sistólicos (Systolic Arrays)</strong>
+                    <p style="margin-top: 0.3rem; line-height: 1.4;">La topología cardiaca del Edge TPU. Una cuadrícula matemática por donde los datos fluyen inyectados ciclo a ciclo.</p>
+                    <p style="margin-top: 0.4rem; color: #ffb86c;"><strong>Elude el Memory Wall:</strong> Un peso cargado fluye hacia abajo reutilizándose indefinidamente en N multiplicaciones sucesivas sin volver a estresar al bus de memoria principal (TOPS/W supremo).</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. Estrategia -->
+    <section>
+        <h3>La Estrategia de Selección</h3>
+        <div style="font-size: 0.7em; text-align: left;">
+            <p>El criterio ingenieril definitivo reside en orquestar el balance perfecto (El <em>Trade-off</em>):</p>
+            <ul style="margin-top: 1rem; line-height: 1.6; padding-left: 1.2rem;">
+                <li><strong style="color: #8be9fd;">Poder Computacional:</strong> Cuántos TOPS reales demanda crujir el <em>Throughput</em> exigido.</li>
+                <li><strong style="color: #50fa7b;">Presupuesto Dinámico:</strong> Contamos con los 30W de un jet pack NVIDIA Orin sobre un ADAS, o con 5mW de un sensor sísmico bajo tierra alimentado limitadamente a pila de reloj.</li>
+                <li><strong style="color: #ff79c6;">Economía de Escala vs. NRE:</strong> 
+                    <ul style="font-size: 0.9em; margin-top: 0.2rem;">
+                        <li><strong>GPU/SoC COTS:</strong> Tiempos de mercado inmediatos (C++/Python listos), unitarios más costosos.</li>
+                        <li><strong>ASICs a Medida:</strong> Costo por chip que roza centavos pero desarrollo inicial (NRE) multimiillonario y lento.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </section>
+</section>

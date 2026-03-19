@@ -1,0 +1,1029 @@
+<!-- 3. Introducción para CEIA -->
+<section>
+
+    <section>
+        <h2 class="gradient-text">3. Introducción para CEIA</h2>
+        <p>Introducción a sistemas embebidos para alumnos de CEIA</p>
+        <ul style="font-size: 0.8em; text-align: left; max-width: 700px; margin: 1.5rem auto;">
+            <li style="margin-bottom: 0.5rem;">Dificultades del desarrollo en sistemas embebidos</li>
+            <li style="margin-bottom: 0.5rem;">Requerimientos y limitaciones del hardware</li>
+            <li style="margin-bottom: 0.5rem;">Plataformas y arquitecturas digitales</li>
+            <li style="margin-bottom: 0.5rem;">Edge vs. cloud: ¿dónde procesar?</li>
+            <li style="margin-bottom: 0.5rem;">Modelos numéricos: punto fijo y punto flotante</li>
+            <li>Complejidad de operaciones en diferentes formatos</li>
+        </ul>
+    </section>
+
+    <!-- ===================== DIFICULTADES EN SISTEMAS EMBEBIDOS ===================== -->
+
+    <section>
+        <h3>Dificultades al desarrollar aplicaciones en sistemas embebidos</h3>
+        <p style="font-size: 0.85em; text-align: left;">Los sistemas embebidos operan bajo restricciones que no existen
+            en servidores o PCs:</p>
+        <ul style="font-size: 0.8em;">
+            <li style="margin-bottom: 0.5rem;">Optimizar el <strong>rendimiento</strong> de la aplicación sujeto
+                a las <strong>restricciones</strong> del hardware.
+            </li>
+            <li style="margin-bottom: 0.5rem;">Equilibrar <strong>funcionalidad</strong> y
+                <strong>eficiencia</strong> dentro de recursos acotados.
+            </li>
+            <li>Diseñar para entornos con restricciones de
+                <span style="color: #ff79c6;">memoria</span>,
+                <span style="color: #50fa7b;">cómputo</span> y
+                <span style="color: #ffb86c;">energía</span>.
+            </li>
+        </ul>
+        <p style="font-size: 0.7em; margin-top: 1rem; font-style: italic; color: #6272a4;">
+            Ejemplo: ejecutar una red neuronal en un microcontrolador con 256 KB de RAM y sin GPU.
+        </p>
+    </section>
+
+    <!-- ===================== REQUERIMIENTOS DE LA APLICACIÓN ===================== -->
+
+    <section>
+        <h3>Requerimientos de la aplicación</h3>
+        <p style="font-size: 0.75em; text-align: left; margin-bottom: 0.5rem;">En sistemas embebidos, además de que
+            la aplicación funcione correctamente, se deben considerar métricas de
+            <strong>complejidad temporal</strong> (tiempo de ejecución) y <strong>espacial</strong> (uso de memoria).
+        </p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 0.65em;">
+            <div
+                style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 15px; border-left: 3px solid #8be9fd;">
+                <strong style="color: #8be9fd;">Rendimiento (throughput)</strong>
+                <p style="margin: 0.3rem 0 0;">Cantidad de datos procesados por unidad de tiempo. Clave en aplicaciones
+                    de tiempo real como procesamiento de video.</p>
+            </div>
+            <div
+                style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 15px; border-left: 3px solid #ff79c6;">
+                <strong style="color: #ff79c6;">Latencia</strong>
+                <p style="margin: 0.3rem 0 0;">Tiempo desde la entrada hasta la obtención de la salida. Crucial en
+                    aplicaciones como conducción autónoma.</p>
+            </div>
+            <div
+                style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 15px; border-left: 3px solid #50fa7b;">
+                <strong style="color: #50fa7b;">Costos</strong>
+                <p style="margin: 0.3rem 0 0;">Computacionales, de implementación y mantenimiento. Equilibrar
+                    rendimiento con recursos necesarios.</p>
+            </div>
+            <div
+                style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 15px; border-left: 3px solid #ffb86c;">
+                <strong style="color: #ffb86c;">Energía y potencia</strong>
+                <p style="margin: 0.3rem 0 0;">Consumo energético total y tasa de consumo. Importante en dispositivos
+                    móviles, embebidos y datacenters.</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h3>Energía vs. potencia</h3>
+        <div style="display: flex; gap: 2rem; align-items: center;">
+            <div style="flex: 1; font-size: 0.75em; text-align: left;">
+                <p>Si el sistema debe mantener un rendimiento de <strong>R</strong> inferencias/segundo
+                    y la potencia máxima es <strong>P</strong> (watt), la energía disponible por inferencia está
+                    acotada:</p>
+                <div
+                    style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 0.5rem; text-align: center; margin: 1rem 0; font-size: 1.2em;">
+                    <code>E &lt; P / R</code>
+                </div>
+                <ul style="font-size: 0.9em;">
+                    <li style="margin-bottom: 0.5rem;"><strong>Energía</strong> (joule): consumo acumulado en el tiempo.
+                    </li>
+                    <li style="margin-bottom: 0.5rem;"><strong>Potencia</strong> (watt): energía consumida por unidad de
+                        tiempo.</li>
+                    <li>Un modelo <em>eficiente energéticamente</em> tiene bajo consumo <strong>por inferencia</strong>.
+                    </li>
+                </ul>
+            </div>
+            <div
+                style="flex: 0.8; background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 1.2rem; font-size: 0.7em;">
+                <p style="color: #50fa7b; margin-bottom: 0.5rem;"><strong>Ejemplo:</strong></p>
+                <p>P = 1 W, R = 10 inf/s</p>
+                <p>→ E &lt; 100 mJ por inferencia</p>
+                <p style="margin-top: 0.8rem; color: #ff79c6;">Esto limita directamente la complejidad computacional de
+                    cada inferencia.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== LIMITACIONES DE LA PLATAFORMA ===================== -->
+
+    <section>
+        <h3>Limitaciones de la plataforma</h3>
+        <p style="font-size: 0.7em; text-align: left; margin-bottom: 0.5rem;">Las plataformas de hardware imponen
+            restricciones que definen qué aplicaciones son viables:</p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 0.65em;">
+            <div
+                style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 15px; border-left: 3px solid #bd93f9;">
+                <strong style="color: #bd93f9;">Memoria</strong>
+                <p style="margin: 0.3rem 0 0;">Limita el tamaño del programa, datos y buffers.
+                    Distinguir entre memoria <em>on-chip</em> (rápida, escasa) y <em>off-chip</em> (abundante, lenta).
+                </p>
+            </div>
+            <div
+                style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 15px; border-left: 3px solid #8be9fd;">
+                <strong style="color: #8be9fd;">Ancho de banda</strong>
+                <p style="margin: 0.3rem 0 0;">Velocidad de transferencia entre memoria externa y procesador. Puede ser
+                    cuello de botella aún con capacidad de memoria suficiente.</p>
+            </div>
+            <div
+                style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 15px; border-left: 3px solid #50fa7b;">
+                <strong style="color: #50fa7b;">Capacidad de cómputo</strong>
+                <p style="margin: 0.3rem 0 0;">Velocidad de ejecución de operaciones. En plataformas con baja capacidad,
+                    el software debe optimizarse.</p>
+            </div>
+            <div
+                style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 15px; border-left: 3px solid #ffb86c;">
+                <strong style="color: #ffb86c;">Consumo energético</strong>
+                <p style="margin: 0.3rem 0 0;">Modelo simplificado basado en: accesos a memoria interna, accesos a
+                    memoria externa, y cantidad/tipo de operaciones aritméticas.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== PLATAFORMAS DIGITALES ===================== -->
+
+    <section>
+        <h3>Plataformas digitales de procesamiento</h3>
+        <p style="font-size: 0.75em; text-align: left;">Cada plataforma ofrece un compromiso distinto entre
+            flexibilidad, rendimiento y eficiencia:</p>
+        <table style="font-size: 0.5em; width: 100%; border-collapse: collapse; margin-top: 0.5rem;">
+            <thead>
+                <tr style="border-bottom: 2px solid #fff;">
+                    <th style="padding: 8px;">Plataforma</th>
+                    <th style="padding: 8px;">Rendimiento</th>
+                    <th style="padding: 8px;">Latencia</th>
+                    <th style="padding: 8px;">Eficiencia</th>
+                    <th style="padding: 8px;">Ventajas / desventajas</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 8px;"><strong>CPU</strong></td>
+                    <td style="padding: 8px;">Bajo</td>
+                    <td style="padding: 8px;">Alta</td>
+                    <td style="padding: 8px;">Baja</td>
+                    <td style="padding: 8px; font-size: 0.9em;">+ Flexibilidad máxima · - Limitado paralelismo</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 8px;"><strong>GPU</strong></td>
+                    <td style="padding: 8px;">Alto</td>
+                    <td style="padding: 8px;">Media</td>
+                    <td style="padding: 8px;">Media</td>
+                    <td style="padding: 8px; font-size: 0.9em;">+ Paralelismo masivo · - Alto consumo energético</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 8px;"><strong>TPU</strong></td>
+                    <td style="padding: 8px;">Muy alto</td>
+                    <td style="padding: 8px;">Baja</td>
+                    <td style="padding: 8px;">Alta</td>
+                    <td style="padding: 8px; font-size: 0.9em;">+ Optimizado para tensores · - Acceso restringido</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 8px;"><strong>FPGA</strong></td>
+                    <td style="padding: 8px;">Medio-Alto</td>
+                    <td style="padding: 8px;">Baja</td>
+                    <td style="padding: 8px;">Alta</td>
+                    <td style="padding: 8px; font-size: 0.9em;">+ Reconfigurable, baja latencia · - Complejidad de
+                        diseño</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px;"><strong>ASIC</strong></td>
+                    <td style="padding: 8px;">Muy alto</td>
+                    <td style="padding: 8px;">Muy baja</td>
+                    <td style="padding: 8px;">Muy alta</td>
+                    <td style="padding: 8px; font-size: 0.9em;">+ Máxima eficiencia · - Sin flexibilidad, alto costo
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section>
+        <h3>Edge vs. cloud: ¿dónde procesar?</h3>
+        <div style="display: flex; gap: 2rem; font-size: 0.7em;">
+            <div
+                style="flex: 1; background: rgba(139,233,253,0.1); border-radius: 0.5rem; padding: 1.2rem; border: 1px solid rgba(139,233,253,0.3);">
+                <h4 style="color: #8be9fd; margin: 0 0 0.8rem;">🔌 Procesamiento en el edge</h4>
+                <ul style="font-size: 0.9em;">
+                    <li style="margin-bottom: 0.4rem;">Baja latencia, privacidad de datos.</li>
+                    <li style="margin-bottom: 0.4rem;">Sin dependencia de conectividad.</li>
+                    <li style="margin-bottom: 0.4rem;">Restricciones de memoria, cómputo y energía.</li>
+                    <li>Requiere <strong>optimización</strong> del software y los algoritmos.</li>
+                </ul>
+            </div>
+            <div
+                style="flex: 1; background: rgba(189,147,249,0.1); border-radius: 0.5rem; padding: 1.2rem; border: 1px solid rgba(189,147,249,0.3);">
+                <h4 style="color: #bd93f9; margin: 0 0 0.8rem;">☁️ Procesamiento en la nube</h4>
+                <ul style="font-size: 0.9em;">
+                    <li style="margin-bottom: 0.4rem;">Recursos ilimitados de cómputo.</li>
+                    <li style="margin-bottom: 0.4rem;">Mayor latencia, dependencia de red.</li>
+                    <li style="margin-bottom: 0.4rem;">Costos por uso (pay-per-inference).</li>
+                    <li>Necesario para modelos grandes.</li>
+                </ul>
+            </div>
+        </div>
+        <p style="font-size: 0.7em; margin-top: 1rem; font-style: italic; color: #6272a4;">
+            La tendencia es un enfoque híbrido: preprocesar en edge y consultar la nube cuando sea necesario.
+        </p>
+    </section>
+
+    <!-- ===================== ARQUITECTURAS DIGITALES ===================== -->
+
+    <section>
+        <h3>Arquitecturas digitales</h3>
+        <div style="display: flex; gap: 2rem; align-items: flex-start;">
+            <div style="flex: 1; font-size: 0.65em; text-align: left;">
+                <div
+                    style="background: rgba(80,250,123,0.1); border-radius: 0.5rem; padding: 0.8rem; margin-bottom: 0.8rem; border: 1px solid rgba(80,250,123,0.3);">
+                    <strong style="color: #50fa7b;">Iterativas (genéricas)</strong>
+                    <ul style="font-size: 0.9em; margin-top: 0.3rem;">
+                        <li>Reutilizan hardware para múltiples operaciones secuenciales.</li>
+                        <li>Flexibles: soportan variedad de modelos.</li>
+                        <li>Típicas de CPUs, GPUs y TPUs.</li>
+                        <li>Menos HW, más ciclos de reloj, menos área.</li>
+                    </ul>
+                </div>
+                <div
+                    style="background: rgba(255,121,198,0.1); border-radius: 0.5rem; padding: 0.8rem; border: 1px solid rgba(255,121,198,0.3);">
+                    <strong style="color: #ff79c6;">Desenrolladas (específicas)</strong>
+                    <ul style="font-size: 0.9em; margin-top: 0.3rem;">
+                        <li>Recursos dedicados a cada operación.</li>
+                        <li>Usan <em>pipelining</em> para maximizar frecuencia.</li>
+                        <li>Típicas de FPGAs y ASICs.</li>
+                        <li>Más HW, 1 ciclo de reloj, más área.</li>
+                    </ul>
+                </div>
+            </div>
+            <div style="flex: 1;">
+                <img src="./figures/specific_unrolled.png"
+                    style="width: 100%; border-radius: 0.5rem; margin-bottom: 0.5rem; background: white;">
+                <img src="./figures/specific_iterative.png"
+                    style="width: 70%; border-radius: 0.5rem; background: white;">
+            </div>
+        </div>
+        <p style="margin-top: 0.6rem; font-size: 0.9em; color: #ffb86c;">
+            ⚡ Compensación: mayor paralelismo reduce tiempo, a expensas de recursos.
+        </p>
+    </section>
+
+    <!-- ===================== PUNTO FIJO ===================== -->
+
+    <section>
+        <h3>Aritmética de punto fijo (FxP)</h3>
+        <div style="font-size: 0.75em; text-align: left;">
+            <p>Representación eficiente para hardware de bajo consumo (FPGAs, ASICs, MCUs).</p>
+            <div style="display: flex; gap: 1.5rem; align-items: center; margin-top: 0.5rem;">
+                <div style="flex: 1;">
+                    <p><strong>Entero sin signo:</strong></p>
+                    <div
+                        style="background: rgba(255,255,255,0.1); padding: 0.5rem; border-radius: 0.5rem; text-align: center; margin-bottom: 0.8rem;">
+                        <code>Valor = Σ x<sub>i</sub> · 2<sup>i</sup></code> &nbsp; (rango: 0 a 2<sup>b</sup>−1)
+                    </div>
+                    <p><strong>Entero con signo</strong> (complemento a dos):</p>
+                    <div
+                        style="background: rgba(255,255,255,0.1); padding: 0.5rem; border-radius: 0.5rem; text-align: center;">
+                        <code>Valor = −x<sub>b−1</sub>·2<sup>b−1</sup> + Σ x<sub>i</sub>·2<sup>i</sup></code>
+                    </div>
+                </div>
+                <div style="flex: 0.8;">
+                    <img src="./figures/specific_unsigned_integer.png"
+                        style="width: 100%; background: white; border-radius: 0.5rem;">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h3>Punto fijo: parte fraccionaria</h3>
+        <div style="display: flex; gap: 1.5rem; align-items: center;">
+            <div style="flex: 1; font-size: 0.75em; text-align: left;">
+                <p>Se fija la posición del punto binario con <strong>f</strong> bits fraccionarios:</p>
+                <div
+                    style="background: rgba(255,255,255,0.1); padding: 0.8rem; border-radius: 0.5rem; text-align: center; margin: 0.8rem 0;">
+                    <code>Valor = (Σ x<sub>i</sub> · 2<sup>i</sup>) · 2<sup>−f</sup></code>
+                </div>
+                <p>Nomenclatura:</p>
+                <ul style="font-size: 0.9em; margin-top: 0.3rem;">
+                    <li style="margin-bottom: 0.3rem;"><code style="color: #50fa7b;">Q&lt;b&gt;.&lt;f&gt;</code> (con
+                        signo)</li>
+                    <li><code style="color: #8be9fd;">UQ&lt;b&gt;.&lt;f&gt;</code> (sin signo)</li>
+                </ul>
+                <p>Ejemplos:</p>
+                <ul style="font-size: 0.9em; margin-top: 0.5rem;">
+                    <li style="margin-bottom: 0.3rem;"><code>Q8.4</code>: 8 bits totales, 4 fraccionarios, 3 enteros + 1
+                        signo.</li>
+                    <li><code>UQ16.8</code>: 16 bits sin signo, 8 fraccionarios y 8 enteros.</li>
+                </ul>
+            </div>
+            <div style="flex: 0.6;">
+                <img src="./figures/specific_signed_integer.png"
+                    style="width: 100%; background: white; border-radius: 0.5rem;">
+            </div>
+        </div>
+        <p style="margin-top: 0.6rem; font-style: italic; color: #6272a4;">
+            La diferencia entre un entero y FxP es solo la <strong>interpretación</strong> del valor binario.
+            Ambos usan la misma codificación.</p>
+    </section>
+
+    <section>
+        <h3>Punto fijo: ejemplos de formatos</h3>
+        <table style="font-size: 0.55em; width: 100%; border-collapse: collapse; margin-top: 0.5rem;">
+            <thead>
+                <tr style="border-bottom: 2px solid #fff;">
+                    <th style="padding: 8px;">Formato</th>
+                    <th style="padding: 8px;">b</th>
+                    <th style="padding: 8px;">f</th>
+                    <th style="padding: 8px;">Rango</th>
+                    <th style="padding: 8px;">Precisión</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 8px;"><code>UQ8</code> (entero)</td>
+                    <td style="padding: 8px;">8</td>
+                    <td style="padding: 8px;">0</td>
+                    <td style="padding: 8px;">0 a 255</td>
+                    <td style="padding: 8px;">1</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 8px;"><code>Q8</code> (entero)</td>
+                    <td style="padding: 8px;">8</td>
+                    <td style="padding: 8px;">0</td>
+                    <td style="padding: 8px;">−128 a 127</td>
+                    <td style="padding: 8px;">1</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 8px;"><code>Q16.15</code> (FxP)</td>
+                    <td style="padding: 8px;">16</td>
+                    <td style="padding: 8px;">15</td>
+                    <td style="padding: 8px;">−1 a ≈1.0</td>
+                    <td style="padding: 8px;">≈3.05 × 10<sup>−5</sup></td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 8px;"><code>Q16.8</code> (FxP)</td>
+                    <td style="padding: 8px;">16</td>
+                    <td style="padding: 8px;">8</td>
+                    <td style="padding: 8px;">−128 a ≈128</td>
+                    <td style="padding: 8px;">≈3.91 × 10<sup>−3</sup></td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px;"><code>Q8.−2</code> (FxP)</td>
+                    <td style="padding: 8px;">8</td>
+                    <td style="padding: 8px;">−2</td>
+                    <td style="padding: 8px;">−512 a 508 (múltiplos de 4)</td>
+                    <td style="padding: 8px;">4</td>
+                </tr>
+            </tbody>
+        </table>
+        <p style="font-size: 0.7em; margin-top: 0.8rem; color: #ffb86c;">
+            💡 Compromiso fundamental: a mayor precisión (mayor f), menor rango, y viceversa.
+        </p>
+    </section>
+
+    <section>
+        <h3>FxP: implementación con enteros</h3>
+        <div style="font-size: 0.7em; text-align: left;">
+            <p>Las operaciones FxP se implementan usando operaciones enteras nativas (<code>INT8</code>,
+                <code>INT16</code>):
+            </p>
+            <div
+                style="background: rgba(80,250,123,0.1); border-radius: 0.5rem; padding: 1rem; margin: 0.8rem 0; border: 1px solid rgba(80,250,123,0.3);">
+                <strong style="color: #50fa7b;">Ejemplo: suma en UQ8.4</strong> &nbsp; (a=1.5, b=0.75)
+                <ol style="font-size: 0.9em; margin-top: 0.3rem;">
+                    <li>Convertir: a<sub>int</sub> = round(1.5 × 2<sup>4</sup>) = 24, &nbsp; b<sub>int</sub> =
+                        round(0.75 × 2<sup>4</sup>) = 12</li>
+                    <li>Sumar enteros: c<sub>int</sub> = 24 + 12 = 36</li>
+                    <li>Interpretar: 36 / 2<sup>4</sup> = <strong>2.25</strong> ✓</li>
+                </ol>
+                <p style="font-size: 0.85em; margin-top: 0.3rem; color: #f8f8f2;">¡La única operación real en HW es la
+                    suma entera!</p>
+            </div>
+            <div
+                style="background: rgba(255,121,198,0.1); border-radius: 0.5rem; padding: 1rem; border: 1px solid rgba(255,121,198,0.3);">
+                <strong style="color: #ff79c6;">Ejemplo: multiplicación en UQ8.4</strong> &nbsp; (a=1.5, b=0.75)
+                <ol style="font-size: 0.9em; margin-top: 0.3rem;">
+                    <li>Multiplicar enteros: 24 × 12 = 288 (resultado en UQ16.8)</li>
+                    <li>Desplazar 4 bits: 288 >> 4 = 18</li>
+                    <li>Interpretar: 18 / 2<sup>4</sup> = <strong>1.125</strong> = 1.5 × 0.75 ✓</li>
+                </ol>
+                <p style="font-size: 0.85em; margin-top: 0.3rem; color: #f8f8f2;">La multiplicación requiere un
+                    desplazamiento adicional en HW.</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h3>FxP: operaciones entre formatos distintos</h3>
+        <table style="font-size: 0.6em; width: 100%; border-collapse: collapse; margin-top: 0.5rem;">
+            <thead>
+                <tr style="border-bottom: 2px solid #fff;">
+                    <th style="padding: 10px;">Operación</th>
+                    <th style="padding: 10px;">Formato de A y B</th>
+                    <th style="padding: 10px;">Operación extra en hardware</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 10px;"><code>A + B</code></td>
+                    <td style="padding: 10px;">Mismo</td>
+                    <td style="padding: 10px;">Ninguna (bits alineados implícitamente)</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 10px;"><code>A × B</code></td>
+                    <td style="padding: 10px;">Mismo</td>
+                    <td style="padding: 10px;">Desplazamiento sobre el resultado</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 10px;"><code>A + B</code></td>
+                    <td style="padding: 10px;">Distinto</td>
+                    <td style="padding: 10px;">Desplazamiento sobre un operando (alineamiento)</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px;"><code>A × B</code></td>
+                    <td style="padding: 10px;">Distinto</td>
+                    <td style="padding: 10px;">Desplazamiento sobre el resultado</td>
+                </tr>
+            </tbody>
+        </table>
+        <div style="font-size: 0.7em; margin-top: 1rem; text-align: left;">
+            <p><strong>Consideraciones clave:</strong></p>
+            <ul style="font-size: 0.9em;">
+                <li style="margin-bottom: 0.3rem;"><strong>Truncado vs. redondeo:</strong> descartar LSBs con o sin
+                    compensación.</li>
+                <li style="margin-bottom: 0.3rem;"><strong>Ancho intermedio:</strong> multiplicar dos valores de 8 bits
+                    puede requerir 16 bits.</li>
+                <li><strong>Saturación vs. wrap-around:</strong> saturar protege contra desbordamientos catastróficos.
+                </li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- ===================== PUNTO FLOTANTE ===================== -->
+
+    <section>
+        <h3>Aritmética de punto flotante (FlP)</h3>
+        <div style="font-size: 0.75em; text-align: left;">
+            <p>Para valores con gran variabilidad, se usa una representación basada en <strong>mantisa y
+                    exponente</strong>:</p>
+            <div
+                style="background: rgba(255,255,255,0.1); padding: 0.8rem; border-radius: 0.5rem; text-align: center; margin: 0.8rem 0; font-size: 1.1em;">
+                <code>Valor = (−1)<sup>s</sup> × (1 + mantisa) × 2<sup>(exponente − bias)</sup></code>
+            </div>
+            <p style="font-size: 0.8em; color: #6272a4; margin-top: 0.3rem;">El "1" implícito se omite
+                en el almacenamiento (bit oculto). El <em>bias</em> centra el rango del exponente.</p>
+            <p>Formatos estándar IEEE 754:</p>
+            <ul style="font-size: 0.9em;">
+                <li style="margin-bottom: 0.3rem;"><code>FP64</code>: 64 bits (1 signo + 11 exp + 52 mantisa) — alta
+                    precisión científica.</li>
+                <li style="margin-bottom: 0.3rem;"><code>FP32</code>: 32 bits (1 + 8 + 23) — estándar en deep learning.
+                </li>
+                <li><code>FP16</code>: 16 bits (1 + 5 + 10) — aceleradores modernos, menor consumo.</li>
+            </ul>
+        </div>
+        <img src="./figures/specific_fp64_fp32_fp16.png"
+            style="width: 80%; background: white; border-radius: 0.5rem; margin-top: 0.5rem;">
+    </section>
+
+    <section>
+        <h3>FlP: números especiales (IEEE 754)</h3>
+        <p style="font-size: 0.7em; text-align: left; margin-bottom: 0.5rem;">
+            El estándar IEEE 754 reserva combinaciones de bits para representar valores especiales:
+        </p>
+        <table style="font-size: 0.55em; width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 2px solid #fff;">
+                    <th style="padding: 8px;">Valor</th>
+                    <th style="padding: 8px;">Exponente</th>
+                    <th style="padding: 8px;">Mantisa</th>
+                    <th style="padding: 8px;">Significado</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 8px;"><strong>±0</strong></td>
+                    <td style="padding: 8px;">Todo ceros</td>
+                    <td style="padding: 8px;">Todo ceros</td>
+                    <td style="padding: 8px;">Cero con signo. +0 y −0 se comparan como iguales.</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 8px;"><strong>Subnormales</strong></td>
+                    <td style="padding: 8px;">Todo ceros</td>
+                    <td style="padding: 8px;">≠ 0</td>
+                    <td style="padding: 8px;">Valores muy pequeños sin bit implícito (1 → 0). Llenan el hueco entre 0 y
+                        el menor normal.</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 8px;"><strong>±∞</strong></td>
+                    <td style="padding: 8px;">Todo unos</td>
+                    <td style="padding: 8px;">Todo ceros</td>
+                    <td style="padding: 8px;">Resultado de overflow o división por cero. Propaga por operaciones.</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px;"><strong>NaN</strong></td>
+                    <td style="padding: 8px;">Todo unos</td>
+                    <td style="padding: 8px;">≠ 0</td>
+                    <td style="padding: 8px;"><em>Not a Number</em>. Resultado de operaciones inválidas (0/0, √−1).
+                        NaN ≠ NaN.</td>
+                </tr>
+            </tbody>
+        </table>
+        <p style="font-size: 0.65em; margin-top: 0.8rem; color: #ffb86c;">
+            ⚠️ Cada valor especial requiere lógica de detección y manejo dedicada en hardware, aumentando la
+            complejidad del diseño respecto a FxP.
+        </p>
+    </section>
+
+    <section>
+        <h3>IEEE 754: precisión y rango</h3>
+        <table style="font-size: 0.55em; width: 100%; border-collapse: collapse; margin-top: 0.5rem;">
+            <thead>
+                <tr style="border-bottom: 2px solid #fff;">
+                    <th style="padding: 8px;">Formato</th>
+                    <th style="padding: 8px;">Valor máximo</th>
+                    <th style="padding: 8px;">Precisión (normales)</th>
+                    <th style="padding: 8px;">Precisión (subnormales)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 8px;"><code>FP16</code></td>
+                    <td style="padding: 8px;">≈ ±6.55 × 10<sup>4</sup></td>
+                    <td style="padding: 8px;">≈ 6.10 × 10<sup>−5</sup></td>
+                    <td style="padding: 8px;">≈ 5.96 × 10<sup>−8</sup></td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 8px;"><code>FP32</code></td>
+                    <td style="padding: 8px;">≈ ±3.40 × 10<sup>38</sup></td>
+                    <td style="padding: 8px;">≈ 1.18 × 10<sup>−38</sup></td>
+                    <td style="padding: 8px;">≈ 1.40 × 10<sup>−45</sup></td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 8px;"><code>FP64</code></td>
+                    <td style="padding: 8px;">≈ ±1.80 × 10<sup>308</sup></td>
+                    <td style="padding: 8px;">≈ 2.23 × 10<sup>−308</sup></td>
+                    <td style="padding: 8px;">≈ 4.94 × 10<sup>−324</sup></td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px;"><code>FP128</code></td>
+                    <td style="padding: 8px;">≈ ±1.19 × 10<sup>4932</sup></td>
+                    <td style="padding: 8px;">≈ 3.36 × 10<sup>−4932</sup></td>
+                    <td style="padding: 8px;">≈ 6.48 × 10<sup>−4966</sup></td>
+                </tr>
+            </tbody>
+        </table>
+        <div style="font-size: 0.7em; margin-top: 1rem; display: flex; gap: 1.5rem;">
+            <div style="flex: 1; text-align: left;">
+                <p style="color: #50fa7b;"><strong>✓ Ventaja:</strong> enorme rango dinámico, evita desbordamientos.</p>
+            </div>
+            <div style="flex: 1; text-align: left;">
+                <p style="color: #ff5555;"><strong>✗ Desventaja:</strong> hardware más complejo, mayor consumo de
+                    energía y área.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== FORMATOS AVANZADOS ===================== -->
+
+    <section>
+        <h3>Formatos optimizados para entrenamiento</h3>
+        <div style="display: flex; gap: 1.5rem; align-items: center;">
+            <div style="flex: 1; font-size: 0.7em; text-align: left;">
+                <div
+                    style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 1rem; margin-bottom: 0.8rem;">
+                    <strong style="color: #8be9fd;">BF16 (bfloat16)</strong>
+                    <p style="font-size: 0.9em; margin: 0.3rem 0 0;">16 bits: 1 signo + 8 exp + 7 mantisa.<br>
+                        Desarrollado por Google Brain para TPUs.<br>
+                        Comparte exponente con FP32 → conversión directa.</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 1rem;">
+                    <strong style="color: #bd93f9;">TF32 (TensorFloat-32)</strong>
+                    <p style="font-size: 0.9em; margin: 0.3rem 0 0;">19 bits: 1 signo + 8 exp + 10 mantisa.<br>
+                        Introducido por NVIDIA (arquitectura Ampere).<br>
+                        Buen balance velocidad/precisión para entrenamiento.</p>
+                </div>
+            </div>
+            <div style="flex: 0.8;">
+                <img src="./figures/specific_bf16_tf32.png"
+                    style="width: 100%; background: white; border-radius: 0.5rem;">
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h3>Formatos numéricos: resumen</h3>
+        <table style="font-size: 0.45em; width: 100%; border-collapse: collapse; margin-top: 0.3rem;">
+            <thead>
+                <tr style="border-bottom: 2px solid #fff;">
+                    <th style="padding: 6px;">Formato</th>
+                    <th style="padding: 6px;">Rango</th>
+                    <th style="padding: 6px;">Precisión</th>
+                    <th style="padding: 6px;">Eficiencia</th>
+                    <th style="padding: 6px;">Uso</th>
+                    <th style="padding: 6px;">Plataformas</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.15);">
+                    <td style="padding: 6px;"><code>FP64</code></td>
+                    <td style="padding: 6px;">Muy alto</td>
+                    <td style="padding: 6px;">Muy alta</td>
+                    <td style="padding: 6px;">Baja</td>
+                    <td style="padding: 6px;">Entrenamiento</td>
+                    <td style="padding: 6px;">CPUs, HPC</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.15);">
+                    <td style="padding: 6px;"><code>FP32</code></td>
+                    <td style="padding: 6px;">Alto</td>
+                    <td style="padding: 6px;">Alta</td>
+                    <td style="padding: 6px;">Moderada</td>
+                    <td style="padding: 6px;">Entrenamiento</td>
+                    <td style="padding: 6px;">GPUs, TPUs</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.15);">
+                    <td style="padding: 6px;"><code>FP16</code></td>
+                    <td style="padding: 6px;">Medio</td>
+                    <td style="padding: 6px;">Moderada</td>
+                    <td style="padding: 6px;">Alta</td>
+                    <td style="padding: 6px;">Entrenamiento</td>
+                    <td style="padding: 6px;">GPUs, TPUs, NPUs</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.03);">
+                    <td style="padding: 6px;"><code>TF32</code></td>
+                    <td style="padding: 6px;">Alto</td>
+                    <td style="padding: 6px;">Moderada</td>
+                    <td style="padding: 6px;">Muy alta</td>
+                    <td style="padding: 6px;">Entrenamiento</td>
+                    <td style="padding: 6px;">GPUs (Ampere)</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.03);">
+                    <td style="padding: 6px;"><code>BF16</code></td>
+                    <td style="padding: 6px;">Medio–Alto</td>
+                    <td style="padding: 6px;">Moderada</td>
+                    <td style="padding: 6px;">Alta</td>
+                    <td style="padding: 6px;">Entrenamiento</td>
+                    <td style="padding: 6px;">TPUs, GPUs</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.15);">
+                    <td style="padding: 6px;"><code>INT16</code></td>
+                    <td style="padding: 6px;">Bajo–Medio</td>
+                    <td style="padding: 6px;">Moderada</td>
+                    <td style="padding: 6px;">Alta</td>
+                    <td style="padding: 6px;">Inferencia/Edge</td>
+                    <td style="padding: 6px;">MCUs, CPUs</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.15);">
+                    <td style="padding: 6px;"><code>INT8</code></td>
+                    <td style="padding: 6px;">Muy bajo</td>
+                    <td style="padding: 6px;">Baja</td>
+                    <td style="padding: 6px;">Muy alta</td>
+                    <td style="padding: 6px;">Inferencia</td>
+                    <td style="padding: 6px;">NPUs, FPGAs, ASICs</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.15);">
+                    <td style="padding: 6px;"><code>INT4</code></td>
+                    <td style="padding: 6px;">Mínimo</td>
+                    <td style="padding: 6px;">Muy baja</td>
+                    <td style="padding: 6px;">Extrema</td>
+                    <td style="padding: 6px;">Inferencia</td>
+                    <td style="padding: 6px;">NPUs, aceleradores</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.03);">
+                    <td style="padding: 6px;"><code>FP8 (E4M3)</code></td>
+                    <td style="padding: 6px;">Bajo</td>
+                    <td style="padding: 6px;">Baja</td>
+                    <td style="padding: 6px;">Muy alta</td>
+                    <td style="padding: 6px;">Entrenamiento/Inf.</td>
+                    <td style="padding: 6px;">H100, MI300</td>
+                </tr>
+                <tr style="background: rgba(255,255,255,0.03);">
+                    <td style="padding: 6px;"><code>FP8 (E5M2)</code></td>
+                    <td style="padding: 6px;">Medio</td>
+                    <td style="padding: 6px;">Muy baja</td>
+                    <td style="padding: 6px;">Muy alta</td>
+                    <td style="padding: 6px;">Entrenamiento</td>
+                    <td style="padding: 6px;">H100, MI300</td>
+                </tr>
+            </tbody>
+        </table>
+        <p style="font-size: 0.65em; margin-top: 0.5rem; color: #ffb86c;">
+            Tendencia: precisiones cada vez más bajas + calibración y entrenamiento consciente de la cuantización.
+        </p>
+    </section>
+
+    <!-- ===================== ESTRATEGIAS COMPLEMENTARIAS ===================== -->
+
+    <section>
+        <h3>Estrategias complementarias</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 0.6em;">
+            <div
+                style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px; border-left: 3px solid #50fa7b;">
+                <strong style="color: #50fa7b;">Combinación de formatos</strong>
+                <p style="margin: 0.3rem 0 0;">Pesos en FxP (ahorro de espacio), convertidos a FlP durante el
+                    procesamiento para mayor rango.</p>
+            </div>
+            <div
+                style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px; border-left: 3px solid #8be9fd;">
+                <strong style="color: #8be9fd;">Block floating point</strong>
+                <p style="margin: 0.3rem 0 0;">Varios valores comparten un único exponente. Reduce memoria y lógica de
+                    control.</p>
+            </div>
+            <div
+                style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px; border-left: 3px solid #ff79c6;">
+                <strong style="color: #ff79c6;">Punto fijo dinámico</strong>
+                <p style="margin: 0.3rem 0 0;">Ajusta la escala adaptativamente por capa para evitar desbordamientos.
+                </p>
+            </div>
+            <div
+                style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px; border-left: 3px solid #bd93f9;">
+                <strong style="color: #bd93f9;">Mixed-precision</strong>
+                <p style="margin: 0.3rem 0 0;">Distintas capas operan con diferentes precisiones. Asigna recursos donde
+                    realmente se necesitan.</p>
+            </div>
+        </div>
+        <p style="font-size: 0.65em; margin-top: 0.8rem; font-style: italic; color: #6272a4;">
+            Varias de estas estrategias solo son eficientes en hardware reconfigurable o dedicado (FPGAs/ASICs).
+        </p>
+    </section>
+
+    <!-- ===================== EJEMPLO CONCRETO ===================== -->
+
+    <section>
+        <h3>Ejemplo: MobileNet v2 en distintos formatos</h3>
+        <p style="font-size: 0.7em; text-align: left; margin-bottom: 0.8rem;">Impacto de la cuantización en un modelo
+            real (MobileNet v2, ImageNet):</p>
+        <table style="font-size: 0.55em; width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 2px solid #fff;">
+                    <th style="padding: 8px;">Métrica</th>
+                    <th style="padding: 8px;">FP32</th>
+                    <th style="padding: 8px;">INT8 (PTQ)</th>
+                    <th style="padding: 8px;">Reducción</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 8px;">Tamaño del modelo</td>
+                    <td style="padding: 8px;">~14 MB</td>
+                    <td style="padding: 8px;">~3.4 MB</td>
+                    <td style="padding: 8px; color: #50fa7b;"><strong>~4×</strong></td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 8px;">Latencia (Cortex-A76)</td>
+                    <td style="padding: 8px;">~90 ms</td>
+                    <td style="padding: 8px;">~35 ms</td>
+                    <td style="padding: 8px; color: #50fa7b;"><strong>~2.5×</strong></td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 8px;">Top-1 accuracy</td>
+                    <td style="padding: 8px;">71.8%</td>
+                    <td style="padding: 8px;">71.2%</td>
+                    <td style="padding: 8px; color: #ffb86c;">−0.6 pp</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px;">Consumo energético (est.)</td>
+                    <td style="padding: 8px;">Referencia</td>
+                    <td style="padding: 8px;">~3× menor</td>
+                    <td style="padding: 8px; color: #50fa7b;"><strong>~3×</strong></td>
+                </tr>
+            </tbody>
+        </table>
+        <p style="font-size: 0.6em; margin-top: 0.8rem; color: #6272a4; font-style: italic;">
+            Fuente: valores representativos de TensorFlow Lite model benchmarks.
+            PTQ = post-training quantization.
+        </p>
+    </section>
+
+    <!-- ===================== ACCURACY VS BITWIDTH ===================== -->
+
+    <section>
+        <h3>Accuracy vs. ancho de bits</h3>
+        <div style="display: flex; gap: 2rem; align-items: center;">
+            <div style="flex: 1; font-size: 0.7em; text-align: left;">
+                <p>El trade-off central de la cuantización:</p>
+                <div style="margin-top: 0.8rem;">
+                    <div style="display: flex; align-items: center; margin-bottom: 0.5rem;">
+                        <div
+                            style="width: 100%; background: rgba(255,255,255,0.1); border-radius: 0.3rem; padding: 0.4rem 0.6rem; position: relative;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span><code>FP32</code> (32 bits)</span>
+                                <span style="color: #50fa7b;">▰▰▰▰▰▰▰▰▰▰ 71.8%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; margin-bottom: 0.5rem;">
+                        <div
+                            style="width: 100%; background: rgba(255,255,255,0.1); border-radius: 0.3rem; padding: 0.4rem 0.6rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span><code>FP16</code> (16 bits)</span>
+                                <span style="color: #50fa7b;">▰▰▰▰▰▰▰▰▰▰ 71.7%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; margin-bottom: 0.5rem;">
+                        <div
+                            style="width: 100%; background: rgba(255,255,255,0.1); border-radius: 0.3rem; padding: 0.4rem 0.6rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span><code>INT8</code> (8 bits)</span>
+                                <span style="color: #8be9fd;">▰▰▰▰▰▰▰▰▰▱ 71.2%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; margin-bottom: 0.5rem;">
+                        <div
+                            style="width: 100%; background: rgba(255,255,255,0.1); border-radius: 0.3rem; padding: 0.4rem 0.6rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span><code>INT4</code> (4 bits)</span>
+                                <span style="color: #ffb86c;">▰▰▰▰▰▰▰▱▱▱ 68.5%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center;">
+                        <div
+                            style="width: 100%; background: rgba(255,255,255,0.1); border-radius: 0.3rem; padding: 0.4rem 0.6rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span><code>INT2</code> (2 bits)</span>
+                                <span style="color: #ff5555;">▰▰▰▰▱▱▱▱▱▱ 52.1%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p style="font-size: 0.85em; margin-top: 0.8rem; color: #6272a4; font-style: italic;">
+                    MobileNet v2 en ImageNet — valores representativos.
+                </p>
+            </div>
+            <div style="flex: 0.8; font-size: 0.65em;">
+                <div
+                    style="background: rgba(80,250,123,0.1); border-radius: 0.5rem; padding: 1rem; margin-bottom: 0.8rem; border: 1px solid rgba(80,250,123,0.3);">
+                    <strong style="color: #50fa7b;">Zona segura (≥8 bits)</strong>
+                    <p style="margin: 0.3rem 0 0;">Pérdida marginal (&lt;1%). PTQ suele ser suficiente.</p>
+                </div>
+                <div
+                    style="background: rgba(255,184,108,0.1); border-radius: 0.5rem; padding: 1rem; margin-bottom: 0.8rem; border: 1px solid rgba(255,184,108,0.3);">
+                    <strong style="color: #ffb86c;">Zona de riesgo (4 bits)</strong>
+                    <p style="margin: 0.3rem 0 0;">Requiere QAT (quantization-aware training) para minimizar la
+                        degradación.</p>
+                </div>
+                <div
+                    style="background: rgba(255,85,85,0.1); border-radius: 0.5rem; padding: 1rem; border: 1px solid rgba(255,85,85,0.3);">
+                    <strong style="color: #ff5555;">Zona crítica (≤2 bits)</strong>
+                    <p style="margin: 0.3rem 0 0;">Degradación severa. Solo viable con técnicas avanzadas y modelos
+                        específicos.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== COMPLEJIDAD ===================== -->
+
+    <section>
+        <h3>Complejidad de operaciones en FxP</h3>
+        <div style="display: flex; gap: 2rem; align-items: center;">
+            <div style="flex: 1; font-size: 0.75em; text-align: left;">
+                <p>La complejidad depende del formato numérico:</p>
+                <ul>
+                    <li style="margin-bottom: 0.5rem;">
+                        <strong>Suma FxP:</strong> <code>O(max(b<sup>A</sup>, b<sup>B</sup>))</code><br>
+                        <span style="font-size: 0.85em; color: #6272a4;">Recorre bit a bit propagando acarreo.</span>
+                    </li>
+                    <li style="margin-bottom: 0.5rem;">
+                        <strong>Multiplicación FxP:</strong> <code>O(b<sup>A</sup> · b<sup>B</sup>)</code><br>
+                        <span style="font-size: 0.85em; color: #6272a4;">b<sup>A</sup> sumas de b<sup>B</sup>
+                            bits.</span>
+                    </li>
+                    <li>
+                        <strong>FlP:</strong> más compleja (alinear exponentes, manejar casos especiales IEEE 754).
+                    </li>
+                </ul>
+            </div>
+            <div style="flex: 1;">
+                <img src="./figures/specific_adder.png"
+                    style="width: 50%; background: white; border-radius: 0.5rem; margin-bottom: 0.3rem;"><br>
+                <img src="./figures/specific_multiplier.png"
+                    style="width: 100%; background: white; border-radius: 0.5rem;">
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h3>Complejidad de operaciones en FlP</h3>
+        <div style="display: flex; gap: 2rem; align-items: flex-start;">
+            <div style="flex: 1.3; font-size: 0.7em; text-align: left;">
+                <p>Las operaciones en punto flotante requieren <strong>mucho más hardware</strong> que en punto fijo:
+                </p>
+                <ul style="margin-top: 0.5rem;">
+                    <li style="margin-bottom: 0.5rem;">
+                        <strong>Suma FlP:</strong> alinear exponentes, sumar mantisas, renormalizar y redondear.
+                    </li>
+                    <li style="margin-bottom: 0.5rem;">
+                        <strong>Multiplicación FlP:</strong> sumar exponentes, multiplicar mantisas, renormalizar y
+                        redondear.
+                    </li>
+                    <li>
+                        Además: manejo de <em>NaN</em>, <em>±∞</em>, subnormales y redondeo IEEE 754.
+                    </li>
+                </ul>
+                <p style="margin-top: 0.8rem; color: #ffb86c;">
+                    ⚡ El costo en área y energía de una operación FlP es significativamente mayor que en FxP
+                    del mismo ancho de bits.
+                </p>
+            </div>
+            <div style="flex: 1;">
+                <img src="./figures/03-flp_sum.png"
+                    style="width: 100%; background: white; border-radius: 0.5rem; margin-bottom: 0.5rem;">
+                <img src="./figures/03-flp_mult.png" style="width: 70%; background: white; border-radius: 0.5rem;">
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h3>Complejidad: resumen</h3>
+        <div style="display: flex; gap: 1.5rem; font-size: 0.6em;">
+            <div style="flex: 1;">
+                <p style="font-size: 1.2em; margin-bottom: 0.5rem;"><strong>Complejidad temporal</strong></p>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid #fff;">
+                            <th style="padding: 8px;">Formato</th>
+                            <th style="padding: 8px;">Operación</th>
+                            <th style="padding: 8px;">Complejidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                            <td style="padding: 8px;" rowspan="2">FxP</td>
+                            <td style="padding: 8px;">Suma</td>
+                            <td style="padding: 8px;">O(max(b<sup>A</sup>, b<sup>B</sup>))</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                            <td style="padding: 8px;">Multiplicación</td>
+                            <td style="padding: 8px;">O(b<sup>A</sup> · b<sup>B</sup>)</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px;">FlP</td>
+                            <td style="padding: 8px;">Suma / Mult</td>
+                            <td style="padding: 8px;">Mayor que FxP (alinear exp.)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div style="flex: 1;">
+                <p style="font-size: 1.2em; margin-bottom: 0.5rem;"><strong>Complejidad espacial</strong></p>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid #fff;">
+                            <th style="padding: 8px;">Formato</th>
+                            <th style="padding: 8px;">Complejidad</th>
+                            <th style="padding: 8px;">Almacenamiento</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                            <td style="padding: 8px;">FxP (Q<em>b.f</em>)</td>
+                            <td style="padding: 8px;">O(b)</td>
+                            <td style="padding: 8px;">b bits</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                            <td style="padding: 8px;">FlP</td>
+                            <td style="padding: 8px;">O(b)</td>
+                            <td style="padding: 8px;">b = e + m + 1</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px;">Mixed Prec.</td>
+                            <td style="padding: 8px;">Variable</td>
+                            <td style="padding: 8px;">Depende de la capa</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <p style="font-size: 0.6em; margin-top: 0.8rem; color: #ffb86c;">💡 Reducir bits de representación
+            reduce cuadráticamente el costo de multiplicaciones y linealmente el de sumas.</p>
+    </section>
+
+    <!-- ===================== CIERRE ===================== -->
+
+    <section>
+        <h3>Resumen: introducción a sistemas embebidos</h3>
+        <ul style="font-size: 0.65em; text-align: left; max-width: 800px; margin: 1rem auto;">
+            <li style="margin-bottom: 0.5rem;">Los sistemas embebidos operan bajo <strong>restricciones</strong> de
+                memoria, cómputo y energía que condicionan el diseño.</li>
+            <li style="margin-bottom: 0.5rem;">Los <strong>requerimientos</strong> clave incluyen rendimiento, latencia,
+                costo, energía y potencia.</li>
+            <li style="margin-bottom: 0.5rem;">Las <strong>plataformas</strong> (CPU, GPU, TPU, FPGA, ASIC) ofrecen
+                distintos compromisos entre flexibilidad y eficiencia.</li>
+            <li style="margin-bottom: 0.5rem;">Las <strong>arquitecturas</strong> pueden ser iterativas (genéricas) o
+                desenrolladas (específicas).</li>
+            <li style="margin-bottom: 0.5rem;">El <strong>punto fijo</strong> (FxP) es la representación preferida
+                en hardware embebido por su eficiencia.</li>
+            <li style="margin-bottom: 0.5rem;">El <strong>punto flotante</strong> (FlP) ofrece mayor rango dinámico
+                a costa de mayor complejidad de hardware.</li>
+            <li>La elección de <strong>formato numérico</strong> impacta directamente en el área, consumo y velocidad
+                del sistema.
+            </li>
+        </ul>
+        <p style="font-size: 0.65em; margin-top: 2rem; color: #6272a4; font-style: italic;">
+            A continuación: introducción a IA embebida →
+        </p>
+    </section>
+
+</section>

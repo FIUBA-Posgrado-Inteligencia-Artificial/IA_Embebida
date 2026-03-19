@@ -1,0 +1,287 @@
+<!-- 6. Cuantización -->
+<section>
+    <section>
+        <h2 class="gradient-text">6. Cuantización</h2>
+        <p>Reducción de la resolución numérica para optimizar la implementación</p>
+    </section>
+
+    <section>
+        <h3>Cuantización: el eje de esta materia</h3>
+        <div style="font-size: 0.75em; text-align: left;">
+            <p>Representar pesos y activaciones con un conjunto <strong>discreto</strong> de valores
+                de menor precisión (ej. INT8 en vez de FP32).</p>
+            <div
+                style="background: rgba(255,255,255,0.1); padding: 0.8rem; border-radius: 0.5rem; text-align: center; margin: 0.8rem 0; font-size: 1.1em;">
+                <code>x<sub>q</sub> = round(x / Δ) · Δ</code>
+            </div>
+            <p>Donde <strong>Δ</strong> es el paso de cuantización (escala) y la operación de redondeo puede ser <code>round</code>, <code>floor</code>, <code>ceil</code>, o <strong>estocástico</strong>.</p>
+            <div style="display: flex; gap: 1.5rem; margin-top: 0.8rem;">
+                <div style="flex: 1;">
+                    <p style="color: #50fa7b; margin-bottom: 0.3rem;"><strong>Beneficios:</strong></p>
+                    <ul style="font-size: 0.85em;">
+                        <li>Reduce tamaño del modelo 4–8×</li>
+                        <li>Acelera inferencia (aritmética entera)</li>
+                        <li>Menor consumo energético</li>
+                    </ul>
+                </div>
+                <div style="flex: 1;">
+                    <p style="color: #ff5555; margin-bottom: 0.3rem;"><strong>Desafíos:</strong></p>
+                    <ul style="font-size: 0.85em;">
+                        <li>Pérdida de precisión por discretización</li>
+                        <li>Elección del rango y escala</li>
+                        <li>Sensibilidad variable por capa</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h3>Función de cuantización</h3>
+        <div style="display: flex; gap: 2rem; align-items: center;">
+            <div style="flex: 1; font-size: 0.7em; text-align: left;">
+                <p>Función por tramos constantes que mapea valores continuos a un conjunto finito de niveles:</p>
+                <div style="display: flex; gap: 1rem; margin-top: 0.8rem;">
+                    <div style="flex: 1; background: rgba(80,250,123,0.1); padding: 0.8rem; border-radius: 0.5rem;">
+                        <strong style="color: #50fa7b;">Uniforme</strong>
+                        <ul style="font-size: 0.85em; margin-top: 0.3rem;">
+                            <li>Intervalos iguales, niveles equiespaciados.</li>
+                            <li>Compatible con aritmética matemática estándar.</li>
+                            <li>Simple en hardware.</li>
+                        </ul>
+                    </div>
+                    <div style="flex: 1; background: rgba(255,121,198,0.1); padding: 0.8rem; border-radius: 0.5rem;">
+                        <strong style="color: #ff79c6;">No uniforme</strong>
+                        <ul style="font-size: 0.85em; margin-top: 0.3rem;">
+                            <li>Intervalos adaptados a la distribución.</li>
+                            <li>Mayor precisión con pocos niveles.</li>
+                            <li>Más compleja en HW.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div style="flex: 0.8;">
+                <img src="./figures/specific_quantization_function_uniform.png"
+                    style="width: 100%; background: white; border-radius: 0.5rem; margin-bottom: 0.5rem;">
+                <img src="./figures/specific_quantization_function_nonuniform.png"
+                    style="width: 100%; background: white; border-radius: 0.5rem;">
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h3>Esquemas de cuantización</h3>
+        <div style="font-size: 0.65em; text-align: left;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px;">
+                    <strong style="color: #8be9fd;">Simétrica vs. asimétrica</strong>
+                    <p style="margin: 0.3rem 0 0;">Simétrica: niveles centrados en 0 (ideal para pesos).
+                        Asimétrica: permite un <em>zero-point</em> para rangos no centrados.</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px;">
+                    <strong style="color: #50fa7b;">Estática vs. dinámica</strong>
+                    <p style="margin: 0.3rem 0 0;">Estática: rangos fijados en calibración. Dinámica: rangos
+                        recalculados en tiempo real (más precisa, más costosa).</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px;">
+                    <strong style="color: #ff79c6;">Granularidad</strong>
+                    <p style="margin: 0.3rem 0 0;">Por tensor (una escala para toda la capa), por canal (una por canal),
+                        o por bloque. Mayor granularidad = mejor adaptación.</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px;">
+                    <strong style="color: #ffb86c;">Precisión</strong>
+                    <p style="margin: 0.3rem 0 0;">INT8 (estándar), INT4 (agresiva), binaria/ternaria (extrema).
+                        A menor precisión, mayor compresión pero más riesgo.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== PTQ ===================== -->
+
+    <section>
+        <h3>Post-Training Quantization (PTQ)</h3>
+        <div style="font-size: 0.7em; text-align: left;">
+            <p>Cuantización aplicada <strong>después</strong> del entrenamiento, sin reentrenar el modelo:</p>
+            <ol style="margin-top: 0.5rem;">
+                <li style="margin-bottom: 0.4rem;"><strong>Calibración:</strong> ejecutar el modelo sobre un subconjunto
+                    pequeño
+                    para estimar rangos de pesos y activaciones.</li>
+                <li style="margin-bottom: 0.4rem;"><strong>Determinar parámetros:</strong> seleccionar escala y
+                    desplazamiento para cada tensor.</li>
+                <li><strong>Aplicar cuantización:</strong> transformar el modelo a representación de menor precisión.
+                </li>
+            </ol>
+            <div style="display: flex; gap: 1.5rem; margin-top: 1rem;">
+                <div style="flex: 1;">
+                    <p style="color: #50fa7b;"><strong>✓ Ventajas:</strong></p>
+                    <ul style="font-size: 0.9em;">
+                        <li>Simple y rápido</li>
+                        <li>No requiere reentrenamiento</li>
+                        <li>No necesita dataset completo</li>
+                    </ul>
+                </div>
+                <div style="flex: 1;">
+                    <p style="color: #ff5555;"><strong>✗ Limitaciones:</strong></p>
+                    <ul style="font-size: 0.9em;">
+                        <li>Posible pérdida de precisión</li>
+                        <li>Difícil con cuantización agresiva (&lt;8 bits)</li>
+                        <li>Calibración inadecuada → errores sistemáticos</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== QAT ===================== -->
+
+    <section>
+        <h3>Quantization-Aware Training (QAT)</h3>
+        <div style="font-size: 0.7em; text-align: left;">
+            <p>Se simulan los efectos de cuantización <strong>durante</strong> el entrenamiento,
+                permitiendo que el modelo se adapte:</p>
+            <ol style="margin-top: 0.5rem;">
+                <li style="margin-bottom: 0.4rem;"><strong>Forward pass:</strong> pesos y activaciones se cuantizan
+                    con funciones de <em>fake quantization</em>.</li>
+                <li style="margin-bottom: 0.4rem;"><strong>Backward pass:</strong> como la cuantización no es
+                    diferenciable,
+                    se usa el <strong>Straight-Through Estimator (STE)</strong>.</li>
+                <li><strong>Resultado:</strong> red optimizada para operar con precisión reducida.</li>
+            </ol>
+        </div>
+    </section>
+
+    <section>
+        <h3>Straight-Through Estimator (STE)</h3>
+        <div style="display: flex; gap: 2rem; align-items: center;">
+            <div style="flex: 1; font-size: 0.7em; text-align: left;">
+                <p>La función de cuantización es <strong>no diferenciable</strong> (saltos discretos).
+                    El STE la aproxima como la identidad durante el backward pass:</p>
+                <div
+                    style="background: rgba(255,255,255,0.1); padding: 0.8rem; border-radius: 0.5rem; text-align: center; margin: 0.8rem 0; font-size: 1.2em;">
+                    <code>∂round(x)/∂x ≈ 1</code>
+                </div>
+                <ul style="font-size: 0.85em;">
+                    <li style="margin-bottom: 0.3rem;">Permite que los gradientes fluyan a través de la cuantización.
+                    </li>
+                    <li style="margin-bottom: 0.3rem;">Es una aproximación heurística pero funciona bien en la práctica.
+                    </li>
+                    <li>Alternativas: <em>soft quantization</em> (funciones suaves diferenciables).</li>
+                </ul>
+            </div>
+            <div style="flex: 0.7;">
+                <img src="./figures/specific_ste.png"
+                    style="width: 100%; background: white; border-radius: 0.5rem; margin-bottom: 0.5rem;">
+                <img src="./figures/specific_soft_quantization.png"
+                    style="width: 100%; background: white; border-radius: 0.5rem;">
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h3>PTQ vs. QAT</h3>
+        <table style="font-size: 0.55em; width: 100%; border-collapse: collapse; margin-top: 0.5rem;">
+            <thead>
+                <tr style="border-bottom: 2px solid #fff;">
+                    <th style="padding: 10px;">Aspecto</th>
+                    <th style="padding: 10px;">PTQ</th>
+                    <th style="padding: 10px;">QAT</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 10px;"><strong>Reentrenamiento</strong></td>
+                    <td style="padding: 10px;">No</td>
+                    <td style="padding: 10px;">Sí</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 10px;"><strong>Precisión alcanzable</strong></td>
+                    <td style="padding: 10px;">Buena (≥8 bits)</td>
+                    <td style="padding: 10px;">Excelente (incluso ≤4 bits)</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 10px;"><strong>Datos necesarios</strong></td>
+                    <td style="padding: 10px;">Subconjunto de calibración</td>
+                    <td style="padding: 10px;">Dataset completo</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 10px;"><strong>Costo computacional</strong></td>
+                    <td style="padding: 10px;">Bajo</td>
+                    <td style="padding: 10px;">Alto (como reentrenar)</td>
+                </tr>
+            </tbody>
+        </table>
+        <p style="font-size: 0.65em; margin-top: 0.8rem; color: #ffb86c;">
+            Regla general: PTQ primero (es gratis). Si no alcanza, pasar a QAT.
+        </p>
+    </section>
+
+    <!-- ===================== ESTADO DEL ARTE Y CASOS ===================== -->
+
+    <section>
+        <h3>Hitos y Casos Especiales</h3>
+        <div style="font-size: 0.6em; text-align: left;">
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                <div style="display: flex; gap: 10px; align-items: flex-start;">
+                    <span style="color: #ff79c6; font-weight: bold; min-width: 100px;">8 Bits</span>
+                    <span><strong>El estándar (INT-only):</strong> Base de TensorFlow Lite, TensorRT. Se fusionan operaciones (ej. BatchNorm) con las capas convolucionales, perdiendo &lt;1% de precisión comparado con FP32.</span>
+                </div>
+                <div style="display: flex; gap: 10px; align-items: flex-start;">
+                    <span style="color: #8be9fd; font-weight: bold; min-width: 100px;">≤ 4 Bits</span>
+                    <span><strong>Ultra-baja precisión:</strong> Aparecen <em>outliers</em> que complican la exactitud. Requieren esquemas de precisión mixta (ej. HAWQ, HAQ).</span>
+                </div>
+                <div style="display: flex; gap: 10px; align-items: flex-start;">
+                    <span style="color: #50fa7b; font-weight: bold; min-width: 100px;">Ternarias</span>
+                    <span><strong>Redes ternarias:</strong> Valores en {-1, 0, 1}. Permiten "apagar" conexiones para ahorrar muchísimas operaciones.</span>
+                </div>
+                <div style="display: flex; gap: 10px; align-items: flex-start;">
+                    <span style="color: #bd93f9; font-weight: bold; min-width: 100px;">Binarias</span>
+                    <span><strong>Redes binarizadas:</strong> Pesos en {-1, +1}. Reemplaza multiplicaciones con compuertas XNOR (XNOR-Net). Gran degradación pero una inmensa aceleración en hardware genérico.</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide added about CNN specifics based on the previous conversation about this file -->
+    <section>
+        <h3>Consideraciones en CNNs</h3>
+        <div style="font-size: 0.7em; text-align: left;">
+            <ul style="line-height: 1.5;">
+                <li style="margin-bottom: 0.8rem;"><strong style="color: #8be9fd;">Precisión Mixta / Sensibilidad:</strong> La primera capa (extracción de features iniciales) y la última (clasificación), son típicamente las más sensibles (usualmente cuantizadas a 8-bit). Las capas ocultas centrales toleran cuantización más agresiva (ej. 4-bit).</li>
+                <li style="margin-bottom: 0.8rem;"><strong style="color: #50fa7b;">Conv2D vs Dense:</strong>
+                    <ul style="font-size: 0.9em; margin-top:0.3rem;">
+                        <li><strong>Conv2D:</strong> Dominan el <em>throughput</em> debido a la inmensa cantidad de operaciones por parámetro. Prioritarias para optimizar en aceleradores.</li>
+                        <li><strong>Dense (Fully Connected):</strong> Acaparan la mayor parte del tamaño de almacenamiento y ancho de banda de la red pero aportan pocas operaciones.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Slide added about LLMs placeholder based on the previous conversation about this file -->
+    <section>
+        <h3>Consideraciones especiales en LLMs</h3>
+        <p style="font-size: 0.8em; color: #ffb86c;">(Contenido de grandes modelos de lenguaje pendiente de agregar)</p>
+    </section>
+
+    <section>
+        <h3>Eficiencia en hardware real</h3>
+        <div style="font-size: 0.7em; text-align: left;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 0.5rem; font-size: 0.9em;">
+                <div style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px;">
+                    <strong style="color: #50fa7b;">CPUs/GPUs</strong>
+                    <p style="margin: 0.3rem 0 0;">INT8 2× throughput vs FP16. Suma INT8 gasta 30× menos energía que una suma FP32.</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px;">
+                    <strong style="color: #ff79c6;">FPGAs</strong>
+                    <p style="margin: 0.3rem 0 0;">FINN: redes binarizadas sumamente veloces y energéticamente eficientes. Flexibilidad para mixed-precision.</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px;">
+                    <strong style="color: #8be9fd;">ASICs / TPUs</strong>
+                    <p style="margin: 0.3rem 0 0;">Google Edge TPU por ejemplo sólo soporta INT8 para la inferencia, dando máxima eficiencia pero baja flexibilidad.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</section>

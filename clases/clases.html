@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+	<title>IA Embebida (CEIA/CESE)</title>
+
+	<link rel="stylesheet" href="reveal.js-master/dist/reset.css">
+	<link rel="stylesheet" href="reveal.js-master/dist/reveal.css">
+	<link rel="stylesheet" href="reveal.js-master/dist/theme/dracula.css">
+
+	<!-- Custom Styling for Premium Look -->
+	<style>
+		:root {
+			--r-main-font: 'Inter', sans-serif;
+			--r-heading-font: 'Outfit', sans-serif;
+			--r-main-font-size: 32px;
+		}
+
+		.reveal section img {
+			border-radius: 12px;
+			box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+		}
+
+		.gradient-text {
+			background: linear-gradient(45deg, #8be9fd, #bd93f9);
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			font-weight: bold;
+		}
+
+		.diagram-header {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			margin-bottom: 1rem;
+		}
+
+		.diagram-header img {
+			height: 150px !important;
+			background: transparent !important;
+			filter: invert(1);
+			box-shadow: none !important;
+			border-radius: 0 !important;
+		}
+	</style>
+
+	<!-- Theme used for syntax highlighted code -->
+	<link rel="stylesheet" href="reveal.js-master/plugin/highlight/monokai.css">
+
+	<!-- Google Fonts -->
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Outfit:wght@700&display=swap"
+		rel="stylesheet">
+</head>
+
+<body>
+	<div class="reveal">
+		<div class="slides">
+
+			<!-- Parte 0 -->
+			<section>
+				<h1 class="gradient-text">Parte 0</h1>
+				<h3>Presentación del curso</h3>
+				<p>Inteligencia Artificial Embebida (CEIA/CESE)</p>
+			</section>
+
+			<!-- 1. Presentación del curso -->
+			<section data-external-replace="seccion01_presentacion.html"></section>
+
+			<!-- Parte 1 -->
+			<section>
+				<h1 class="gradient-text">Parte 1</h1>
+				<h3>Introducción</h3>
+				<p>Inteligencia Artificial Embebida (CEIA/CESE)</p>
+			</section>
+
+			<!-- 2. Introducción para CESE -->
+			<section data-external-replace="seccion02_introduccion_cese.html"></section>
+
+			<!-- 3. Introducción para CEIA -->
+			<section data-external-replace="seccion03_introduccion_ceia.html"></section>
+
+			<!-- 4. Introducción a IA embebida -->
+			<section data-external-replace="seccion04_introduccion_iae.html"></section>
+
+			<!-- Parte 2 -->
+			<section>
+				<h1 class="gradient-text">Parte 2</h1>
+				<h3>Compresión</h3>
+				<p>Inteligencia Artificial Embebida (CEIA/CESE)</p>
+			</section>
+
+			<!-- 5. Compresión -->
+			<section data-external-replace="seccion05_compresion.html"></section>
+
+			<!-- 6. Cuantización -->
+			<section data-external-replace="seccion06_cuantizacion.html"></section>
+
+			<!-- 7. Pruning -->
+			<section data-external-replace="seccion07_pruning.html"></section>
+
+			<!-- 8. Factorización -->
+			<section data-external-replace="seccion08_factorizacion.html"></section>
+
+			<!-- 9. NAS -->
+			<section data-external-replace="seccion09_nas.html"></section>
+
+			<!-- 10. Destilación del Conocimiento (KD) -->
+			<section data-external-replace="seccion10_kd.html"></section>
+
+			<!-- Parte 3 -->
+			<section>
+				<h1 class="gradient-text">Parte 3</h1>
+				<h3>Despliegue en entornos de recursos limitados</h3>
+				<p>Inteligencia Artificial Embebida (CEIA/CESE)</p>
+			</section>
+
+			<!-- 11. Fundamentos de IA Embebida -->
+			<section data-external-replace="seccion11_ia_embebida.html"></section>
+
+			<!-- 12. Plataformas de Hardware -->
+			<section data-external-replace="seccion12_plataformas.html"></section>
+
+			<!-- 13. Frameworks y Herramientas -->
+			<section data-external-replace="seccion13_frameworks.html"></section>
+
+			<!-- 14. Algoritmos para Sistemas Embebidos -->
+			<section data-external-replace="seccion14_algoritmos.html"></section>
+
+			<!-- 15. Despliegue en el Edge -->
+			<section data-external-replace="seccion15_despliegue.html"></section>
+
+			<!-- 16. Casos de Estudio y Aplicaciones -->
+			<section data-external-replace="seccion16_aplicaciones.html"></section>
+
+		</div>
+	</div>
+
+	<script src="reveal.js-master/dist/reveal.js"></script>
+	<script src="reveal.js-master/plugin/notes/notes.js"></script>
+	<script src="reveal.js-master/plugin/markdown/markdown.js"></script>
+	<script src="reveal.js-master/plugin/highlight/highlight.js"></script>
+	<script>
+		// More info about initialization & config:
+		// - https://revealjs.com/initialization/
+		// - https://revealjs.com/config/
+		Reveal.initialize({
+			hash: true,
+			controls: true,
+			progress: true,
+			center: true,
+			slideNumber: 'c/t',
+			transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+			// Learn about plugins: https://revealjs.com/plugins/
+			// The plugin external.js needs to be loaded by register the script or using plugin array.
+			// Since it's a version 3 plugin (not an ES module), we just load it via dependencies array or directly as a script.
+			dependencies: [
+				{
+					src: 'reveal_external/external/external.js',
+					condition: function () {
+						return !!document.querySelector('[data-external],[data-external-replace]');
+					}
+				}
+			],
+			plugins: [RevealMarkdown, RevealHighlight, RevealNotes]
+		});
+
+		// Global Auto-Animate: Inject data-auto-animate to all sections
+		Reveal.on('ready', () => {
+			document.querySelectorAll('section').forEach(s => {
+				if (!s.hasAttribute('data-auto-animate')) {
+					s.setAttribute('data-auto-animate', '');
+				}
+			});
+		});
+	</script>
+</body>
+
+</html>

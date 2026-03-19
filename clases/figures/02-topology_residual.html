@@ -1,0 +1,58 @@
+<svg viewBox="0 0 400 200"
+    style="width: 100%; display: block; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3)); border-radius: 0.5rem; background: rgba(255,255,255,0.05); margin-bottom: 20px;">
+    <defs>
+        <marker id="arrow-res" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6"
+            orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="rgba(248, 248, 242, 0.6)" />
+        </marker>
+        <filter id="glow-res">
+            <feGaussianBlur stdDeviation="2" result="blur" />
+            <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+            </feMerge>
+        </filter>
+    </defs>
+
+    <text x="200" y="25" fill="#f1fa8c" font-size="14" font-weight="bold" font-family="sans-serif"
+        text-anchor="middle">Bloque Residual</text>
+
+    <!-- Input -->
+    <rect x="20" y="80" width="40" height="40" rx="4" fill="rgba(139, 233, 253, 0.2)" stroke="#8be9fd"
+        stroke-width="2" />
+    <text x="40" y="105" fill="#f8f8f2" font-size="14" font-family="sans-serif" text-anchor="middle">x</text>
+
+    <!-- Main Path Connections -->
+    <path d="M 60 100 L 90 100" stroke="rgba(248, 248, 242, 0.6)" stroke-width="2" marker-end="url(#arrow-res)" />
+    <path d="M 180 100 L 210 100" stroke="rgba(248, 248, 242, 0.6)" stroke-width="2" marker-end="url(#arrow-res)" />
+    <path d="M 300 100 L 320 100" stroke="rgba(248, 248, 242, 0.6)" stroke-width="2" marker-end="url(#arrow-res)" />
+
+    <!-- Layers -->
+    <rect x="100" y="60" width="80" height="80" rx="6" fill="rgba(189, 147, 249, 0.2)" stroke="#bd93f9" stroke-width="2"
+        filter="url(#glow-res)" />
+    <text x="140" y="95" fill="#bd93f9" font-size="12" font-family="sans-serif" font-weight="bold"
+        text-anchor="middle">Weight</text>
+    <text x="140" y="115" fill="#bd93f9" font-size="10" font-family="sans-serif" text-anchor="middle">Layer 1</text>
+
+    <rect x="220" y="60" width="80" height="80" rx="6" fill="rgba(189, 147, 249, 0.2)" stroke="#bd93f9" stroke-width="2"
+        filter="url(#glow-res)" />
+    <text x="260" y="95" fill="#bd93f9" font-size="12" font-family="sans-serif" font-weight="bold"
+        text-anchor="middle">Weight</text>
+    <text x="260" y="115" fill="#bd93f9" font-size="10" font-family="sans-serif" text-anchor="middle">Layer 2</text>
+
+    <!-- Addition Node -->
+    <circle cx="335" cy="100" r="15" fill="rgba(80, 250, 123, 0.2)" stroke="#50fa7b" stroke-width="2"
+        filter="url(#glow-res)" />
+    <text x="335" y="105" fill="#50fa7b" font-size="18" font-family="sans-serif" font-weight="bold"
+        text-anchor="middle">+</text>
+
+    <!-- Output Connection -->
+    <path d="M 350 100 L 390 100" stroke="rgba(248, 248, 242, 0.6)" stroke-width="2" marker-end="url(#arrow-res)" />
+    <text x="370" y="90" fill="#f8f8f2" font-size="12" font-family="sans-serif" text-anchor="middle">F(x)+x</text>
+
+    <!-- Skip Connection -->
+    <path d="M 75 100 L 75 160 L 335 160 L 335 125" fill="none" stroke="#ff79c6" stroke-width="3" stroke-dasharray="6 4"
+        marker-end="url(#arrow-res)" filter="url(#glow-res)" />
+    <text x="200" y="175" fill="#ff79c6" font-size="12" font-family="sans-serif" font-weight="bold"
+        text-anchor="middle">Identidad (Skip Connection)</text>
+</svg>

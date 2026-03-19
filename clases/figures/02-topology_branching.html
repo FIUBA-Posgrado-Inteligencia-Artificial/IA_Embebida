@@ -1,0 +1,64 @@
+<svg viewBox="0 0 400 200"
+    style="width: 100%; display: block; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3)); border-radius: 0.5rem; background: rgba(255,255,255,0.05); margin-bottom: 20px;">
+    <defs>
+        <marker id="arrow-br" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6"
+            orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="rgba(248, 248, 242, 0.6)" />
+        </marker>
+        <filter id="glow-br">
+            <feGaussianBlur stdDeviation="2" result="blur" />
+            <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+            </feMerge>
+        </filter>
+    </defs>
+
+    <text x="200" y="25" fill="#f1fa8c" font-size="14" font-weight="bold" font-family="sans-serif"
+        text-anchor="middle">Ramificaciones (Ej: Inception)</text>
+
+    <!-- Input -->
+    <rect x="20" y="80" width="40" height="40" rx="4" fill="rgba(139, 233, 253, 0.2)" stroke="#8be9fd"
+        stroke-width="2" />
+    <text x="40" y="105" fill="#f8f8f2" font-size="14" font-family="sans-serif" text-anchor="middle">In</text>
+
+    <!-- Path splitting -->
+    <path d="M 60 100 L 90 100 L 90 50 L 130 50" fill="none" stroke="rgba(248, 248, 242, 0.6)" stroke-width="2"
+        marker-end="url(#arrow-br)" />
+    <path d="M 90 100 L 130 100" fill="none" stroke="rgba(248, 248, 242, 0.6)" stroke-width="2"
+        marker-end="url(#arrow-br)" />
+    <path d="M 90 100 L 90 150 L 130 150" fill="none" stroke="rgba(248, 248, 242, 0.6)" stroke-width="2"
+        marker-end="url(#arrow-br)" />
+
+    <!-- Branch 1 (Top) -->
+    <rect x="140" y="35" width="80" height="30" rx="6" fill="rgba(189, 147, 249, 0.2)" stroke="#bd93f9" stroke-width="2"
+        filter="url(#glow-br)" />
+    <text x="180" y="55" fill="#bd93f9" font-size="12" font-family="sans-serif" text-anchor="middle">Conv 1x1</text>
+
+    <!-- Branch 2 (Middle) -->
+    <rect x="140" y="85" width="80" height="30" rx="6" fill="rgba(189, 147, 249, 0.2)" stroke="#bd93f9" stroke-width="2"
+        filter="url(#glow-br)" />
+    <text x="180" y="105" fill="#bd93f9" font-size="12" font-family="sans-serif" text-anchor="middle">Conv 3x3</text>
+
+    <!-- Branch 3 (Bottom) -->
+    <rect x="140" y="135" width="80" height="30" rx="6" fill="rgba(189, 147, 249, 0.2)" stroke="#bd93f9"
+        stroke-width="2" filter="url(#glow-br)" />
+    <text x="180" y="155" fill="#bd93f9" font-size="12" font-family="sans-serif" text-anchor="middle">Max Pool</text>
+
+    <!-- Connection to Concat -->
+    <path d="M 230 50 L 270 50 L 270 90 L 290 90" fill="none" stroke="rgba(248, 248, 242, 0.6)" stroke-width="2"
+        marker-end="url(#arrow-br)" />
+    <path d="M 230 100 L 290 100" fill="none" stroke="rgba(248, 248, 242, 0.6)" stroke-width="2"
+        marker-end="url(#arrow-br)" />
+    <path d="M 230 150 L 270 150 L 270 110 L 290 110" fill="none" stroke="rgba(248, 248, 242, 0.6)" stroke-width="2"
+        marker-end="url(#arrow-br)" />
+
+    <!-- Concat Node -->
+    <rect x="300" y="60" width="30" height="80" rx="4" fill="rgba(80, 250, 123, 0.2)" stroke="#50fa7b" stroke-width="2"
+        filter="url(#glow-br)" />
+    <text x="315" y="105" fill="#50fa7b" font-size="10" font-family="sans-serif" font-weight="bold" text-anchor="middle"
+        transform="rotate(-90 315,100)">Concat</text>
+
+    <!-- Output Connection -->
+    <path d="M 340 100 L 380 100" stroke="rgba(248, 248, 242, 0.6)" stroke-width="2" marker-end="url(#arrow-br)" />
+</svg>

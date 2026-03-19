@@ -1,0 +1,93 @@
+<!-- 13. Frameworks y Herramientas -->
+<section>
+    <section>
+        <h2 class="gradient-text">13. Frameworks y Herramientas</h2>
+        <p>El puente crítico: De grafos abstractos a código máquina</p>
+    </section>
+
+    <!-- 1. Frameworks Generales -->
+    <section>
+        <h3>1. Frameworks de Propósito General</h3>
+        <p style="font-size: 0.65em; text-align: left; margin-bottom: 0.8rem;">La "navaja suiza" adaptada para sobrevivir en la hostilidad del Edge.</p>
+        <div style="font-size: 0.65em; text-align: left;">
+            <div style="background: rgba(255,184,108,0.1); border-radius: 0.5rem; padding: 12px; margin-bottom: 12px;">
+                <strong style="color: #ffb86c;">TensorFlow Lite (TFLite) y Microcontrollers</strong>
+                <p style="margin: 0.3rem 0 0;"><strong>El concepto clave: "Delegates".</strong> TFLite "terceriza" las operaciones pesadas al hardware especializado (GPU, DSP). <br><em>TFLite for Microcontrollers:</em> Reescritura C++11 bare-metal. No usa <code>malloc</code>; exige preasignar un <strong>"Tensor Arena"</strong> de SRAM estática donde los tensores intermedios se sobreescriben cuidadosamente.</p>
+            </div>
+            <div style="background: rgba(189,147,249,0.1); border-radius: 0.5rem; padding: 12px; margin-bottom: 12px;">
+                <strong style="color: #bd93f9;">PyTorch Mobile / ExecuTorch</strong>
+                <p style="margin: 0.3rem 0 0;">PyTorch domina con grafos dinámicos en la academia, pero el Edge exige determinismo. <strong>ExecuTorch</strong> (mediante AOT compilation trazada con tiempo) convierte el modelo algorítmico en un grafo estático diminuto y altamente predecible en recursos.</p>
+            </div>
+            <div style="background: rgba(139,233,253,0.1); border-radius: 0.5rem; padding: 12px;">
+                <strong style="color: #8be9fd;">ONNX Runtime (ORT): El Traductor Universal</strong>
+                <p style="margin: 0.3rem 0 0;">Estandariza los modelos cruzados bajo <strong>"Execution Providers" (EP)</strong> (equivalente a delegados). Analiza si hay conectada una GPU NVIDIA (usando el EP TensorRT) o un chip Intel (cargando OpenVINO) y optimiza automáticamente sin tocar código de la app.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. Bajo Nivel -->
+    <section>
+        <h3>2. Librerías de Bajo Nivel: El Bisturí</h3>
+        <p style="font-size: 0.65em; text-align: left; margin-bottom: 0.8rem;">Cuando cada milisegundo o byte cuesta caro, evitamos el sobrepeso directo al metal.</p>
+        <div style="display: flex; gap: 1.5rem; font-size: 0.7em; text-align: left;">
+            <div style="flex: 1; background: rgba(80,250,123,0.1); padding: 0.8rem; border-radius: 0.5rem;">
+                <h4 style="color: #50fa7b; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.1em;">CMSIS-NN (ARM)</h4>
+                <p>Kernels matemáticos de brutal eficiencia en C/Ensamblador para microcontroladores Cortex-M.</p>
+                <ul style="margin-top: 0.5rem; padding-left: 1.2rem; line-height: 1.4;">
+                    <li style="margin-bottom: 0.3rem;">Maximizan el uso del set de instrucciones SIMD integrado.</li>
+                    <li>Empaquetan 4 datos INT8 de una convolución en un registro de 32 bits, procesándolos simétricamente en un solo ciclo de reloj.</li>
+                    <li><strong style="color: #8be9fd;">Uso:</strong> Es el motor profundo real detrás de TFLite Micro.</li>
+                </ul>
+            </div>
+            <div style="flex: 1; background: rgba(255,121,198,0.1); padding: 0.8rem; border-radius: 0.5rem;">
+                <h4 style="color: #ff79c6; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.1em;">NCNN (Tencent)</h4>
+                <p>El titán hegemónico tras la industria móvil asiática.</p>
+                <ul style="margin-top: 0.5rem; padding-left: 1.2rem; line-height: 1.4;">
+                    <li style="margin-bottom: 0.3rem;">Carece absolutamente de dependencias externas. Cero grasa.</li>
+                    <li>Optimizado minuciosamente a mano en ensamblador base sobre extensiones vectorizadas ARM NEON.</li>
+                    <li><strong style="color: #8be9fd;">Uso:</strong> Extracción de visión a tiempo real en el SoC pasivo de un móvil anticuado Android/IOS.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. Compiladores IA (TVM) -->
+    <section>
+        <h3>3. Compiladores Inteligentes: Apache TVM</h3>
+        <div style="font-size: 0.7em; text-align: left;">
+            <p><strong>TVM no interpreta el modelo, lo indaga y recompila de cero.</strong> Interviene reescribiendo la matemática de la red en 2 grandes niveles:</p>
+            <div style="margin-top: 1rem;">
+                <p style="color: #8be9fd; margin-bottom: 0.3rem;"><strong>1. Nivel de Grafo (Agnóstico del Hardware):</strong></p>
+                <ul style="margin-top: 0.5rem; padding-left: 1.2rem; line-height: 1.4;">
+                    <li style="margin-bottom: 0.4rem;"><strong>Operator Fusion (Fusión de Operadores):</strong> El secreto supremo. Fusiona algebraicamente (Ej: Conv + BatchNorm + ReLU) en <em>un solo bloque de ensamblador unificado</em>. Se lee la RAM una vez, se operan registros en chip, y escupe el resultado escrito final. Erradica la trágica "destrucción asíncrona del caché".</li>
+                    <li style="margin-bottom: 0.6rem;"><strong>Constant Folding:</strong> Precalcula masivamente tensores estáticos al momento base de compilar (Ahorro astronómico de ciclos vivos).</li>
+                </ul>
+                
+                <p style="color: #50fa7b; margin-top: 0.8rem; margin-bottom: 0.3rem;"><strong>2. Nivel de Tensor (AutoTVM / Auto-Tuning):</strong></p>
+                <ul style="margin-top: 0.5rem; padding-left: 1.2rem; line-height: 1.4;">
+                    <li>Machine Learning agendado para refactorizar Machine Learning. TVM envía iterativamente al silicio destino miles de fracturas forzadas de bucles, cronometra duraciones en carne viva y cristaliza la mutación esambladora más drásticamente veloz para las especificaciones puras del hardware.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. End-to-End MLOps -->
+    <section>
+        <h3>4. Plataformas End-to-End (MLOps Edge)</h3>
+        <div style="font-size: 0.7em; text-align: left;">
+            <p>El SaaS moderno que democratiza el agobio algorítmico al ingeniero clásico (Ej. <strong>Edge Impulse</strong>, <strong>SensiML</strong>).</p>
+            <div style="display: flex; gap: 1.5rem; margin-top: 1rem;">
+                <div style="flex: 1; background: rgba(255,255,255,0.05); padding: 0.8rem; border-radius: 0.5rem;">
+                    <strong style="color: #bd93f9;">Flujo de trabajo sumamente integrado:</strong>
+                    <ol style="margin-top: 0.5rem; padding-left: 1.2rem; line-height: 1.5;">
+                        <li style="margin-bottom: 0.4rem;">Ingesta de datos crudos telemétricos despachado desde multisensores (Bluetooth/Wi-Fi).</li>
+                        <li style="margin-bottom: 0.4rem;">Canalización automática del acondicionamiento clásico DSP (Signal Processing) adosado como proxy.</li>
+                        <li style="margin-bottom: 0.4rem;">Entrenamiento de topologías TinyML proyectando el "Constraint Checking" dictaminando huellas de ROM/SRAM.</li>
+                        <li><strong>One-Click to C++:</strong> Descarga atómica de subrutinas robustas desplegables velozmente en cualquier IDE (Keil, STM32Cube).</li>
+                    </ol>
+                </div>
+            </div>
+            <p style="margin-top: 1rem; color: #ffb86c; font-size:1.1em; text-align: center;"><strong>El despliegue ya no es darle "Aceptar", es ciencia arquitectónica per se.</strong></p>
+        </div>
+    </section>
+</section>

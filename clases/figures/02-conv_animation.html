@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: transparent;
+            font-family: sans-serif;
+            overflow: hidden;
+        }
+
+        .conv-grid {
+            display: inline-grid;
+            gap: 1px;
+            background-color: rgba(248, 248, 242, 0.2);
+            border: 1px solid rgba(248, 248, 242, 0.3);
+        }
+
+        .conv-cell {
+            background-color: rgba(40, 42, 54, 0.8);
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 7px;
+            color: rgba(248, 248, 242, 0.5);
+            transition: background-color 0.15s, box-shadow 0.15s;
+        }
+
+        .input-ch0 .conv-cell {
+            color: #ff5555;
+        }
+
+        .input-ch1 .conv-cell {
+            color: #50fa7b;
+        }
+
+        .input-ch2 .conv-cell {
+            color: #8be9fd;
+        }
+
+        .conv-cell.active-input-0 {
+            background-color: rgba(255, 85, 85, 0.6);
+            box-shadow: 0 0 4px #ff5555;
+            color: white;
+        }
+
+        .conv-cell.active-input-1 {
+            background-color: rgba(80, 250, 123, 0.6);
+            box-shadow: 0 0 4px #50fa7b;
+            color: white;
+        }
+
+        .conv-cell.active-input-2 {
+            background-color: rgba(139, 233, 253, 0.6);
+            box-shadow: 0 0 4px #8be9fd;
+            color: white;
+        }
+
+        .conv-cell.active-kernel-0 {
+            background-color: rgba(255, 121, 198, 0.8);
+            box-shadow: 0 0 4px #ff79c6;
+            color: white;
+        }
+
+        .conv-cell.active-kernel-1 {
+            background-color: rgba(189, 147, 249, 0.8);
+            box-shadow: 0 0 4px #bd93f9;
+            color: white;
+        }
+
+        .conv-cell.active-output-0 {
+            background-color: #ff79c6;
+            box-shadow: 0 0 8px #ff79c6;
+            color: white;
+            font-weight: bold;
+        }
+
+        .conv-cell.active-output-1 {
+            background-color: #bd93f9;
+            box-shadow: 0 0 8px #bd93f9;
+            color: white;
+            font-weight: bold;
+        }
+
+        .conv-cell.computed-output-0 {
+            background-color: rgba(255, 121, 198, 0.4);
+            color: white;
+            border: 1px solid #ff79c6;
+        }
+
+        .conv-cell.computed-output-1 {
+            background-color: rgba(189, 147, 249, 0.4);
+            color: white;
+            border: 1px solid #bd93f9;
+        }
+
+        .section-title {
+            font-size: 12px;
+            color: #f8f8f2;
+            text-align: center;
+            margin-bottom: 4px;
+            font-weight: bold;
+            position: relative;
+            z-index: 100;
+        }
+
+        .channel-title {
+            font-size: 9px;
+            color: rgba(248, 248, 242, 0.8);
+            text-align: center;
+            margin-bottom: 2px;
+            transition: opacity 0.8s;
+        }
+
+        .grid-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+                margin-top 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+                margin-bottom 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.8s;
+        }
+
+        .column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            perspective: 600px;
+        }
+
+        /* Phase 1: spread out, isometric perspective */
+        .grid-container.iso {
+            transform: rotateX(35deg) rotateZ(-20deg) scale(0.85);
+            margin-top: -20px;
+            margin-bottom: -10px;
+        }
+
+        .grid-container.iso:first-child {
+            margin-top: 0;
+        }
+
+        .grid-container.iso .channel-title {
+            opacity: 0.5;
+        }
+
+        /* Phase 0: stacked/overlapping — general */
+        .grid-container.stacked {
+            margin-top: -45px !important;
+            margin-bottom: -5px !important;
+            position: relative;
+        }
+
+        .grid-container.stacked:first-child {
+            margin-top: 0 !important;
+        }
+
+        /* Z-index: first channel on top, last channel at bottom */
+        .grid-container.stacked {
+            z-index: 10;
+        }
+
+        .grid-container.stacked~.grid-container.stacked {
+            z-index: 5;
+        }
+
+        .grid-container.stacked~.grid-container.stacked~.grid-container.stacked {
+            z-index: 1;
+        }
+
+        /* Phase 0: deeper stacking for input and output (larger grids) */
+        #input-column .grid-container.stacked {
+            margin-top: -85px !important;
+        }
+
+        #input-column .grid-container.stacked:first-child {
+            margin-top: 0 !important;
+        }
+
+        #output-column .grid-container.stacked {
+            margin-top: -65px !important;
+        }
+
+        #output-column .grid-container.stacked:first-child {
+            margin-top: 0 !important;
+        }
+
+        /* Intro: extra top space when stacked */
+        #layout-row {
+            transition: padding-top 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #layout-row.intro {
+            padding-top: 60px;
+        }
+
+        #status-bar {
+            margin-top: 8px;
+            padding: 6px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            text-align: center;
+            font-size: 11px;
+            color: #f1fa8c;
+            min-height: 16px;
+        }
+
+        #main-container {
+            padding: 10px;
+        }
+
+        .symbol {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6272a4;
+            font-size: 20px;
+            min-width: 25px;
+        }
+
+        .controls {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            display: flex;
+            gap: 4px;
+            z-index: 110;
+        }
+
+        .ctrl-btn {
+            background: rgba(98, 114, 164, 0.4);
+            border: 1px solid #6272a4;
+            color: #f8f8f2;
+            padding: 3px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            transition: background 0.2s;
+        }
+
+        .ctrl-btn:hover {
+            background: rgba(98, 114, 164, 0.7);
+        }
+
+        .ctrl-btn.active-play {
+            background: rgba(80, 250, 123, 0.3);
+            border-color: #50fa7b;
+        }
+
+        #lines-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="main-container" style="position: relative;">
+        <div class="controls">
+            <button id="reset-btn" class="ctrl-btn" title="Reset">&#8634;</button>
+            <button id="back-btn" class="ctrl-btn" title="Paso atrás">&#9664;</button>
+            <button id="pause-btn" class="ctrl-btn active-play" title="Pausa/Play">&#9654;</button>
+            <button id="fwd-btn" class="ctrl-btn" title="Paso adelante">&#9654;</button>
+        </div>
+
+        <svg id="lines-overlay"></svg>
+
+        <div id="layout-row" class="intro"
+            style="display: flex; justify-content: center; align-items: center; gap: 10px;">
+
+            <!-- Inputs (7x7x3) stacked vertically -->
+            <div id="input-column" class="column">
+                <div class="section-title">Entrada &rarr; (7&times;7)&times;3</div>
+                <div class="grid-container iso stacked">
+                    <div class="channel-title" style="color: #ff5555;">Canal 1</div>
+                    <div id="grid-in-0" class="conv-grid input-ch0" style="grid-template-columns: repeat(7, 1fr);">
+                    </div>
+                </div>
+                <div class="grid-container iso stacked">
+                    <div class="channel-title" style="color: #50fa7b;">Canal 2</div>
+                    <div id="grid-in-1" class="conv-grid input-ch1" style="grid-template-columns: repeat(7, 1fr);">
+                    </div>
+                </div>
+                <div class="grid-container iso stacked">
+                    <div class="channel-title" style="color: #8be9fd;">Canal 3</div>
+                    <div id="grid-in-2" class="conv-grid input-ch2" style="grid-template-columns: repeat(7, 1fr);">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Multiply symbol -->
+            <div class="symbol">&times;</div>
+
+            <!-- Kernels stacked vertically -->
+            <div id="kernel-column" class="column">
+                <div class="section-title">Kernels &rarr; (3&times;3)&times;3 &times;2</div>
+                <!-- Kernel 0 -->
+                <div id="kernel-box-0"
+                    style="border: 1px dashed rgba(255, 121, 198, 0.3); padding: 4px; border-radius: 5px;">
+                    <div class="channel-title" style="color: #ff79c6;">Filtro 1 &rarr; Sal. 1</div>
+                    <div class="grid-container iso stacked">
+                        <div id="grid-k0-0" class="conv-grid" style="grid-template-columns: repeat(3, 1fr);"></div>
+                    </div>
+                    <div class="grid-container iso stacked" style="margin-top:2px;">
+                        <div id="grid-k0-1" class="conv-grid" style="grid-template-columns: repeat(3, 1fr);"></div>
+                    </div>
+                    <div class="grid-container iso stacked" style="margin-top:2px;">
+                        <div id="grid-k0-2" class="conv-grid" style="grid-template-columns: repeat(3, 1fr);"></div>
+                    </div>
+                </div>
+                <!-- Kernel 1 -->
+                <div id="kernel-box-1"
+                    style="border: 1px dashed rgba(189, 147, 249, 0.3); padding: 4px; border-radius: 5px; opacity: 0.3;">
+                    <div class="channel-title" style="color: #bd93f9;">Filtro 2 &rarr; Sal. 2</div>
+                    <div class="grid-container iso stacked">
+                        <div id="grid-k1-0" class="conv-grid" style="grid-template-columns: repeat(3, 1fr);"></div>
+                    </div>
+                    <div class="grid-container iso stacked" style="margin-top:2px;">
+                        <div id="grid-k1-1" class="conv-grid" style="grid-template-columns: repeat(3, 1fr);"></div>
+                    </div>
+                    <div class="grid-container iso stacked" style="margin-top:2px;">
+                        <div id="grid-k1-2" class="conv-grid" style="grid-template-columns: repeat(3, 1fr);"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Equals symbol -->
+            <div class="symbol">=</div>
+
+            <!-- Outputs stacked vertically -->
+            <div id="output-column" class="column">
+                <div class="section-title">Salida &rarr; (5&times;5)&times;2</div>
+                <div class="grid-container iso stacked">
+                    <div class="channel-title" style="color: #ff79c6;">Canal 1</div>
+                    <div id="grid-out-0" class="conv-grid" style="grid-template-columns: repeat(5, 1fr);"></div>
+                </div>
+                <div class="grid-container iso stacked">
+                    <div class="channel-title" style="color: #bd93f9;">Canal 2</div>
+                    <div id="grid-out-1" class="conv-grid" style="grid-template-columns: repeat(5, 1fr);"></div>
+                </div>
+            </div>
+
+        </div>
+
+        <div id="status-bar">Presion&aacute; &#9654; Play para comenzar</div>
+    </div>
+
+    <script>
+        (function () {
+            var inputSize = 7;
+            var kernelSize = 3;
+            var outputSize = inputSize - kernelSize + 1;
+            var inputChannels = 3;
+            var outputChannels = 2;
+            var totalSteps = outputSize * outputSize * outputChannels;
+
+            var animPhase = 0;
+            var currentStep = 0;
+            var paused = true;
+            var computedValues = [];
+
+            var statusBar = document.getElementById("status-bar");
+            var pauseBtn = document.getElementById("pause-btn");
+            var fwdBtn = document.getElementById("fwd-btn");
+            var backBtn = document.getElementById("back-btn");
+            var resetBtn = document.getElementById("reset-btn");
+            var svgOverlay = document.getElementById("lines-overlay");
+            var mainContainer = document.getElementById("main-container");
+            var layoutRow = document.getElementById("layout-row");
+
+            function stepToCoords(step) {
+                var s = ((step % totalSteps) + totalSteps) % totalSteps;
+                var filt = Math.floor(s / (outputSize * outputSize));
+                var rem = s % (outputSize * outputSize);
+                var oy = Math.floor(rem / outputSize);
+                var ox = rem % outputSize;
+                return { filter: filt, outY: oy, outX: ox };
+            }
+
+            // --- Line drawing ---
+            function clearLines() {
+                svgOverlay.innerHTML = '';
+            }
+
+            function getCenter(el) {
+                var r = el.getBoundingClientRect();
+                var cr = mainContainer.getBoundingClientRect();
+                return {
+                    x: r.left + r.width / 2 - cr.left,
+                    y: r.top + r.height / 2 - cr.top
+                };
+            }
+
+            function getWindowCenter(ch, outY, outX) {
+                // Get center of the 3x3 active window on input channel ch
+                var topLeft = (outY) * inputSize + (outX);
+                var botRight = (outY + kernelSize - 1) * inputSize + (outX + kernelSize - 1);
+                var tlCell = document.getElementById("grid-in-" + ch + "-cell-" + topLeft);
+                var brCell = document.getElementById("grid-in-" + ch + "-cell-" + botRight);
+                if (!tlCell || !brCell) return null;
+                var cr = mainContainer.getBoundingClientRect();
+                var r1 = tlCell.getBoundingClientRect();
+                var r2 = brCell.getBoundingClientRect();
+                return {
+                    x: (r1.left + r2.right) / 2 - cr.left,
+                    y: (r1.top + r2.bottom) / 2 - cr.top
+                };
+            }
+
+            function drawLines(cf, outY, outX) {
+                clearLines();
+                if (animPhase < 2) return;
+
+                var lineColor = cf === 0 ? 'rgba(255,121,198,0.25)' : 'rgba(189,147,249,0.25)';
+
+                for (var ch = 0; ch < inputChannels; ch++) {
+                    var kernelGrid = document.getElementById("grid-k" + cf + "-" + ch);
+                    if (!kernelGrid) continue;
+
+                    var kCenter = getCenter(kernelGrid);
+                    var wCenter = getWindowCenter(ch, outY, outX);
+                    if (!wCenter) continue;
+
+                    var line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                    line.setAttribute("x1", kCenter.x);
+                    line.setAttribute("y1", kCenter.y);
+                    line.setAttribute("x2", wCenter.x);
+                    line.setAttribute("y2", wCenter.y);
+                    line.setAttribute("stroke", lineColor);
+                    line.setAttribute("stroke-width", "1.5");
+                    line.setAttribute("stroke-dasharray", "4,3");
+                    svgOverlay.appendChild(line);
+                }
+            }
+
+            // --- Phase transitions ---
+            function goToPhase1() {
+                animPhase = 1;
+                document.querySelectorAll('.grid-container.stacked').forEach(function (el) {
+                    el.classList.remove('stacked');
+                });
+                layoutRow.classList.remove('intro');
+                clearLines();
+                statusBar.innerHTML = 'Separando canales en profundidad...';
+            }
+
+            function goToPhase2() {
+                animPhase = 2;
+                document.querySelectorAll('.grid-container.iso').forEach(function (el) {
+                    el.classList.remove('iso');
+                });
+                currentStep = 0;
+                computedValues = [];
+                clearAllOutputs();
+                renderCurrentStep();
+            }
+
+            function goBackToPhase1() {
+                animPhase = 1;
+                resetHighlights();
+                clearAllOutputs();
+                clearLines();
+                currentStep = 0;
+                computedValues = [];
+                document.querySelectorAll('.grid-container').forEach(function (el) {
+                    el.classList.add('iso');
+                });
+                statusBar.innerHTML = 'Canales separados (vista isom\u00e9trica)';
+            }
+
+            function goBackToPhase0() {
+                animPhase = 0;
+                document.querySelectorAll('.grid-container').forEach(function (el) {
+                    el.classList.add('stacked');
+                });
+                layoutRow.classList.add('intro');
+                clearLines();
+                statusBar.innerHTML = 'Presion\u00e1 \u25B6 Play para comenzar';
+            }
+
+            function fullReset() {
+                animPhase = 0;
+                currentStep = 0;
+                computedValues = [];
+                resetHighlights();
+                clearAllOutputs();
+                clearLines();
+                document.querySelectorAll('.grid-container').forEach(function (el) {
+                    el.classList.add('iso');
+                    el.classList.add('stacked');
+                });
+                layoutRow.classList.add('intro');
+                statusBar.innerHTML = 'Presion\u00e1 \u25B6 Play para comenzar';
+            }
+
+            function advanceOne() {
+                if (animPhase === 0) {
+                    goToPhase1();
+                } else if (animPhase === 1) {
+                    goToPhase2();
+                } else {
+                    currentStep++;
+                    if (currentStep >= totalSteps) {
+                        currentStep = 0;
+                        computedValues = [];
+                        clearAllOutputs();
+                    }
+                    renderCurrentStep();
+                }
+            }
+
+            function retreatOne() {
+                if (animPhase === 0) {
+                    return;
+                } else if (animPhase === 1) {
+                    goBackToPhase0();
+                } else if (animPhase === 2 && currentStep === 0) {
+                    goBackToPhase1();
+                } else {
+                    currentStep--;
+                    if (currentStep < 0) currentStep = 0;
+                    renderCurrentStep();
+                }
+            }
+
+            // --- Controls ---
+            function setPaused() {
+                paused = true;
+                pauseBtn.innerHTML = "&#9654;";
+                pauseBtn.classList.add("active-play");
+            }
+
+            pauseBtn.addEventListener("click", function () {
+                paused = !paused;
+                if (paused) {
+                    pauseBtn.innerHTML = "&#9654;";
+                    pauseBtn.classList.add("active-play");
+                } else {
+                    pauseBtn.innerHTML = "&#10074;&#10074;";
+                    pauseBtn.classList.remove("active-play");
+                }
+            });
+
+            fwdBtn.addEventListener("click", function () {
+                setPaused();
+                advanceOne();
+            });
+
+            backBtn.addEventListener("click", function () {
+                setPaused();
+                retreatOne();
+            });
+
+            resetBtn.addEventListener("click", function () {
+                setPaused();
+                fullReset();
+            });
+
+            // --- Grid creation ---
+            function createGrid(containerId, size, defaultText) {
+                var container = document.getElementById(containerId);
+                if (!container) return;
+                container.innerHTML = "";
+                for (var i = 0; i < size * size; i++) {
+                    var cell = document.createElement("div");
+                    cell.className = "conv-cell";
+                    cell.id = containerId + "-cell-" + i;
+                    cell.textContent = defaultText || Math.floor(Math.random() * 10);
+                    container.appendChild(cell);
+                }
+            }
+
+            for (var c = 0; c < inputChannels; c++) {
+                createGrid("grid-in-" + c, inputSize, "");
+            }
+            for (var f = 0; f < outputChannels; f++) {
+                for (var c2 = 0; c2 < inputChannels; c2++) {
+                    createGrid("grid-k" + f + "-" + c2, kernelSize, "w");
+                }
+                createGrid("grid-out-" + f, outputSize, "-");
+            }
+
+            // --- Render helpers ---
+            function clearAllOutputs() {
+                document.querySelectorAll('[id^=grid-out-] .conv-cell').forEach(function (el) {
+                    el.className = 'conv-cell';
+                    el.textContent = "-";
+                });
+            }
+
+            function resetHighlights() {
+                document.querySelectorAll('.conv-cell').forEach(function (el) {
+                    el.classList.remove('active-input-0', 'active-input-1', 'active-input-2',
+                        'active-kernel-0', 'active-kernel-1',
+                        'active-output-0', 'active-output-1');
+                });
+            }
+
+            function renderCurrentStep() {
+                resetHighlights();
+                var coords = stepToCoords(currentStep);
+                var cx = coords.outX, cy = coords.outY, cf = coords.filter;
+
+                // 1. Highlight Input Window
+                for (var ch = 0; ch < inputChannels; ch++) {
+                    for (var ky = 0; ky < kernelSize; ky++) {
+                        for (var kx = 0; kx < kernelSize; kx++) {
+                            var idx = (cy + ky) * inputSize + (cx + kx);
+                            var cell = document.getElementById("grid-in-" + ch + "-cell-" + idx);
+                            if (cell) cell.classList.add("active-input-" + ch);
+                        }
+                    }
+                }
+
+                // 2. Highlight Kernel
+                for (var ch2 = 0; ch2 < inputChannels; ch2++) {
+                    for (var i = 0; i < kernelSize * kernelSize; i++) {
+                        var kCell = document.getElementById("grid-k" + cf + "-" + ch2 + "-cell-" + i);
+                        if (kCell) kCell.classList.add("active-kernel-" + (cf % 2));
+                    }
+                }
+
+                // Kernel Box UI
+                var kBox0 = document.getElementById('kernel-box-0');
+                var kBox1 = document.getElementById('kernel-box-1');
+                if (cf === 0) { kBox0.style.opacity = '1'; kBox1.style.opacity = '0.3'; }
+                else { kBox0.style.opacity = '0.3'; kBox1.style.opacity = '1'; }
+
+                // 3. Output — store computed value
+                if (!computedValues[currentStep]) {
+                    computedValues[currentStep] = Math.floor(Math.random() * 10);
+                }
+                var outIdx = cy * outputSize + cx;
+                var outCell = document.getElementById("grid-out-" + cf + "-cell-" + outIdx);
+                if (outCell) {
+                    outCell.classList.add("active-output-" + (cf % 2));
+                    outCell.classList.add("computed-output-" + (cf % 2));
+                    outCell.textContent = computedValues[currentStep];
+                }
+
+                // Re-paint previous computed outputs
+                for (var s = 0; s < currentStep; s++) {
+                    var pc = stepToCoords(s);
+                    var pIdx = pc.outY * outputSize + pc.outX;
+                    var pCell = document.getElementById("grid-out-" + pc.filter + "-cell-" + pIdx);
+                    if (pCell && computedValues[s] !== undefined) {
+                        pCell.classList.add("computed-output-" + (pc.filter % 2));
+                        pCell.textContent = computedValues[s];
+                    }
+                }
+
+                // Draw connecting lines kernel ↔ input window
+                drawLines(cf, cy, cx);
+
+                statusBar.innerHTML = 'Paso ' + (currentStep + 1) + '/' + totalSteps +
+                    ' &mdash; P\u00edxel <b>(' + cx + ', ' + cy + ')</b> &rarr; <b>Salida ' + (cf + 1) + '</b><br>' +
+                    '<span style="font-size:0.8em; opacity:0.8;">Ventana 3\u00d73 \u00d7 Filtro ' + (cf + 1) + '</span>';
+            }
+
+            // --- Auto-play loop ---
+            function autoStep() {
+                if (paused) return;
+                advanceOne();
+            }
+
+            setInterval(autoStep, 600);
+        })();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,100 @@
+<!-- 5. Compresión -->
+<section>
+    <section>
+        <h2 class="gradient-text">5. Compresión</h2>
+        <p>Optimizando redes neuronales para entornos restringidos</p>
+    </section>
+    
+    <section>
+        <h3>El problema central</h3>
+        <div style="font-size: 0.8em; text-align: left;">
+            <p>Para implementar modelos de Deep Learning en entornos con capacidades limitadas debemos encontrar un equilibrio entre la <strong>precisión</strong> y la <strong>eficiencia</strong>.</p>
+            <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                <div style="flex: 1; background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 0.5rem; border-top: 4px solid #8be9fd;">
+                    <strong style="color: #8be9fd;">Requerimientos de la aplicación</strong>
+                    <ul style="margin-top: 0.5rem; font-size: 0.9em; padding-left: 1.2em;">
+                        <li>Rendimiento</li>
+                        <li>Retardo o latencia</li>
+                        <li>Energía y potencia</li>
+                        <li>Costos</li>
+                    </ul>
+                </div>
+                <div style="flex: 1; background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 0.5rem; border-top: 4px solid #ff79c6;">
+                    <strong style="color: #ff79c6;">Limitaciones de la plataforma</strong>
+                    <ul style="margin-top: 0.5rem; font-size: 0.9em; padding-left: 1.2em;">
+                        <li>Capacidad de cómputo</li>
+                        <li>Memoria</li>
+                        <li>Ancho de banda</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h3>Requerimientos de la aplicación</h3>
+        <div style="font-size: 0.65em; text-align: left;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div style="background: rgba(80,250,123,0.1); padding: 15px; border-radius: 8px;">
+                    <strong style="color: #50fa7b;">Rendimiento (Throughput)</strong>
+                    <p style="margin: 5px 0 0;">Cantidad de datos procesados en un tiempo determinado (e.g. video a altos cuadros por segundo).</p>
+                </div>
+                <div style="background: rgba(255,184,108,0.1); padding: 15px; border-radius: 8px;">
+                    <strong style="color: #ffb86c;">Retardo (Latencia)</strong>
+                    <p style="margin: 5px 0 0;">Tiempo mínimo desde la entrada del dato hasta la obtención de la salida (vital en aplicaciones críticas como conducción autónoma).</p>
+                </div>
+                <div style="background: rgba(189,147,249,0.1); padding: 15px; border-radius: 8px;">
+                    <strong style="color: #bd93f9;">Costos</strong>
+                    <p style="margin: 5px 0 0;">Incluye tanto los costos computacionales (recursos necesarios) como los de implementación y mantenimiento general de la solución.</p>
+                </div>
+                <div style="background: rgba(255,121,198,0.1); padding: 15px; border-radius: 8px;">
+                    <strong style="color: #ff79c6;">Energía y Potencia</strong>
+                    <ul style="margin: 5px 0 0; padding-left: 1.2em;">
+                        <li><strong>Energía (Joules)</strong>: Consumo acumulado (batería, impacto ambiental). El modelo debe requerir baja energía por inferencia.</li>
+                        <li><strong>Potencia (Watts)</strong>: Tasa de consumo energético por unidad de tiempo. Límite físico en operación sostenida, acota cuánto cómputo podemos permitir por inferencia.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h3>Limitaciones de hardware</h3>
+        <div style="font-size: 0.7em; text-align: left;">
+            <ul style="line-height: 1.5;">
+                <li style="margin-bottom: 0.8rem;"><strong style="color: #8be9fd;">Memoria:</strong> Restringe el tamaño del modelo y lotes de procesamiento. 
+                    <ul style="font-size: 0.9em; margin-top:0.3rem;">
+                        <li><strong>Interna (on-chip):</strong> Alta velocidad, muy escasa y de bajo costo energético.</li>
+                        <li><strong>Externa (off-chip):</strong> Abundante, pero lenta y con elevado peso energético.</li>
+                    </ul>
+                </li>
+                <li style="margin-bottom: 0.8rem;"><strong style="color: #50fa7b;">Ancho de banda:</strong> Velocidad de transferencia del cuello de botella principal (procesador-memoria externa). Un acceso eficiente incluye maximizar la reutilización de datos on-chip.</li>
+                <li><strong style="color: #ff79c6;">Capacidad de cómputo:</strong> Operaciones o cálculos posibles por segundo de la plataforma limitan el uso de arquitecturas de ML hiper-computacionales.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section>
+        <h3>Métodos de compresión de redes</h3>
+        <div style="font-size: 0.65em; text-align: left;">
+            <p>Reducen la complejidad de un modelo con un objetivo claro: <span class="gradient-text">alta eficiencia durante la inferencia</span> sin sacrificar la precisión original del resultado.</p>
+            <div style="display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 1rem;">
+                <div style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; border-left: 4px solid #50fa7b;">
+                    <strong>Poda (Pruning):</strong> Elimina conexiones (sinapsis) o neuronas no esenciales para reducir la cantidad de parámetros.
+                </div>
+                <div style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; border-left: 4px solid #8be9fd;">
+                    <strong>Cuantización:</strong> Reduce la precisión de pesos y activaciones (ej. pasar de punto flotante de 32 bits a punto fijo de 8 u 4 bits).
+                </div>
+                <div style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; border-left: 4px solid #ff79c6;">
+                    <strong>Factorización de matrices:</strong> Aproxima matemáticamente operaciones grandes mediante el producto de múltiples matrices menores.
+                </div>
+                <div style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; border-left: 4px solid #ffb86c;">
+                    <strong>Búsqueda de Arquitectura Neuronal (NAS):</strong> Algoritmos automatizados que exploran estructuras óptimas respetando requerimientos dados.
+                </div>
+                <div style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; border-left: 4px solid #f1fa8c;">
+                    <strong>Destilación del conocimiento:</strong> Permite utilizar el aprendizaje de una red gigante (teacher) para nutrir de un resumen a una pequeña (student).
+                </div>
+            </div>
+        </div>
+    </section>
+</section>

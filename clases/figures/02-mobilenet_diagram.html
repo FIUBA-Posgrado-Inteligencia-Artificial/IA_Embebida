@@ -1,0 +1,86 @@
+<svg viewBox="0 0 600 200"
+    style="width: 100%; display: block; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3)); border-radius: 0.5rem; background: rgba(255,255,255,0.05);">
+    <defs>
+        <marker id="arrow-mob" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6"
+            orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="rgba(248, 248, 242, 0.4)" />
+        </marker>
+        <filter id="glow-mob">
+            <feGaussianBlur stdDeviation="2" result="blur" />
+            <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+            </feMerge>
+        </filter>
+    </defs>
+
+    <text x="300" y="25" fill="#f8f8f2" font-size="14" font-weight="bold" font-family="sans-serif"
+        text-anchor="middle">Separable Convolution (MobileNet)</text>
+
+    <!-- Standard Convolution (Left) -->
+    <text x="150" y="60" fill="#ff5555" font-size="12" font-weight="bold" font-family="sans-serif"
+        text-anchor="middle">Conv Estándar (Costosa)</text>
+
+    <rect x="50" y="80" width="30" height="30" fill="rgba(248, 248, 242, 0.2)" stroke="#f8f8f2" />
+    <text x="65" y="100" fill="#f8f8f2" font-size="10" font-family="sans-serif" text-anchor="middle">M</text>
+
+    <path d="M 85 95 L 125 95" stroke="rgba(248, 248, 242, 0.4)" stroke-width="2" marker-end="url(#arrow-mob)" />
+
+    <rect x="130" y="70" width="40" height="50" fill="rgba(189, 147, 249, 0.4)" stroke="#bd93f9" stroke-width="2" />
+    <text x="150" y="90" fill="#bd93f9" font-size="10" font-weight="bold" font-family="sans-serif"
+        text-anchor="middle">3x3xM</text>
+    <text x="150" y="110" fill="#bd93f9" font-size="10" font-family="sans-serif" text-anchor="middle">N Filters</text>
+
+    <path d="M 175 95 L 215 95" stroke="rgba(248, 248, 242, 0.4)" stroke-width="2" marker-end="url(#arrow-mob)" />
+
+    <rect x="220" y="75" width="40" height="40" fill="rgba(80, 250, 123, 0.3)" stroke="#50fa7b" />
+    <text x="240" y="100" fill="#50fa7b" font-size="10" font-family="sans-serif" text-anchor="middle">N</text>
+
+    <text x="150" y="160" fill="#ffb86c" font-size="10" font-weight="bold" font-family="sans-serif" text-anchor="middle"
+        font-style="italic">Computación = 3 * 3 * M * N * Area</text>
+
+    <!-- Separable Line -->
+    <line x1="300" y1="50" x2="300" y2="180" stroke="rgba(248, 248, 242, 0.2)" stroke-width="1" stroke-dasharray="4" />
+
+    <!-- Depthwise Separable (Right) -->
+    <text x="450" y="60" fill="#50fa7b" font-size="12" font-weight="bold" font-family="sans-serif"
+        text-anchor="middle">Depthwise Separable (Eficiente)</text>
+
+    <rect x="320" y="80" width="30" height="30" fill="rgba(248, 248, 242, 0.2)" stroke="#f8f8f2" />
+    <text x="335" y="100" fill="#f8f8f2" font-size="10" font-family="sans-serif" text-anchor="middle">M</text>
+
+    <path d="M 355 95 L 375 95" stroke="rgba(248, 248, 242, 0.4)" stroke-width="2" marker-end="url(#arrow-mob)" />
+
+    <!-- Depthwise -->
+    <rect x="380" y="75" width="20" height="40" fill="rgba(189, 147, 249, 0.6)" stroke="#bd93f9" stroke-width="2"
+        filter="url(#glow-mob)" />
+    <text x="390" y="100" fill="#bd93f9" font-size="10" font-weight="bold" font-family="sans-serif" text-anchor="middle"
+        transform="rotate(-90 390,100)">3x3 (M)</text>
+
+    <text x="390" y="130" fill="#bd93f9" font-size="8" font-family="sans-serif" text-anchor="middle">Depthwise</text>
+
+    <path d="M 405 95 L 425 95" stroke="rgba(248, 248, 242, 0.4)" stroke-width="2" marker-end="url(#arrow-mob)" />
+
+    <rect x="430" y="80" width="30" height="30" fill="rgba(139, 233, 253, 0.3)" stroke="#8be9fd" />
+    <text x="445" y="100" fill="#8be9fd" font-size="10" font-family="sans-serif" text-anchor="middle">M</text>
+
+    <path d="M 465 95 L 485 95" stroke="rgba(248, 248, 242, 0.4)" stroke-width="2" marker-end="url(#arrow-mob)" />
+
+    <!-- Pointwise -->
+    <rect x="490" y="70" width="20" height="50" fill="rgba(255, 121, 198, 0.6)" stroke="#ff79c6" stroke-width="2"
+        filter="url(#glow-mob)" />
+    <text x="500" y="100" fill="#f8f8f2" font-size="10" font-weight="bold" font-family="sans-serif" text-anchor="middle"
+        transform="rotate(-90 500,100)">1x1xM (N)</text>
+
+    <text x="500" y="130" fill="#ff79c6" font-size="8" font-family="sans-serif" text-anchor="middle">Pointwise</text>
+
+    <path d="M 515 95 L 535 95" stroke="rgba(248, 248, 242, 0.4)" stroke-width="2" marker-end="url(#arrow-mob)" />
+
+    <rect x="540" y="75" width="40" height="40" fill="rgba(80, 250, 123, 0.3)" stroke="#50fa7b" />
+    <text x="560" y="100" fill="#50fa7b" font-size="10" font-family="sans-serif" text-anchor="middle">N</text>
+
+    <text x="450" y="160" fill="#ffb86c" font-size="10" font-weight="bold" font-family="sans-serif" text-anchor="middle"
+        font-style="italic">Computación ≈ Area * ( 3*3*M + M*N )</text>
+    <text x="450" y="175" fill="#50fa7b" font-size="10" font-weight="bold" font-family="sans-serif"
+        text-anchor="middle">¡Muchísimo menor!</text>
+</svg>

@@ -1,0 +1,95 @@
+<svg viewBox="0 0 800 200"
+    style="width: 100%; display: block; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3)); border-radius: 0.5rem; background: rgba(255,255,255,0.05);">
+    <defs>
+        <marker id="arrow-vgg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6"
+            orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="rgba(248, 248, 242, 0.4)" />
+        </marker>
+        <filter id="glow-vgg">
+            <feGaussianBlur stdDeviation="2" result="blur" />
+            <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+            </feMerge>
+        </filter>
+    </defs>
+
+    <text x="400" y="25" fill="#f8f8f2" font-size="14" font-weight="bold" font-family="sans-serif"
+        text-anchor="middle">VGG-16</text>
+
+    <!-- Input -->
+    <rect x="20" y="60" width="30" height="80" fill="rgba(248, 248, 242, 0.2)" stroke="#f8f8f2" stroke-width="2" />
+    <text x="35" y="160" fill="#f8f8f2" font-size="10" font-family="sans-serif" text-anchor="middle">224x224</text>
+    <path d="M 50 100 L 70 100" stroke="rgba(248, 248, 242, 0.4)" stroke-width="2" marker-end="url(#arrow-vgg)" />
+
+    <!-- Block 1 -->
+    <rect x="80" y="60" width="10" height="80" fill="rgba(189, 147, 249, 0.3)" stroke="#bd93f9" />
+    <rect x="90" y="60" width="10" height="80" fill="rgba(189, 147, 249, 0.4)" stroke="#bd93f9" />
+    <rect x="100" y="70" width="10" height="60" fill="rgba(80, 250, 123, 0.5)" stroke="#50fa7b" />
+    <text x="95" y="160" fill="#bd93f9" font-size="9" font-family="sans-serif" text-anchor="middle">Pool 1</text>
+    <path d="M 110 100 L 130 100" stroke="rgba(248, 248, 242, 0.4)" stroke-width="2" marker-end="url(#arrow-vgg)" />
+
+    <!-- Block 2 -->
+    <rect x="140" y="70" width="10" height="60" fill="rgba(189, 147, 249, 0.5)" stroke="#bd93f9" />
+    <rect x="150" y="70" width="10" height="60" fill="rgba(189, 147, 249, 0.6)" stroke="#bd93f9" />
+    <rect x="160" y="80" width="10" height="40" fill="rgba(80, 250, 123, 0.6)" stroke="#50fa7b" />
+    <text x="155" y="160" fill="#bd93f9" font-size="9" font-family="sans-serif" text-anchor="middle">Pool 2</text>
+    <path d="M 170 100 L 190 100" stroke="rgba(248, 248, 242, 0.4)" stroke-width="2" marker-end="url(#arrow-vgg)" />
+
+    <!-- Block 3 -->
+    <rect x="200" y="80" width="10" height="40" fill="rgba(189, 147, 249, 0.7)" stroke="#bd93f9" />
+    <rect x="210" y="80" width="10" height="40" fill="rgba(189, 147, 249, 0.7)" stroke="#bd93f9" />
+    <rect x="220" y="80" width="10" height="40" fill="rgba(189, 147, 249, 0.8)" stroke="#bd93f9" />
+    <rect x="230" y="85" width="10" height="30" fill="rgba(80, 250, 123, 0.7)" stroke="#50fa7b" />
+    <text x="215" y="160" fill="#bd93f9" font-size="9" font-family="sans-serif" text-anchor="middle">Pool 3</text>
+    <path d="M 240 100 L 260 100" stroke="rgba(248, 248, 242, 0.4)" stroke-width="2" marker-end="url(#arrow-vgg)" />
+
+    <!-- Block 4 -->
+    <rect x="270" y="85" width="10" height="30" fill="rgba(189, 147, 249, 0.8)" stroke="#bd93f9" />
+    <rect x="280" y="85" width="10" height="30" fill="rgba(189, 147, 249, 0.8)" stroke="#bd93f9" />
+    <rect x="290" y="85" width="10" height="30" fill="rgba(189, 147, 249, 0.9)" stroke="#bd93f9" />
+    <rect x="300" y="90" width="10" height="20" fill="rgba(80, 250, 123, 0.8)" stroke="#50fa7b" />
+    <text x="285" y="160" fill="#bd93f9" font-size="9" font-family="sans-serif" text-anchor="middle">Pool 4</text>
+    <path d="M 310 100 L 330 100" stroke="rgba(248, 248, 242, 0.4)" stroke-width="2" marker-end="url(#arrow-vgg)" />
+
+    <!-- Block 5 -->
+    <rect x="340" y="90" width="10" height="20" fill="rgba(189, 147, 249, 0.9)" stroke="#bd93f9" />
+    <rect x="350" y="90" width="10" height="20" fill="rgba(189, 147, 249, 0.9)" stroke="#bd93f9" />
+    <rect x="360" y="90" width="10" height="20" fill="rgba(189, 147, 249, 1.0)" stroke="#bd93f9" />
+    <rect x="370" y="92.5" width="10" height="15" fill="rgba(80, 250, 123, 0.9)" stroke="#50fa7b" />
+    <text x="355" y="160" fill="#bd93f9" font-size="9" font-family="sans-serif" text-anchor="middle">Pool 5</text>
+    <path d="M 380 100 L 410 100" stroke="rgba(248, 248, 242, 0.4)" stroke-width="2" marker-end="url(#arrow-vgg)" />
+
+    <!-- FC Layers -->
+    <rect x="420" y="30" width="40" height="140" fill="rgba(255, 184, 108, 0.6)" stroke="#ffb86c" stroke-width="2"
+        filter="url(#glow-vgg)" />
+    <text x="440" y="95" fill="#f8f8f2" font-size="10" font-family="sans-serif" text-anchor="middle">FC</text>
+    <text x="440" y="110" fill="#f8f8f2" font-size="10" font-weight="bold" font-family="sans-serif"
+        text-anchor="middle">4096</text>
+    <path d="M 460 100 L 490 100" stroke="rgba(248, 248, 242, 0.4)" stroke-width="2" marker-end="url(#arrow-vgg)" />
+
+    <rect x="500" y="30" width="40" height="140" fill="rgba(255, 184, 108, 0.7)" stroke="#ffb86c" stroke-width="2"
+        filter="url(#glow-vgg)" />
+    <text x="520" y="95" fill="#f8f8f2" font-size="10" font-family="sans-serif" text-anchor="middle">FC</text>
+    <text x="520" y="110" fill="#f8f8f2" font-size="10" font-weight="bold" font-family="sans-serif"
+        text-anchor="middle">4096</text>
+    <path d="M 540 100 L 570 100" stroke="rgba(248, 248, 242, 0.4)" stroke-width="2" marker-end="url(#arrow-vgg)" />
+
+    <rect x="580" y="40" width="30" height="120" fill="rgba(255, 184, 108, 0.8)" stroke="#ffb86c" stroke-width="2"
+        filter="url(#glow-vgg)" />
+    <text x="595" y="95" fill="#f8f8f2" font-size="10" font-family="sans-serif" text-anchor="middle">FC</text>
+    <text x="595" y="110" fill="#f8f8f2" font-size="10" font-weight="bold" font-family="sans-serif"
+        text-anchor="middle">1000</text>
+    <path d="M 610 100 L 650 100" stroke="rgba(248, 248, 242, 0.4)" stroke-width="2" marker-end="url(#arrow-vgg)" />
+
+    <!-- Output -->
+    <circle cx="680" cy="100" r="25" fill="rgba(255, 85, 85, 0.8)" stroke="#ff5555" stroke-width="2"
+        filter="url(#glow-vgg)" />
+    <text x="680" y="105" fill="#f8f8f2" font-size="12" font-weight="bold" font-family="sans-serif"
+        text-anchor="middle">Out</text>
+    <text x="680" y="145" fill="#ff5555" font-size="10" font-family="sans-serif" text-anchor="middle">Softmax</text>
+
+    <text x="215" y="180" fill="#bd93f9" font-size="10" font-family="sans-serif" text-anchor="middle">Todas las convs
+        son 3x3 minúsculas</text>
+
+</svg>

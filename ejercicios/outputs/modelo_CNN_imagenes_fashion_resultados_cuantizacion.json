@@ -1,0 +1,230 @@
+{
+    "model_name": "modelo_CNN_imagenes_fashion",
+    "float_acc": 0.8924999833106995,
+    "results": {
+        "8_Global_max": {
+            "bits": 8,
+            "scope": "Global",
+            "metric": "max",
+            "config": {
+                "conv2d_1": {
+                    "kernel_quantizer": "quantized_linear(8, 0, symmetric=False, keep_negative=True, alpha=1)",
+                    "bias_quantizer": "quantized_linear(8, -2, symmetric=False, keep_negative=True, alpha=1)",
+                    "activation_quantizer": "quantized_relu(8, 3)"
+                },
+                "conv2d_2": {
+                    "kernel_quantizer": "quantized_linear(8, 0, symmetric=False, keep_negative=True, alpha=1)",
+                    "bias_quantizer": "quantized_linear(8, -2, symmetric=False, keep_negative=True, alpha=1)",
+                    "activation_quantizer": "quantized_relu(8, 3)"
+                },
+                "dense_1": {
+                    "kernel_quantizer": "quantized_linear(8, 0, symmetric=False, keep_negative=True, alpha=1)",
+                    "bias_quantizer": "quantized_linear(8, -2, symmetric=False, keep_negative=True, alpha=1)",
+                    "activation_quantizer": "quantized_relu(8, 3)"
+                },
+                "dense_2": {
+                    "kernel_quantizer": "quantized_linear(8, 0, symmetric=False, keep_negative=True, alpha=1)",
+                    "bias_quantizer": "quantized_linear(8, -2, symmetric=False, keep_negative=True, alpha=1)",
+                    "activation_quantizer": "quantized_relu(8, 3)"
+                },
+                "output": {
+                    "kernel_quantizer": "quantized_linear(8, 0, symmetric=False, keep_negative=True, alpha=1)",
+                    "bias_quantizer": "quantized_linear(8, -2, symmetric=False, keep_negative=True, alpha=1)"
+                }
+            },
+            "ptq_acc": 0.8907999992370605,
+            "qat_acc": 0.0
+        },
+        "8_Global_p95": {
+            "bits": 8,
+            "scope": "Global",
+            "metric": "p95",
+            "config": {
+                "conv2d_1": {
+                    "kernel_quantizer": "quantized_linear(8, -1, symmetric=False, keep_negative=True, alpha=1)",
+                    "bias_quantizer": "quantized_linear(8, -2, symmetric=False, keep_negative=True, alpha=1)",
+                    "activation_quantizer": "quantized_relu(8, 2)"
+                },
+                "conv2d_2": {
+                    "kernel_quantizer": "quantized_linear(8, -1, symmetric=False, keep_negative=True, alpha=1)",
+                    "bias_quantizer": "quantized_linear(8, -2, symmetric=False, keep_negative=True, alpha=1)",
+                    "activation_quantizer": "quantized_relu(8, 2)"
+                },
+                "dense_1": {
+                    "kernel_quantizer": "quantized_linear(8, -1, symmetric=False, keep_negative=True, alpha=1)",
+                    "bias_quantizer": "quantized_linear(8, -2, symmetric=False, keep_negative=True, alpha=1)",
+                    "activation_quantizer": "quantized_relu(8, 2)"
+                },
+                "dense_2": {
+                    "kernel_quantizer": "quantized_linear(8, -1, symmetric=False, keep_negative=True, alpha=1)",
+                    "bias_quantizer": "quantized_linear(8, -2, symmetric=False, keep_negative=True, alpha=1)",
+                    "activation_quantizer": "quantized_relu(8, 2)"
+                },
+                "output": {
+                    "kernel_quantizer": "quantized_linear(8, -1, symmetric=False, keep_negative=True, alpha=1)",
+                    "bias_quantizer": "quantized_linear(8, -2, symmetric=False, keep_negative=True, alpha=1)"
+                }
+            },
+            "ptq_acc": 0.8921999931335449,
+            "qat_acc": 0.0
+        },
+        "8_Global_p75": {
+            "bits": 8,
+            "scope": "Global",
+            "metric": "p75",
+            "config": {
+                "conv2d_1": {
+                    "kernel_quantizer": "quantized_linear(8, -2, symmetric=False, keep_negative=True, alpha=1)",
+                    "bias_quantizer": "quantized_linear(8, -3, symmetric=False, keep_negative=True, alpha=1)",
+                    "activation_quantizer": "quantized_relu(8, 1)"
+                },
+                "conv2d_2": {
+                    "kernel_quantizer": "quantized_linear(8, -2, symmetric=False, keep_negative=True, alpha=1)",
+                    "bias_quantizer": "quantized_linear(8, -3, symmetric=False, keep_negative=True, alpha=1)",
+                    "activation_quantizer": "quantized_relu(8, 1)"
+                },
+                "dense_1": {
+                    "kernel_quantizer": "quantized_linear(8, -2, symmetric=False, keep_negative=True, alpha=1)",
+                    "bias_quantizer": "quantized_linear(8, -3, symmetric=False, keep_negative=True, alpha=1)",
+                    "activation_quantizer": "quantized_relu(8, 1)"
+                },
+                "dense_2": {
+                    "kernel_quantizer": "quantized_linear(8, -2, symmetric=False, keep_negative=True, alpha=1)",
+                    "bias_quantizer": "quantized_linear(8, -3, symmetric=False, keep_negative=True, alpha=1)",
+                    "activation_quantizer": "quantized_relu(8, 1)"
+                },
+                "output": {
+                    "kernel_quantizer": "quantized_linear(8, -2, symmetric=False, keep_negative=True, alpha=1)",
+                    "bias_quantizer": "quantized_linear(8, -3, symmetric=False, keep_negative=True, alpha=1)"
+                }
+            },
+            "ptq_acc": 0.8720999956130981,
+            "qat_acc": 0.0
+        },
+        "8_Mixed_max": {
+            "bits": 8,
+            "scope": "Mixed",
+            "metric": "max",
+            "config": {
+                "conv2d_1": {
+                    "kernel_quantizer": "quantized_linear(8, -1, symmetric=False, keep_negative=True, alpha=1)",
+                    "bias_quantizer": "quantized_linear(8, -3, symmetric=False, keep_negative=True, alpha=1)",
+                    "activation_quantizer": "quantized_relu(8, 1)"
+                },
+                "conv2d_2": {
+                    "kernel_quantizer": "quantized_linear(8, 0, symmetric=False, keep_negative=True, alpha=1)",
+                    "bias_quantizer": "quantized_linear(8, -2, symmetric=False, keep_negative=True, alpha=1)",
+                    "activation_quantizer": "quantized_relu(8, 1)"
+                },
+                "dense_1": {
+                    "kernel_quantizer": "quantized_linear(8, 0, symmetric=False, keep_negative=True, alpha=1)",
+                    "bias_quantizer": "quantized_linear(8, -3, symmetric=False, keep_negative=True, alpha=1)",
+                    "activation_quantizer": "quantized_relu(8, 3)"
+                },
+                "dense_2": {
+                    "kernel_quantizer": "quantized_linear(8, 0, symmetric=False, keep_negative=True, alpha=1)",
+                    "bias_quantizer": "quantized_linear(8, -2, symmetric=False, keep_negative=True, alpha=1)",
+                    "activation_quantizer": "quantized_relu(8, 3)"
+                },
+                "output": {
+                    "kernel_quantizer": "quantized_linear(8, 0, symmetric=False, keep_negative=True, alpha=1)",
+                    "bias_quantizer": "quantized_linear(8, -2, symmetric=False, keep_negative=True, alpha=1)"
+                }
+            },
+            "ptq_acc": 0.890500009059906,
+            "qat_acc": 0.0
+        },
+        "8_Mixed_p95": {
+            "bits": 8,
+            "scope": "Mixed",
+            "metric": "p95",
+            "config": {
+                "conv2d_1": {
+                    "kernel_quantizer": "quantized_linear(8, -1, symmetric=False, keep_negative=True, alpha=1)",
+                    "bias_quantizer": "quantized_linear(8, -3, symmetric=False, keep_negative=True, alpha=1)",
+                    "activation_quantizer": "quantized_relu(8, 0)"
+                },
+                "conv2d_2": {
+                    "kernel_quantizer": "quantized_linear(8, -2, symmetric=False, keep_negative=True, alpha=1)",
+                    "bias_quantizer": "quantized_linear(8, -2, symmetric=False, keep_negative=True, alpha=1)",
+                    "activation_quantizer": "quantized_relu(8, 0)"
+                },
+                "dense_1": {
+                    "kernel_quantizer": "quantized_linear(8, -2, symmetric=False, keep_negative=True, alpha=1)",
+                    "bias_quantizer": "quantized_linear(8, -3, symmetric=False, keep_negative=True, alpha=1)",
+                    "activation_quantizer": "quantized_relu(8, 1)"
+                },
+                "dense_2": {
+                    "kernel_quantizer": "quantized_linear(8, -2, symmetric=False, keep_negative=True, alpha=1)",
+                    "bias_quantizer": "quantized_linear(8, -3, symmetric=False, keep_negative=True, alpha=1)",
+                    "activation_quantizer": "quantized_relu(8, 2)"
+                },
+                "output": {
+                    "kernel_quantizer": "quantized_linear(8, -1, symmetric=False, keep_negative=True, alpha=1)",
+                    "bias_quantizer": "quantized_linear(8, -3, symmetric=False, keep_negative=True, alpha=1)"
+                }
+            },
+            "ptq_acc": 0.8841000199317932,
+            "qat_acc": 0.0
+        },
+        "8_Mixed_p75": {
+            "bits": 8,
+            "scope": "Mixed",
+            "metric": "p75",
+            "config": {
+                "conv2d_1": {
+                    "kernel_quantizer": "quantized_linear(8, -2, symmetric=False, keep_negative=True, alpha=1)",
+                    "bias_quantizer": "quantized_linear(8, -3, symmetric=False, keep_negative=True, alpha=1)",
+                    "activation_quantizer": "quantized_relu(8, 0)"
+                },
+                "conv2d_2": {
+                    "kernel_quantizer": "quantized_linear(8, -3, symmetric=False, keep_negative=True, alpha=1)",
+                    "bias_quantizer": "quantized_linear(8, -3, symmetric=False, keep_negative=True, alpha=1)",
+                    "activation_quantizer": "quantized_relu(8, 0)"
+                },
+                "dense_1": {
+                    "kernel_quantizer": "quantized_linear(8, -4, symmetric=False, keep_negative=True, alpha=1)",
+                    "bias_quantizer": "quantized_linear(8, -4, symmetric=False, keep_negative=True, alpha=1)",
+                    "activation_quantizer": "quantized_relu(8, 0)"
+                },
+                "dense_2": {
+                    "kernel_quantizer": "quantized_linear(8, -3, symmetric=False, keep_negative=True, alpha=1)",
+                    "bias_quantizer": "quantized_linear(8, -4, symmetric=False, keep_negative=True, alpha=1)",
+                    "activation_quantizer": "quantized_relu(8, 1)"
+                },
+                "output": {
+                    "kernel_quantizer": "quantized_linear(8, -2, symmetric=False, keep_negative=True, alpha=1)",
+                    "bias_quantizer": "quantized_linear(8, -4, symmetric=False, keep_negative=True, alpha=1)"
+                }
+            },
+            "ptq_acc": 0.8312000036239624,
+            "qat_acc": 0.0
+        }
+    },
+    "strategies": [
+        [
+            "Global",
+            "max"
+        ],
+        [
+            "Global",
+            "p95"
+        ],
+        [
+            "Global",
+            "p75"
+        ],
+        [
+            "Mixed",
+            "max"
+        ],
+        [
+            "Mixed",
+            "p95"
+        ],
+        [
+            "Mixed",
+            "p75"
+        ]
+    ]
+}

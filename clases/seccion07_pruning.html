@@ -1,0 +1,97 @@
+<!-- 7. Pruning -->
+<section>
+    <section>
+        <h2 class="gradient-text">7. Pruning (Poda)</h2>
+        <p>Eliminando las conexiones redundantes de la red</p>
+    </section>
+
+    <!-- 1. ¿Qué es Pruning? -->
+    <section>
+        <h3>¿Qué es el Pruning?</h3>
+        <div style="font-size: 0.75em; text-align: left;">
+            <p>Si NAS es encontrar los planos perfectos para construir una casa, <strong>Pruning</strong> es tomar una casa ya construida, y quitarle los muros no estructurales sin que se derrumbe.</p>
+            <p style="margin-top: 1rem;"><strong style="color: #8be9fd;">La Máscara Binaria</strong></p>
+            <p>Las redes neuronales modernas están <em>sobreparametrizadas</em>. Si un peso (weight) es cercano a cero, su impacto es mínimo.</p>
+            <div style="background: rgba(255,255,255,0.1); padding: 0.8rem; border-radius: 0.5rem; text-align: center; margin: 0.8rem 0; font-size: 1.1em;">
+                <code>W<sub>pruned</sub> = W ⊙ M</code>
+            </div>
+            <p>Donde <strong>W</strong> es la matriz de pesos original, <strong>M</strong> es una matriz de ceros y unos, y <strong>⊙</strong> es la multiplicación de elementos (Hadamard product). El desafío computacional es <strong>qué forma tiene esa matriz M</strong>.</p>
+        </div>
+    </section>
+
+    <!-- 2. Granularidad -->
+    <section>
+        <h3>El Espectro de la Granularidad</h3>
+        <p style="font-size: 0.65em; text-align: left; margin-bottom: 1rem;">¿Qué podamos? ¿Hojas individuales, o ramas y troncos enteros?</p>
+        <div style="display: flex; gap: 1.5rem; font-size: 0.7em; text-align: left;">
+            <div style="flex: 1; background: rgba(255,121,198,0.1); padding: 0.8rem; border-radius: 0.5rem;">
+                <h4 style="color: #ff79c6; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.1em;">No Estructurado (Fine-grained)</h4>
+                <p style="margin-bottom: 0.4rem;">Se evalúa y elimina cada conexión individualmente por su magnitud.</p>
+                <ul style="margin-top: 0.5rem; padding-left: 1.2rem;">
+                    <li style="margin-bottom: 0.3rem;"><strong style="color: #50fa7b;">Preserva Precisión:</strong> Altas tasas de sparsity (90-95%) casi sin perder accuracy.</li>
+                    <li><strong style="color: #ff5555;">Problema (Sparse Matrices):</strong> Ceros aleatorios arruinan la eficiencia del caché (Cache Misses). 80% de pruning suele ser <strong>más lento</strong> que un modelo denso estándar.</li>
+                </ul>
+            </div>
+            <div style="flex: 1; background: rgba(80,250,123,0.1); padding: 0.8rem; border-radius: 0.5rem;">
+                <h4 style="color: #50fa7b; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.1em;">Estructurado (Coarse-grained)</h4>
+                <p style="margin-bottom: 0.4rem;">Se eliminan estructuras matemáticas complejas: filtros enteros, canales o neuronas.</p>
+                <ul style="margin-top: 0.5rem; padding-left: 1.2rem;">
+                    <li style="margin-bottom: 0.3rem;"><strong style="color: #50fa7b;">Aceleración Lineal:</strong> Matriz resultante totalmente densa pero más chica. Menos RAM y operaciones.</li>
+                    <li><strong style="color: #ff5555;">Problema:</strong> Muy destructivo. Al 50% suele degradar la precisión mucho más que el no estructurado.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. Semi-Estructurado -->
+    <section>
+        <h3>Pruning Semi-Estructurado (2:4)</h3>
+        <div style="font-size: 0.7em; text-align: left;">
+            <p>El estándar de oro en data centers (ej. NVIDIA Ampere A100), logra lo mejor de ambos mundos mediante co-diseño hardware-software.</p>
+            <div style="margin-top: 1rem;">
+                <p style="color: #8be9fd; margin-bottom: 0.3rem;"><strong>¿Cómo funciona?</strong></p>
+                <ol style="margin-top: 0.5rem; line-height: 1.4;">
+                    <li style="margin-bottom: 0.4rem;">Obliga a que por cada bloque contiguo de 4 pesos en la memoria, <strong>exactamente 2 sean cero</strong>.</li>
+                    <li style="margin-bottom: 0.4rem;">Se entrena la red densa, se aplica el criterio 2:4 (cortando los 2 más bajos) y se hace un <em>Fine-tuning</em> ligero.</li>
+                    <li>El hardware especializado (Tensor Cores) <strong>salta</strong> los ciclos de reloj de los ceros.</li>
+                </ol>
+                <p style="margin-top: 1rem;"><strong style="color: #50fa7b;">Resultado:</strong> 2x de aceleración (Speedup) y reducción de memoria a la mitad, sin pérdida notable de precisión.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. Práctica: Edge vs Cloud -->
+    <section>
+        <h3>Pruning en la Práctica</h3>
+        <div style="display: flex; gap: 1.5rem; margin-top: 1rem; font-size: 0.7em; text-align: left;">
+            <div style="flex: 1; background: rgba(139,233,253,0.1); padding: 0.8rem; border-radius: 0.5rem;">
+                <h4 style="color: #8be9fd; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.1em;">Cloud (HPC / Datacenters)</h4>
+                <p>Mandan las <strong>GPUs y Tensor Cores</strong>.</p>
+                <ul style="margin-top: 0.5rem; padding-left: 1.2rem;">
+                    <li style="margin-bottom: 0.4rem;">El enfoque predominante es la esparsidad híbrida 2:4.</li>
+                    <li>Para <strong>LLMs</strong> (miles de millones de parámetros), técnicas como <em>SparseGPT</em> o <em>Wanda</em> permiten comprimir modelos inmensos logrando que quepan en la mitad de GPUs casi sin degradación.</li>
+                </ul>
+            </div>
+            <div style="flex: 1; background: rgba(255,184,108,0.1); padding: 0.8rem; border-radius: 0.5rem;">
+                <h4 style="color: #ffb86c; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.1em;">Edge / IoT (IA Embebida)</h4>
+                <p>Mandan los <strong>Microcontroladores (MCU) y NPUs</strong>.</p>
+                <ul style="margin-top: 0.5rem; padding-left: 1.2rem;">
+                    <li style="margin-bottom: 0.4rem;">Generalmente nulo hardware para saltos de memoria irregulares ni patrón 2:4.</li>
+                    <li><strong>El Pruning Estructurado es el rey</strong> (Channel Pruning). Interesa reducir el <em>Footprint</em> de SRAM/Flash y el costo energético de mover los datos.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. Resumen -->
+    <section>
+        <h3>Resumen y Takeaways</h3>
+        <div style="font-size: 0.75em; text-align: left;">
+            <ul style="line-height: 1.5;">
+                <li style="margin-bottom: 0.8rem;"><strong style="color: #ff79c6;">Cuidado con el Sparsity teórico:</strong> Un 90% de pesos en cero no sirve para acelerar inferencia si están aleatorios y no posees el hardware para explotarlo.</li>
+                <li style="margin-bottom: 0.8rem;"><strong style="color: #8be9fd;">Regla general de granularidad:</strong> Estructurado = Aceleración garantizada en cualquier HW. No Estructurado = Mayor preservación de <em>Accuracy</em> teórica sin velocidad.</li>
+                <li style="margin-bottom: 0.8rem;"><strong style="color: #50fa7b;">Co-diseño HW/SW:</strong> El pruning moderno demuestra que los algoritmos de poda hoy deben adaptarse íntimamente a cómo el silicio y la caché organizan la memoria.</li>
+            </ul>
+        </div>
+    </section>
+</section>

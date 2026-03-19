@@ -1,0 +1,893 @@
+<!-- 2. Introducción para CESE -->
+<section>
+
+  <section>
+    <h2 class="gradient-text">2. Introducción para CESE</h2>
+    <p>Introducción a inteligencia artificial para alumnos de CESE</p>
+  </section>
+
+  <section>
+    <h3>IA, ML, redes neuronales y deep learning</h3>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <div style="flex: 1;">
+        <img src="./figures/00_intro-ia_ml_ann_dl.png" style="width: 50%;">
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h3>IA, ML, redes neuronales y deep learning</h3>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <div style="flex: 1;">
+        <img src="./figures/00_intro-ia_ml_ann_dl.png" style="width: 100%;">
+      </div>
+      <div style="flex: 1.5; text-align: left; font-size: 0.65em;">
+        <p class="fragment"><strong>IA:</strong> cualquier simulación o imitación de la inteligencia humana en una
+          máquina se considera IA. Programación de máquinas que imitan el pensamiento, el aprendizaje y la resolución de
+          problemas humanos.</p>
+        <p class="fragment"><strong>ML:</strong> la metodología de entrenar un sistema con el fin de aprender de datos
+          del pasado para realizar predicciones y tomar decisiones de más precisas.</p>
+        <p class="fragment"><strong>ANN:</strong> sistemas de ML inspirados por el cerebro humano. Consisten en unidades
+          (neuronas) conectadas en una capa para aprender relaciones entre las entradas y las salidas.</p>
+        <p class="fragment"><strong>DL:</strong> grandes estructuras de redes neuronales con múltiples capas capaces de
+          extraer características de entrada con el fin de obtener una buena respresentación entre entradas y salidas.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h3>Ciclo de vida de un proyecto de IA</h3>
+    <p>Un recorrido por las etapas fundamentales</p>
+    <div class="diagram-header">
+      <div data-external-replace="./figures/00_intro-proyecto_ia_diagram.html"></div>
+    </div>
+  </section>
+
+  <!-- 1. Adquisición -->
+  <section>
+    <h3>Ciclo de vida de un proyecto de IA</h3>
+    <div class="diagram-header">
+      <div data-external-replace="./figures/00_intro-proyecto_ia_diagram.html"></div>
+    </div>
+    <h4>Adquisición de datos</h4>
+    <ul style="font-size: 0.8em;">
+      <li><strong>Materia prima:</strong> sensores, imágenes, texto, IoT.</li>
+      <li><strong>Calidad:</strong> "Garbage in, garbage out".</li>
+    </ul>
+  </section>
+
+  <!-- 2. Preparación -->
+  <section>
+    <h3>Ciclo de vida de un proyecto de IA</h3>
+    <div class="diagram-header">
+      <div data-external-replace="./figures/00_intro-proyecto_ia_diagram.html"></div>
+    </div>
+    <h4>Preparación de datos</h4>
+    <ul style="font-size: 0.8em;">
+      <li><strong>Limpieza y etiquetado:</strong> ordenar la casa.</li>
+      <li><strong>Esfuerzo:</strong> representa el <strong>80% del tiempo</strong> del proyecto.</li>
+    </ul>
+  </section>
+
+  <!-- 3. Diseño -->
+  <section>
+    <h3>Ciclo de vida de un proyecto de IA</h3>
+    <div class="diagram-header">
+      <div data-external-replace="./figures/00_intro-proyecto_ia_diagram.html"></div>
+    </div>
+    <h4>Diseño de modelos</h4>
+    <p style="font-size: 0.8em;">Búsqueda de la representación matemática ideal para aprender patrones.</p>
+  </section>
+
+  <!-- 4. Entrenamiento e Inferencia -->
+  <section>
+    <h3>Ciclo de vida de un proyecto de IA</h3>
+    <div class="diagram-header">
+      <div data-external-replace="./figures/00_intro-proyecto_ia_diagram.html"></div>
+    </div>
+    <h4>Entrenamiento e inferencia</h4>
+    <ul style="font-size: 0.75em;">
+      <li><strong>Entrenamiento:</strong> proceso de aprendizaje (requiere GPU y energía).</li>
+      <li><strong>Inferencia:</strong> uso del modelo en producción (ejecución).</li>
+    </ul>
+  </section>
+
+  <!-- 5. Evaluación: Clasificación -->
+  <section>
+    <h3>Ciclo de vida de un proyecto de IA</h3>
+    <div class="diagram-header">
+      <div data-external-replace="./figures/00_intro-proyecto_ia_diagram.html"></div>
+    </div>
+    <h4>Evaluación: clasificación</h4>
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      <div style="flex: 1;">
+        <ul style="font-size: 0.7em;">
+          <li><strong>Precisión:</strong> ¿cuánto de lo que predigo es correcto?</li>
+          <li><strong>Recall / sensibilidad:</strong> ¿cuánto de la realidad detecto?</li>
+          <li><strong>F1-score:</strong> balance entre ambos.</li>
+        </ul>
+      </div>
+      <div style="flex: 1; text-align: center;">
+        <img src="./figures/00_intro-metrics1.png" style="max-height: 300px; width: auto;">
+        <p style="font-size: 0.4em; opacity: 0.6; margin-top: 0.5rem;">
+          Fuente: <a href="https://en.wikipedia.org/wiki/Evaluation_of_binary_classifiers" target="_blank"
+            style="color: inherit;">Wikipedia - evaluation of binary classifiers</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Evaluación: Regresión -->
+  <section>
+    <h3>Ciclo de vida de un proyecto de IA</h3>
+    <div class="diagram-header">
+      <div data-external-replace="./figures/00_intro-proyecto_ia_diagram.html"></div>
+    </div>
+    <h4>Evaluación: regresión</h4>
+    <ul style="font-size: 0.8em;">
+      <li><strong>MSE (Mean Squared Error):</strong> penaliza errores grandes.</li>
+      <li><strong>MAE (Mean Absolute Error):</strong> más fácil de interpretar.</li>
+      <li><strong>R² (coeficiente de determinación):</strong> ¿qué tan bien se ajusta la curva?</li>
+    </ul>
+  </section>
+
+  <!-- 6. Despliegue -->
+  <section>
+    <h3>Ciclo de vida de un proyecto de IA</h3>
+    <div class="diagram-header">
+      <div data-external-replace="./figures/00_intro-proyecto_ia_diagram.html"></div>
+    </div>
+    <h4>Despliegue</h4>
+    <ul style="font-size: 0.75em;">
+      <li>Llevar la IA al mundo real (App, Microcontrolador, Cloud).</li>
+      <li><strong>Desafíos:</strong> latencia, escalabilidad y mantenimiento.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h3>Ciclo de vida de un proyecto de IA</h3>
+    <div class="diagram-header">
+      <div data-external-replace="./figures/00_intro-proyecto_ia_diagram.html"></div>
+    </div>
+    <h4>Ideas clave</h4>
+    <ul style="font-size: 0.8em;">
+      <li>El éxito depende más de los <strong>datos</strong> que del algoritmo.</li>
+      <li>La evaluación debe ser rigurosa y penalizar el impacto real.</li>
+      <li>El despliegue cierra el ciclo pero requiere monitoreo constante.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h3>Tipos de problemas</h3>
+    <p style="font-size: 0.9em;">De manera general existen dos tipos de problemas:</p>
+    <ul style="font-size: 0.8em;">
+      <li style="margin-bottom: 0.5rem;">
+        <strong>Regresión:</strong> Consiste en predecir un valor <strong>continuo</strong> a partir de un <span
+          style="color: #8be9fd;">conjunto de datos</span>.
+      </li>
+      <li>
+        <strong>Clasificación:</strong> Consiste en predecir una <strong>categoría</strong> o etiqueta a partir de un
+        <span style="color: #8be9fd;">conjunto de datos</span>.
+      </li>
+    </ul>
+    <p style="font-size: 0.8em; margin-top: 1rem; font-style: italic;">
+      Los datos son la materia prima de los algoritmos de IA.
+    </p>
+  </section>
+
+  <section>
+    <h3>Regresión lineal</h3>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <div style="flex: 1.2; text-align: left;">
+        <ul style="font-size: 0.75em; margin-bottom: 1rem;">
+          <li style="margin-bottom: 0.5rem;"><strong>Tipo de problema:</strong> predicción continua (regresión).</li>
+          <li style="margin-bottom: 0.5rem;">Modela relación entre variable dependiente ($y$) e independientes ($X$).
+          </li>
+          <li style="margin-bottom: 0.5rem;">Busca minimizar la suma de errores cuadráticos (<strong>MSE</strong> o
+            Mínimos Cuadrados).</li>
+        </ul>
+        <div
+          style="background: rgba(255,255,255,0.1); padding: 0.5rem; border-radius: 0.5rem; display: inline-block; margin-bottom: 1rem;">
+          <code style="font-size: 0.9em;">&beta; = (X<sup>T</sup> X)<sup>-1</sup> X<sup>T</sup> y</code>
+        </div>
+        <p style="font-size: 0.75em; color: #50fa7b;"><strong>¡Tiene solución analítica cerrada!</strong><br>
+          <span style="font-size: 0.85em; color: #f8f8f2;">Los coeficientes exactos se calculan directamente en un solo
+            paso (OLS).</span>
+        </p>
+      </div>
+      <div style="flex: 1;">
+        <img src="./figures/00_intro-regression.png" style="width: 100%; margin-top: 0; background: transparent;">
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h3>Regresión logística</h3>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <div style="flex: 1.2; text-align: left;">
+        <ul style="font-size: 0.75em; margin-bottom: 1rem;">
+          <li style="margin-bottom: 0.5rem;"><strong>Tipo de problema:</strong> clasificación (predice probabilidades).
+          </li>
+          <li style="margin-bottom: 0.5rem;">Emplea una <strong>función sigmoide</strong> para acotar las salidas entre
+            0
+            y 1.</li>
+          <li style="margin-bottom: 0.5rem;">Busca maximizar la función de <strong>log-verosimilitud</strong>.</li>
+        </ul>
+        <p style="font-size: 0.75em; color: #ff5555;"><strong>¡NO tiene solución analítica cerrada!</strong><br>
+          <span style="font-size: 0.85em; color: #f8f8f2;">Requiere algoritmos de <em>optimización numérica</em>
+            iterativos
+            (ej. Descenso de Gradiente o Newton-Raphson).</span>
+        </p>
+      </div>
+      <div style="flex: 1;">
+        <img src="./figures/00_intro-logistic_regression.png"
+          style="width: 100%; margin-top: 0; background: transparent; border-radius: 1rem;">
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h3>Datos, cómputo y el paradigma ML/DL</h3>
+    <div style="display: flex; align-items: center; gap: 30px;">
+      <div style="flex: 1.5; text-align: left;">
+        <ul style="font-size: 0.65em; margin-bottom: 1rem;">
+          <li>Al pasar de algoritmos clásicos a de ML/DL, es lo mismoLos modelos se definen como problemas de
+            optimización (regresión/clasificación).</li>
+          <li>Se pueden resolver problemas más complejos.</li>
+          <li>Están completamente impulsados por los <strong>datos</strong>, que son más complejos.</li>
+          <li>Se requieren modelos con complejidad proporcional a la tarea.</li>
+          <li>El modelo hace la parte del preprocesamiento de datos.</li>
+          <li>Casi nunca tienen <strong>forma cerrada</strong>: dependen un 100% de la optimización numérica para
+            ajustar sus parámetros.</li>
+        </ul>
+      </div>
+      <div style="flex: 1.2; text-align: left;">
+        <img src="./figures/00_intro-ml_dl.png" style="width: 100%; border-radius: 0.5rem;">
+        <p style="font-size: 0.75em; margin-top: 1rem;">
+          El poder de la IA está atado a poder de cómputo y la abundancia de datos, que permiten entrenar modelos más
+          complejos.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h3>¿Qué es un modelo matemático?</h3>
+    <p style="font-size: 0.9em;">Una <strong>función paramétrica</strong> que aproxima una relación entre datos:</p>
+    <div
+      style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 0.5rem; display: inline-block; margin-bottom: 1rem;">
+      <code style="font-size: 1.2em;">y = f(x; &theta;)</code>
+    </div>
+    <ul style="font-size: 0.85em;">
+      <li><strong>Entradas (x):</strong> Datos observados (features).</li>
+      <li><strong>Salidas (y):</strong> Predicción o decisión.</li>
+      <li><strong>Parámetros (&theta;):</strong> Valores internos ajustables de la función.</li>
+      <li>Ejemplos:</li>
+      <ul>
+        <li>Regresión lineal:
+          <code>y = &beta;<sub>0</sub> + &beta;<sub>1</sub>x<sub>1</sub> + ... + &beta;<sub>n</sub>x<sub>n</sub></code>
+        </li>
+        <li>Regresión logística:
+          <code>y = &sigma;(&beta;<sub>0</sub> + &beta;<sub>1</sub>x<sub>1</sub> + ... + &beta;<sub>n</sub>x<sub>n</sub>)</code>
+        </li>
+        <li>Modelo cuadrático: <code>y = ax<sup>2</sup> + bx + c</code></li>
+        <li>Recta + senoide: <code>y = a x + b + c sin(d x + e)</code></li>
+        <li>Una neurona: <code>y = &phi;(&sum;w<sub>i</sub>x<sub>i</sub> + b)</code></li>
+      </ul>
+    </ul>
+  </section>
+
+  <section>
+    <h3>Entrenamiento vs. inferencia</h3>
+    <ul style="font-size: 0.85em;">
+      <li style="margin-bottom: 1rem;"><strong>Inferencia:</strong> ejecutar el modelo <code>f(x, &theta;)</code> con
+        parámetros <strong>fijos</strong> para generar salidas ante nuevos datos.</li>
+      <li><strong>Entrenamiento:</strong> proceso iterativo de optimización donde se ajustan los parámetros
+        <code>&theta;</code> para minimizar la discrepancia (error) entre la predicción y el valor real.
+      </li>
+    </ul>
+  </section>
+
+  <section>
+    <h3>Proceso de optimización</h3>
+    <ul style="font-size: 0.85em;">
+      <li style="margin-bottom: 1rem;"><strong>Gradiente descendente:</strong> algoritmo para minimizar el error.
+        Calcula el gradiente (derivada) de la función de costo y actualiza los parámetros en dirección contraria a la
+        pendiente.</li>
+      <li><strong>Backpropagation:</strong> método eficiente para computar gradientes en redes neuronales, propagando el
+        error hacia atrás mediante la aplicación sucesiva de la regla de la cadena.</li>
+    </ul>
+    <img src="./figures/costo.png"
+      style="height: 300px; border-radius: 1rem; margin: 0 auto 4rem auto; background: white;">
+  </section>
+
+  <section>
+    <h3>Sobreajuste vs subajuste</h3>
+    <ul style="font-size: 0.65em;">
+      <li style="margin-bottom: 0.8rem;">🔴 <strong>Overfitting (Sobreajuste):</strong>
+        <ul style="list-style-type: circle;">
+          <li>El modelo es <strong>demasiado complejo</strong> y memoriza ruido.</li>
+          <li>Excelente en entrenamiento, pésimo en generalización.</li>
+        </ul>
+      </li>
+      <li style="margin-bottom: 0.8rem;">🔴 <strong>Underfitting (Subajuste):</strong>
+        <ul style="list-style-type: circle;">
+          <li>El modelo es <strong>demasiado simple</strong> para captar patrones.</li>
+          <li>Falla incluso en los datos de entrenamiento.</li>
+        </ul>
+      </li>
+      <li>🎯 <strong>Good fit:</strong> equilibrio ideal para generalizar.</li>
+    </ul>
+    <img src="./figures/sobreajuste.svg" style="width: 65%; height: auto; border-radius: 1rem; background: white;">
+    <p class="citation" style="font-size: 0.25em; margin-top: 0.0rem; text-align: center;">
+      <a
+        href="https://la.mathworks.com/discovery/overfitting/_jcr_content/mainParsys/image.adapt.full.medium.svg/1718273118308.svg">
+        Fuente: MathWorks - Overfitting
+      </a>
+    </p>
+  </section>
+
+  <section>
+    <h3>Sesgo vs varianza</h3>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <div style="flex: 1; text-align: left;">
+        <ul style="font-size: 0.7em; margin-bottom: 1.5rem;">
+          <li style="margin-bottom: 0.8rem;">📌 <strong>Sesgo (Bias):</strong>
+            <span style="font-size: 0.85em;">
+              Suposiciones demasiado simples (ej. asumir linealidad). Resulta típicamente en <em>underfitting</em>.
+            </span>
+          </li>
+          <li style="margin-bottom: 0.8rem;">📌 <strong>Varianza (Variance):</strong>
+            <span style="font-size: 0.85em;">
+              Sensibilidad excesiva al set de entrenamiento. Resulta típicamente en <em>overfitting</em>.
+            </span>
+          </li>
+        </ul>
+        <p style="font-size: 0.75em;">💡 <strong>El trade-off sesgo-varianza</strong></p>
+        <p style="font-size: 0.75em;">
+          Ajustar la complejidad (mediante regularización, más
+          datos o validación cruzada) para lograr un balance óptimo.</p>
+      </div>
+      <div style="flex: 1.2;">
+        <img src="./figures/01-bias_variance.png" style="width: 100%; border-radius: 1rem;">
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h3>Hiperparámetros</h3>
+    <p style="font-size: 0.85em; text-align: left;">Variables de ajuste configurados antes del entrenamiento que
+      impactan rendimiento y tiempos:</p>
+    <ul style="font-size: 0.8em;">
+      <li style="margin-bottom: 0.5rem;"><strong>Tasa de aprendizaje (Learning rate):</strong> tamaño del paso al
+        actualizar parámetros.</li>
+      <li style="margin-bottom: 0.5rem;"><strong>Épocas (Epochs):</strong> cuántas veces el algoritmo recorre
+        <em>todo</em> el conjunto de entrenamiento.
+      </li>
+      <li><strong>Tamaño de lote (Batch size):</strong> cantidad de muestras analizadas en paralelo antes de realizar un
+        ajuste.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h3>Arquitectura de redes</h3>
+    <p>De la neurona a la red neuronal</p>
+    <ul>
+      <li>Neuronas y activaciones</li>
+      <li>Capas: densas, convolucionales, recurrentes</li>
+      <li>Capas de soporte: pooling, dropout, batchnorm</li>
+      <li>Perceptrón multicapa</li>
+      <li>Estrucutra típica para redes de visión artificial</li>
+      <li>Topologias avanzadas: multiples caminos y conexiones residuales</li>
+      <li>Ejemplos de redes neuronales para visión artificial</li>
+    </ul>
+  </section>
+
+  <!-- Neuronas -->
+  <section>
+    <h3>Neuronas</h3>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <div style="flex: 1.2; font-size: 0.8em; text-align: left;">
+        <p>El <strong>perceptrón</strong> es la unidad fundamental de las redes neuronales.</p>
+        <ul>
+          <li style="margin-bottom: 0.5rem;">Recibe múltiples <strong>entradas</strong> ponderadas por
+            <strong>pesos</strong>.
+          </li>
+          <li style="margin-bottom: 0.5rem;">Suma todas las contribuciones y agrega un <strong>sesgo (bias)</strong>.
+          </li>
+          <li>Pasa el resultado por una <strong>función de activación</strong> no lineal.</li>
+        </ul>
+      </div>
+      <div style="flex: 1;">
+        <div data-external-replace="./figures/02-neuron_diagram.html"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Activaciones -->
+  <section>
+    <h3>Funciones de activación</h3>
+    Son funciones no lineales que se aplican a la salida de la neurona.
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; flex: 1; margin-top: 20px;">
+      <img src="./figures/02-activation_relu.png"
+        style="width: 100%; border-radius: 0.5rem; background: rgba(255,255,255,0.1); margin: 0;">
+      <img src="./figures/02-activation_sigmoid.png"
+        style="width: 100%; border-radius: 0.5rem; background: rgba(255,255,255,0.1); margin: 0;">
+      <img src="./figures/02-activation_tanh.png"
+        style="width: 100%; border-radius: 0.5rem; background: rgba(255,255,255,0.1); margin: 0;">
+      <img src="./figures/02-activation_leakyrelu.png"
+        style="width: 100%; border-radius: 0.5rem; background: rgba(255,255,255,0.1); margin: 0;">
+      <img src="./figures/02-activation_elu.png"
+        style="width: 100%; border-radius: 0.5rem; background: rgba(255,255,255,0.1); margin: 0;">
+      <img src="./figures/02-activation_swish.png"
+        style="width: 100%; border-radius: 0.5rem; background: rgba(255,255,255,0.1); margin: 0;">
+    </div>
+  </section>
+
+  <!-- Capas densas -->
+  <section>
+    <h3>Capas Densas</h3>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <div style="flex: 1.2; font-size: 0.8em; text-align: left;">
+        <p>También conocidas como <strong>Fully Connected (FC)</strong>.</p>
+        <ul>
+          <li style="margin-bottom: 0.5rem;">Cada neurona está conectada a <strong>todas</strong> las neuronas de la
+            capa anterior.</li>
+          <li>Gran cantidad de parámetros: propensa al <em>overfitting</em> y costosa computacionalmente.</li>
+        </ul>
+      </div>
+      <div style="flex: 1;">
+        <div data-external-replace="./figures/02-dense_layer_diagram.html"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h3>Capas Convolucionales (CNN)</h3>
+    <p>Especialmente diseñadas para datos con estructura espacial (imágenes).</p>
+    <ul>
+      <li style="margin-bottom: 0.5rem;">La idea es aplicar <strong>filtros (kernels)</strong> que se deslizan
+        sobre
+        la entrada.</li>
+      <li style="margin-bottom: 0.5rem;">Extraen características locales de bajo y alto nivel estructural.</li>
+      <li><strong>Compartición de pesos:</strong> reduce drásticamente los parámetros frente a las capas densas.
+      </li>
+    </ul>
+  </section>
+  <section>
+    <h3>Capas Convolucionales (CNN)</h3>
+    <iframe src="./figures/02-conv_animation.html"
+      style="width: 100%; height: 620px; border: none; background: transparent;" scrolling="no"></iframe>
+  </section>
+
+  <section>
+    <h3>Capas Recurrentes (RNN, GRU, LSTM)</h3>
+    <p style="font-size: 0.75em; text-align: left; margin-bottom: 20px;">Ideales para datos con estructura secuencial o
+      temporal (texto, series temporales).</p>
+    <div style="display: flex; align-items: flex-start; gap: 20px;">
+      <div style="flex: 1; text-align: center;">
+        <img src="./figures/02-rnn.png"
+          style="width: 70%; border-radius: 0.5rem; background: rgba(255,255,255,0.1); margin-bottom: 15px;">
+        <p style="font-size: 0.65em; text-align: left; margin: 0;"><strong>RNN:</strong> tienen memoria (estado
+          interno). Sufren desvanecimiento de gradiente con secuencias largas.</p>
+      </div>
+      <div style="flex: 1; text-align: center;">
+        <img src="./figures/02-lstm.png"
+          style="width: 100%; border-radius: 0.5rem; background: rgba(255,255,255,0.1); margin-bottom: 15px;">
+        <p style="font-size: 0.65em; text-align: left; margin: 0;"><strong>LSTM (Long Short-Term Memory):</strong>
+          resuelven lo anterior con compuertas para retener memoria a largo plazo.</p>
+      </div>
+      <div style="flex: 1; text-align: center;">
+        <img src="./figures/02-gru.png"
+          style="width: 100%; border-radius: 0.5rem; background: rgba(255,255,255,0.1); margin-bottom: 15px;">
+        <p style="font-size: 0.65em; text-align: left; margin: 0;"><strong>GRU (Gated Recurrent Unit):</strong> versión
+          simplificada de LSTM con rendimiento similar y menos cómputo.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h3>Capas de Soporte</h3>
+    <p style="font-size: 0.85em;">Ayudan a regularizar, reducir tamaño y estabilizar la red neuronal.</p>
+    <div style="display: flex; align-items: stretch; gap: 20px;">
+      <!-- Pooling Column -->
+      <div
+        style="flex: 1; display: flex; flex-direction: column; gap: 10px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 0.5rem; border: 1px solid rgba(255,255,255,0.1);">
+        <h4 style="margin: 0; font-size: 0.8em; color: #ff79c6;">Pooling (Max/Average)</h4>
+        <p style="font-size: 0.65em; margin: 0;">Reduce dimensiones espaciales conservando lo más relevante.</p>
+        <iframe src="./figures/02-pooling_animation.html"
+          style="width: 100%; height: 320px; border: none; background: transparent;" scrolling="no"></iframe>
+      </div>
+      <!-- Flatten Column -->
+      <div
+        style="flex: 1; display: flex; flex-direction: column; gap: 10px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 0.5rem; border: 1px solid rgba(255,255,255,0.1);">
+        <h4 style="margin: 0; font-size: 0.8em; color: #50fa7b;">Flatten</h4>
+        <p style="font-size: 0.65em; margin: 0;">Transforma tensores multidimensionales en vectores 1D.</p>
+        <iframe src="./figures/02-flatten_animation.html"
+          style="width: 100%; height: 320px; border: none; background: transparent;" scrolling="no"></iframe>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h3>Capas de Soporte</h3>
+    <p style="font-size: 0.85em;">Ayudan a regularizar, reducir tamaño y estabilizar la red neuronal.</p>
+    <div style="display: flex; align-items: stretch; gap: 20px;">
+      <!-- BatchNorm Column -->
+      <div
+        style="flex: 1; display: flex; flex-direction: column; gap: 10px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 0.5rem; border: 1px solid rgba(255,255,255,0.1);">
+        <h4 style="margin: 0; font-size: 0.8em; color: #ffb86c;">Batch Normalization</h4>
+        <p style="font-size: 0.6em; margin: 0; line-height: 1.2;">Centra y escala las activaciones. Acelera y estabiliza
+          el entrenamiento.</p>
+        <iframe src="./figures/02-batchnorm_animation.html"
+          style="width: 100%; height: 320px; border: none; background: transparent;" scrolling="no"></iframe>
+      </div>
+      <!-- Dropout Column -->
+      <div
+        style="flex: 1; display: flex; flex-direction: column; gap: 10px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 0.5rem; border: 1px solid rgba(255,255,255,0.1);">
+        <h4 style="margin: 0; font-size: 0.8em; color: #ff5555;">Dropout</h4>
+        <p style="font-size: 0.6em; margin: 0; line-height: 1.2;">Apaga neuronas aleatoriamente para forzar
+          independencia y evitar <em>overfitting</em>.</p>
+        <iframe src="./figures/02-dropout_animation.html"
+          style="width: 100%; height: 320px; border: none; background: transparent;" scrolling="no"></iframe>
+      </div>
+    </div>
+    <p style="font-size: 0.85em;">Estas capas tienen comportamiento diferente en entrenamiento y en inferencia.</p>
+  </section>
+
+  <!-- Perceptrón multicapa -->
+  <section>
+    <h3>Perceptrón Multicapa (MLP)</h3>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <div style="flex: 1.2; font-size: 0.8em; text-align: left;">
+        <p>Una arquitectura clásica y fundamental.</p>
+        <ul>
+          <li style="margin-bottom: 0.5rem;">Múltiples capas de neuronas densas formadas por la capa de entrada,
+            capas ocultas y capa de salida.</li>
+          <li style="margin-bottom: 0.5rem;">La información fluye en una sola dirección (Feedforward).</li>
+          <li>Teóricamente capaz de aproximar cualquier función continua matemática compleja.</li>
+        </ul>
+      </div>
+      <div style="flex: 1;">
+        <div data-external-replace="./figures/02-mlp_diagram.html"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Estructura típica para redes de visión artificial: backbone -->
+  <section>
+    <h3>Estructura típica para redes de visión artificial</h3>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <div style="flex: 1; font-size: 0.7em; text-align: left;">
+        <p>Dividida típicamente en dos grandes bloques:</p>
+        <strong>Extracción de características (Backbone):</strong>
+        <ul>
+          <li>Capas <strong>convolucionales</strong> para detectar patrones (bordes, texturas, formas).</li>
+          <li>Capas de <strong>pooling</strong> para reducir dimensiones espaciales.</li>
+          <li>Suele incluir <strong>Batch Normalization</strong> para estabilidad durante el entrenamiento.
+          </li>
+        </ul>
+      </div>
+      <div style="flex: 1.3;">
+        <div data-external-replace="./figures/02-architecture_backbone.html"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Estructura típica para redes de visión artificial: head -->
+  <section>
+    <h3>Estructura típica para redes de visión artificial</h3>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <div style="flex: 1; font-size: 0.7em; text-align: left;">
+        <p>Dividida típicamente en dos grandes bloques:</p>
+        <strong>Cabeza de la red (Head):</strong>
+        <ul>
+          <li>Capas <strong>densas (Fully Connected)</strong> para interpretar los patrones extraídos.</li>
+          <li>Puede contener <strong>Batch Normalization</strong> y <strong>Dropout</strong> para
+            regularización.
+          </li>
+          <li><strong>Activación Final:</strong>
+            <ul>
+              <li><strong>Lineal:</strong> para problemas de regresión (valores continuos).</li>
+              <li><strong>Softmax (o Sigmoide):</strong> para clasificación (probabilidades por categoría).
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+      <div style="flex: 1.3;">
+        <div data-external-replace="./figures/02-architecture_head.html"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Topologías avanzadas -->
+  <section>
+    <h3>Topologías avanzadas</h3>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <div style="flex: 1; font-size: 0.75em; text-align: left;">
+        <p><strong>Conexiones Residuales (Skip Connections):</strong></p>
+        <ul style="margin-bottom: 1rem;">
+          <li>Permiten que la información "salte" capas sin ser modificada.</li>
+          <li>Evitan el problema de desvanecimiento del gradiente en redes ultra-profundas.</li>
+        </ul>
+        <p><strong>Redes con Múltiples Caminos (Ramificaciones):</strong></p>
+        <ul>
+          <li>Procesan la información en paralelo usando filtros de distintos tamaños sobre la misma entrada.</li>
+          <li>Combinan/concatenan los resultados al final del bloque.</li>
+        </ul>
+      </div>
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 20px;">
+        <div data-external-replace="./figures/02-topology_residual.html"></div>
+        <div data-external-replace="./figures/02-topology_branching.html"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ejemplos CNN (Cronológico) -->
+  <section>
+    <h3>Ejemplos de redes</h3>
+    <p style="font-size: 0.8em;">Breve recorrido histórico de arquitecturas exitosas y su influencia en visión
+      artificial.</p>
+  </section>
+
+  <section>
+    <h3>LeNet-5 (1998)</h3>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+      <div style="font-size: 0.8em; text-align: left; width: 100%;">
+        <p>Pionera en el uso práctico de redes convolucionales.</p>
+        <ul>
+          <li style="margin-bottom: 0.5rem;">Diseñada por Yann LeCun para reconocimiento manuscrito de códigos
+            postales
+            y cheques.</li>
+          <li style="margin-bottom: 0.5rem;">Marcó el estándar inicial de estructura: <em>Conv &rarr; Pool &rarr;
+              Conv
+              &rarr; Pool &rarr; FC</em>.</li>
+        </ul>
+      </div>
+      <div style="width: 100%;">
+        <div data-external-replace="./figures/02-lenet5_diagram.html"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h3>AlexNet (2012)</h3>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+      <div style="font-size: 0.8em; text-align: left; width: 100%;">
+        <p>El despegue que impulsó la revolución del Deep Learning.</p>
+        <ul>
+          <li style="margin-bottom: 0.5rem;">Ganó el concurso ImageNet destruyendo los métodos tradicionales.</li>
+          <li style="margin-bottom: 0.5rem;">Popularizó la función de activación <strong>ReLU</strong> y el uso de
+            <strong>Dropout</strong> libremente.
+          </li>
+          <li>Aprovechó de lleno el poder paralelo de las GPUs modernas.</li>
+        </ul>
+      </div>
+      <div style="width: 100%;">
+        <div data-external-replace="./figures/02-alexnet_diagram.html"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h3>VGG (2014)</h3>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+      <div style="font-size: 0.8em; text-align: left; width: 100%;">
+        <p>Más profundidad con un canon de simplicidad estructural absoluta.</p>
+        <ul>
+          <li style="margin-bottom: 0.5rem;">Demostró empíricamente que apilar muchos filtros pequeños (3x3) era
+            mejor
+            que usar filtros grandes.</li>
+          <li style="margin-bottom: 0.5rem;">Modelos masivos (VGG-16, VGG-19) referenciando capas que tenían.</li>
+          <li>Muy pesadas y computacionalmente costosas (más de 138 millones de parámetros).</li>
+        </ul>
+      </div>
+      <div style="width: 100%;">
+        <div data-external-replace="./figures/02-vgg_diagram.html"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h3>Inception / GoogLeNet (2014)</h3>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+      <div style="font-size: 0.8em; text-align: left; width: 100%;">
+        <p>Uso temprano de <strong>múltiples caminos</strong>.</p>
+        <ul>
+          <li style="margin-bottom: 0.5rem;">Superó a VGG siendo mucho más liviana.</li>
+          <li style="margin-bottom: 0.5rem;">Cada módulo <em>Inception</em> aplica filtros 1x1, 3x3 y 5x5 en
+            paralelo.
+          </li>
+          <li>Uso de convoluciones "cuello de botella" (1x1) para reducir costo computacional.</li>
+        </ul>
+      </div>
+      <div style="width: 100%;">
+        <div data-external-replace="./figures/02-inception_diagram.html"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h3>ResNet (2015)</h3>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+      <div style="font-size: 0.8em; text-align: left; width: 100%;">
+        <p>El santo grial moderno: las verdaderas redes hiperprofundas.</p>
+        <ul>
+          <li style="margin-bottom: 0.5rem;">Introdujo los bloques residuales (<em>skip connections</em>)
+            estructurales.
+          </li>
+          <li style="margin-bottom: 0.5rem;">Demostró algo crucial: permitir entrenar cientos de capas sin el
+            problema
+            de desaparición del gradiente.</li>
+          <li>Cimentó el pilar arquitectónico de casi cualquier diseño moderno.</li>
+        </ul>
+      </div>
+      <div style="width: 100%;">
+        <div data-external-replace="./figures/02-resnet_diagram.html"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h3>MobileNet (2017)</h3>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+      <div style="font-size: 0.8em; text-align: left; width: 100%;">
+        <p>Eficiencia y miniaturización total para Embedded AI e IoT.</p>
+        <ul>
+          <li style="margin-bottom: 0.5rem;">Reemplazó las convoluciones estándar por convoluciones separables en
+            profundidad (<em>Depthwise Separable</em>).</li>
+          <li style="margin-bottom: 0.5rem;">Cae la complejidad multiplicativa abismalmente.</li>
+          <li>Hizo viable correr modelos de visión en tiempo real sobre hardware móvil en los bordes.</li>
+        </ul>
+      </div>
+      <div style="width: 100%;">
+        <div data-external-replace="./figures/02-mobilenet_diagram.html"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h3>Resumen de Redes de Visión</h3>
+    <table style="font-size: 0.55em; width: 100%; border-collapse: collapse; text-align: left; margin-top: 1rem;">
+      <thead>
+        <tr style="border-bottom: 2px solid #fff;">
+          <th style="padding: 10px;">Red</th>
+          <th style="padding: 10px;">Año</th>
+          <th style="padding: 10px;">Parámetros</th>
+          <th style="padding: 10px;">Precisión (ImageNet Top-5)</th>
+          <th style="padding: 10px;">Uso / Innovación Destacada</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+          <td style="padding: 10px;"><strong>LeNet-5</strong></td>
+          <td style="padding: 10px;">1998</td>
+          <td style="padding: 10px;">~ 60 K</td>
+          <td style="padding: 10px;">N/A (Cifras de MNIST)</td>
+          <td style="padding: 10px;">Reconocimiento de dígitos y OCR básico.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+          <td style="padding: 10px;"><strong>AlexNet</strong></td>
+          <td style="padding: 10px;">2012</td>
+          <td style="padding: 10px;">~ 60 M</td>
+          <td style="padding: 10px;">~ 84.7%</td>
+          <td style="padding: 10px;">Pionera en popularizar Deep Learning con GPUs y ReLU.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+          <td style="padding: 10px;"><strong>VGG-16</strong></td>
+          <td style="padding: 10px;">2014</td>
+          <td style="padding: 10px;">~ 138 M</td>
+          <td style="padding: 10px;">~ 92.7%</td>
+          <td style="padding: 10px;">Canon de simplicidad, pero muy costosa computacionalmente.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+          <td style="padding: 10px;"><strong>Inception-V1 (GoogLeNet)</strong></td>
+          <td style="padding: 10px;">2014</td>
+          <td style="padding: 10px;">~ 7 M</td>
+          <td style="padding: 10px;">~ 93.3%</td>
+          <td style="padding: 10px;">Extremadamente eficiente. Introdujo múltiples caminos.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+          <td style="padding: 10px;"><strong>ResNet-50</strong></td>
+          <td style="padding: 10px;">2015</td>
+          <td style="padding: 10px;">~ 25 M</td>
+          <td style="padding: 10px;">~ 94.7%</td>
+          <td style="padding: 10px;">Estándar moderno en la industria gracia a conexiones residuales.</td>
+        </tr>
+        <tr>
+          <td style="padding: 10px;"><strong>MobileNet-V1</strong></td>
+          <td style="padding: 10px;">2017</td>
+          <td style="padding: 10px;">~ 4.2 M</td>
+          <td style="padding: 10px;">~ 89.5%</td>
+          <td style="padding: 10px;">Prioriza la eficiencia para dispositivos móviles (IoT, Edge AI).</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Ejemplos intuitivos: presentación -->
+  <section>
+    <h3>Ejemplos intuitivos</h3>
+    <p style="font-size: 0.85em; margin-bottom: 1.5rem;">Dos ejemplos concretos para desarrollar intuición sobre cómo
+      aprenden los modelos:</p>
+    <ul style="font-size: 0.9em; list-style: none; padding: 0;">
+      <li style="margin-bottom: 1.2rem; display: flex; align-items: flex-start; gap: 0.8rem;">
+        <span style="color: #50fa7b; font-size: 1.2em; flex-shrink: 0;">①</span>
+        <span>
+          <strong>Ajuste de función 1D:</strong> modelos de complejidad creciente aprenden
+          <code>y = ax + b + c·sin(dx + e)</code> - desde regresión lineal hasta redes neuronales.
+        </span>
+      </li>
+      <li style="display: flex; align-items: flex-start; gap: 0.8rem;">
+        <span style="color: #bd93f9; font-size: 1.2em; flex-shrink: 0;">②</span>
+        <span>
+          <strong>Visualización interactiva de una LeNet:</strong> veremos cómo fluyen los datos
+          a través de una red convolucional, capa por capa, en tiempo real.
+        </span>
+      </li>
+    </ul>
+  </section>
+
+  <!-- Ejemplos intuitivos: datos + modelos -->
+  <section>
+    <h3>Ejemplo 1 - El problema</h3>
+    <div style="display: flex; align-items: center; gap: 2rem;">
+      <div style="flex: 1.2;">
+        <img src="./figures/02-fit_datos_reales.png" style="width: 100%; border-radius: 0.5rem; margin: 0;">
+      </div>
+      <div style="flex: 1.2; font-size: 0.65em; text-align: left;">
+        <p style="margin-bottom: 1rem;">Modelos probados, de menor a mayor complejidad:</p>
+        <ol style="line-height: 2;">
+          <li>Regresión lineal <code>ax + b</code></li>
+          <li>Lineal + senoide <code>ax + b + c·sin(dx+e)</code></li>
+          <li>Neurona sola con ReLU</li>
+          <li>Capa densa (sin hidden)</li>
+          <li>MLP - 1 capa, 8 neuronas</li>
+          <li>MLP - 1 capa, 128 neuronas</li>
+          <li>MLP - 2 capas, 8×8 neuronas</li>
+          <li>MLP - 2 capas, 64×64 neuronas</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ejemplos intuitivos: imagen de salida (sin título) -->
+  <section data-background-color="#282a36">
+    <h3>Ejemplo 1 - Ajustes</h3>
+    <img src="./figures/02-fit_models_1d.png"
+      style="width: 100%; max-height: 155vh; object-fit: contain; margin: 0; padding: 0; display: block;">
+  </section>
+
+  <!-- Ejemplos intuitivos: visualización LeNet 2D -->
+  <section>
+    <h3>Ejemplo 2 - Visualización 2D de una LeNet</h3>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+      <a href="https://adamharley.com/nn_vis/cnn/2d.html" target="_blank" style="font-size: 0.75em; color: #8be9fd;">
+        🔗 adamharley.com/nn_vis/cnn/2d.html
+      </a>
+      <img src="./figures/02-2d_lenet_visualization.png"
+        style="width: 90%; max-height: 78vh; object-fit: contain; border-radius: 0.5rem;">
+    </div>
+  </section>
+
+  <!-- Cierre sección CESE -->
+  <section>
+    <h3>Resumen: introducción para CESE</h3>
+    <ul style="font-size: 0.65em; text-align: left; max-width: 800px; margin: 1rem auto;">
+      <li style="margin-bottom: 0.4rem;">El <strong>ciclo de vida</strong> de un proyecto de IA es iterativo e incluye
+        desde la definición de datos hasta el despliegue del modelo.</li>
+      <li style="margin-bottom: 0.4rem;">Los <strong>modelos matemáticos</strong> aprenden de los datos mediante el
+        entrenamiento (ajustando parámetros), para luego realizar la inferencia de manera rápida y eficiente.</li>
+      <li style="margin-bottom: 0.4rem;">Las <strong>arquitecturas de redes neuronales</strong> se componen de distintas
+        capas (densas, convolucionales, recurrentes, pooling, etc.) y topologías según la tarea a resolver.</li>
+      <li style="margin-bottom: 0.4rem;">La <strong>intuición práctica</strong> es vital: ver cómo ajusta una regresión
+        1D y cómo activan los mapas visuales en una CNN nos ayuda a entender "qué ve" y cómo procesa la red.</li>
+    </ul>
+    <p style="font-size: 0.65em; margin-top: 1.5rem; color: #6272a4; font-style: italic;">
+      A continuación: introducción para CEIA →
+    </p>
+  </section>
+
+</section>

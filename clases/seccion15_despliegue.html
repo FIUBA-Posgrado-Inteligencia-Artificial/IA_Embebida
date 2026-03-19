@@ -1,0 +1,96 @@
+<!-- 15. Despliegue en el Edge -->
+<section>
+    <section>
+        <h2 class="gradient-text">15. Despliegue en el Edge</h2>
+        <p>El ciclo de vida real: Mucho más que "Exportar"</p>
+    </section>
+
+    <!-- 1. Train-Deploy Gap -->
+    <section>
+        <h3>1. La Brecha con la Realidad (Train-Deploy Gap)</h3>
+        <div style="font-size: 0.7em; text-align: left;">
+            <p>En la academia, el modelo converge en PyTorch con <strong>FP32</strong> en un dataset inmaculado y ahí termina el trabajo. <strong>En la industria, ese es solo el 20%.</strong></p>
+            <div style="background: rgba(255,85,85,0.1); padding: 0.8rem; border-radius: 0.5rem; margin-top: 1rem;">
+                <strong style="color: #ff5555;">El Choque Físico</strong>
+                <p style="margin: 0.4rem 0;">Imágenes y audios de alta fidelidad frente a sensores de bajo costo con ruido, aberraciones ópticas y variaciones caóticas de tensión de batería.</p>
+                <p style="margin-top: 0.5rem; color: #ffb86c;"><strong>Solución:</strong> Aplicar <em>Data Augmentation</em> abismal inyectando defectos fidedignos del hardware físico final al propio tensor de entrenamiento.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. Optimización y Compresión -->
+    <section>
+        <h3>2. Optimización (El Núcleo del Despliegue)</h3>
+        <p style="font-size: 0.65em; text-align: left; margin-bottom: 0.8rem;">El modelo FP32 recién parido es gigantesco. Aplicamos una tríada iterativa que <strong>se apila (Ablation Pipeline)</strong>:</p>
+        <div style="font-size: 0.6em; text-align: left;">
+            <div style="background: rgba(139,233,253,0.1); border-radius: 0.5rem; padding: 10px; margin-bottom: 8px;">
+                <strong style="color: #8be9fd;">1. Pruning (Poda)</strong>
+                <p style="margin: 0.3rem 0 0;">Preferimos ineludiblemente el <em>Estructurado</em> (eliminar canales/filtros) garantizando reducción palpable de latencia física en chips llanos.</p>
+            </div>
+            <div style="background: rgba(189,147,249,0.1); border-radius: 0.5rem; padding: 10px; margin-bottom: 8px;">
+                <strong style="color: #bd93f9;">2. Knowledge Distillation (KD)</strong>
+                <p style="margin: 0.3rem 0 0;">La poda arranca Accuracy. Resucitamos el balance fundiendo divergencias de divergencia KL, inyectando "Soft Targets" del Profesor Intacto al "Alumno Raquítico".</p>
+            </div>
+            <div style="background: rgba(80,250,123,0.1); border-radius: 0.5rem; padding: 10px;">
+                <strong style="color: #50fa7b;">3. Cuantización Lineal a INT8</strong>
+                <p style="margin: 0.3rem 0 0.5rem;">Implante incisivo en pesos y pasajes: <code>r = S(q - Z)</code></p>
+                <p style="margin: 0;">Colapsa FP32 a fríos enteros amputando 3/4 del acopio de SRAM y duplicando latencia por caída del 1% del acierto global real de campo.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. Conversión -->
+    <section>
+        <h3>3. Compilación y Embudo de Tensores</h3>
+        <div style="font-size: 0.7em; text-align: left;">
+            <p>Traducción asíncrona castiza (.pth a .tflite / .onnx).</p>
+            <div style="display: flex; gap: 1.2rem; margin-top: 1rem;">
+                <div style="flex: 1;">
+                    <strong style="color: #ff5555;">La Incompatibilidad de Operadores</strong>
+                    <p style="margin-top: 0.4rem; line-height: 1.4;">Los motores de silicio profundo aborrecen artilugios (GELU/Swish). Si exportas sin que exista kernel C++, el despliegue aborta súbitamente.</p>
+                    <p style="margin-top: 0.4rem; font-style: italic;">(El NAS debe limitarse explícitamente a librerías reconocidas por destino).</p>
+                </div>
+                <div style="flex: 1; background: rgba(255,255,255,0.05); padding: 0.8rem; border-radius: 0.5rem;">
+                    <strong style="color: #8be9fd;">Operator Fusion Activa</strong>
+                    <p style="margin-top: 0.4rem; line-height: 1.4;">El compilador intermedio incinera pasos y pliega contundentemente (Ej. Convolución + BN + ReLU en una función monolítica extrema).</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. Integración y Bare-Metal -->
+    <section>
+        <h3>4. Integración Bare-Metal (C Firmware)</h3>
+        <div style="font-size: 0.7em; text-align: left;">
+            <p>El arreglo nativo HEX flasheado en frío adentro del sistema cerrado.</p>
+            <div style="background: rgba(255,184,108,0.1); padding: 0.8rem; border-radius: 0.5rem; margin-top: 1rem;">
+                <strong style="color: #ffb86c; font-size: 1.1em;">El Tensor Arena (y la Fobia al Malloc)</strong>
+                <p style="margin: 0.4rem 0;">Los Sitemas Operativos clásicos reclaman generosamente <code>malloc</code>. En los microcontroladores esto fragmentos SRAM colapsando con <em>Crashes y Heap Overflows</em> ciegos.</p>
+                <ul style="margin-top: 0.5rem; padding-left: 1.5rem; line-height: 1.4;">
+                    <li style="margin-bottom: 0.3rem;">Decreto vital: Pre-asignar un bloque fijo estático: <strong>Tensor Arena</strong> (sobrescritura circular metódica).</li>
+                    <li><strong style="color: #50fa7b;">API Delegates:</strong> Inicialización de librerías dirigiendo flujos paralelos forzosos a los DSP / Accelerators externos y esquivando la ALU de la CPU mermada.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. Evaluación Práctica MLPerf -->
+    <section>
+        <h3>5. Validación Física (La Hora de la Verdad)</h3>
+        <div style="font-size: 0.7em; text-align: left;">
+            <p>El emulador simulado en Python es una quimera. La evaluación final la certifica el osciloscopio de sobremesa.</p>
+            <div style="margin-top: 1rem;">
+                <p style="margin-bottom: 0.4rem;"><strong>Estándar MLPerf Tiny:</strong> Métrica de benchmark igualitaria internacionalmente (manzanas con manzanas):</p>
+                <ul style="margin-top: 0.5rem; padding-left: 1.2rem; line-height: 1.4;">
+                    <li style="margin-bottom: 0.3rem;"><strong style="color: #8be9fd;">Latencia Fija (ms):</strong> Exclusivamente de reloj GPIO de entrada a salida.</li>
+                    <li style="margin-bottom: 0.3rem;"><strong style="color: #ff5555;">Peak Memory (KB):</strong> Tope hídrico exigido arrinconando el Overflow del <em>Tensor Arena</em>.</li>
+                    <li><strong style="color: #50fa7b;">Consumo Energético (mJ/Inf):</strong> Agotamiento crudo censado transitoriamente en derivaciones VCC/GND reales bajo la pila del hardware pasivo.</li>
+                </ul>
+                <div style="background: rgba(255,255,255,0.05); padding: 0.8rem; border-radius: 0.5rem; margin-top: 1rem;">
+                    <strong style="color: #ffb86c; font-size:1.1em; display:block; text-align:center;">El Feedback Loop Severo</strong>
+                    <p style="margin-top: 0.3rem; text-align:center;">Si la celda alberga 10mA y tu Red devora 15mA, <strong>es un fracaso abyecto</strong>. Retornar urgente al Punto 2 para castigar de nuevo el podado.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</section>

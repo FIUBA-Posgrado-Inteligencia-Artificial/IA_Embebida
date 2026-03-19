@@ -1,0 +1,95 @@
+<!-- 9. Neural Architecture Search (NAS) -->
+<section>
+    <section>
+        <h2 class="gradient-text">9. Neural Architecture Search (NAS)</h2>
+        <p>Automatizando el diseño de arquitecturas óptimas</p>
+    </section>
+
+    <!-- 1. ¿Qué es NAS? -->
+    <section>
+        <h3>¿Qué es NAS?</h3>
+        <div style="font-size: 0.75em; text-align: left;">
+            <p>El paso del diseño manual (intuición humana) al diseño automatizado. Subcampo del <strong>AutoML</strong> que usa algoritmos para descubrir la arquitectura óptima.</p>
+            <p style="margin-top: 1rem;"><strong style="color: #8be9fd;">HW-NAS (Hardware-Aware NAS)</strong></p>
+            <p>En compresión, se busca el mejor equilibrio (Trade-off) entre <strong>precisión</strong> y <strong>restricciones de hardware</strong> (Latencia, FLOPs, Memoria RAM/SRAM, Energía).</p>
+            <div style="background: rgba(255,255,255,0.1); padding: 0.8rem; border-radius: 0.5rem; text-align: center; margin: 0.8rem 0; font-size: 1.1em;">
+                <code>L = Error(red) + α · max(0, Latencia(red) - Latencia<sub>target</sub>)</code>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pilares -->
+    <section>
+        <h3>Pilares de un sistema NAS</h3>
+        <div style="font-size: 0.65em; text-align: left;">
+            <div style="display: grid; grid-template-columns: 1fr; gap: 12px;">
+                <div style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px;">
+                    <strong style="color: #ff79c6;">A. Espacio de Búsqueda (Search Space)</strong>
+                    <p style="margin: 0.3rem 0 0;">El "universo" de arquitecturas posibles. <br><strong>Macro:</strong> estructura global. <br><strong>Micro (Cell-based):</strong> diseño de una "célula" óptima que se apila (reduce drásticamente el espacio).</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px;">
+                    <strong style="color: #50fa7b;">B. Estrategia de Búsqueda (Search Strategy)</strong>
+                    <p style="margin: 0.3rem 0 0;">Cómo explorar el espacio. <br><strong>Reinforcement Learning / Evolutivos:</strong> discretos, pero computacionalmente costosos.<br><strong>Gradientes (DARTS):</strong> relaja a un espacio continuo. Suma ponderada de operaciones, extremadamente rápido en pocas GPUs.</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px;">
+                    <strong style="color: #8be9fd;">C. Estrategia de Evaluación (Performance Estimation)</strong>
+                    <p style="margin: 0.3rem 0 0;">Cómo saber si es buena sin entrenar desde cero. <br><strong>Weight Sharing:</strong> se entrena una gigantesca Superred de donde heredan los pesos. <br><strong>Zero-cost Proxies:</strong> métricas matemáticas previas al entrenamiento.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. HW-NAS Edge y Cloud -->
+    <section>
+        <h3>HW-NAS en Edge vs. Cloud</h3>
+        <div style="display: flex; gap: 1.5rem; margin-top: 1rem; font-size: 0.7em; text-align: left;">
+            <div style="flex: 1; background: rgba(80,250,123,0.1); padding: 0.8rem; border-radius: 0.5rem;">
+                <h4 style="color: #50fa7b; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.1em;">Edge / IA Embebida</h4>
+                <p>Limitados por batería, latencia, y RAM (&lt; 1MB).</p>
+                <ul style="margin-top: 0.5rem;">
+                    <li style="margin-bottom: 0.4rem;"><strong>MobileNetV3:</strong> NAS descubrió mezclar capas asimétricamente según cuellos de botella de memoria.</li>
+                    <li><strong>ProxylessNAS:</strong> evalúa latencia <em>en el hardware real</em>, en lugar de usar FLOPs como estimación.</li>
+                </ul>
+            </div>
+            <div style="flex: 1; background: rgba(139,233,253,0.1); padding: 0.8rem; border-radius: 0.5rem;">
+                <h4 style="color: #8be9fd; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.1em;">Cloud / HPC</h4>
+                <p>El problema es maximizar Throughput y abaratar costo computacional.</p>
+                <ul style="margin-top: 0.5rem;">
+                    <li style="margin-bottom: 0.4rem;"><strong>EfficientNet:</strong> Utilizó NAS para hallar el "Compound Scaling Rule".</li>
+                    <li>Fórmula matemática exacta para escalar ancho, profundidad y resolución simultáneamente.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. OFA -->
+    <section>
+        <h3>Estado del Arte: Once-For-All (OFA)</h3>
+        <div style="font-size: 0.7em; text-align: left;">
+            <p>Escalar modelos a miles de dispositivos diferentes eficientemente.</p>
+            <div style="margin-top: 1rem;">
+                <p style="color: #ff5555; margin-bottom: 0.3rem;"><strong>El Problema:</strong></p>
+                <p>Correr NAS por cada hardware diferente (celulares varios, IoT, cloud) cuesta miles de horas de GPU y una huella de carbono masiva.</p>
+
+                <p style="color: #50fa7b; margin-top: 1rem; margin-bottom: 0.3rem;"><strong>La Solución (MIT):</strong></p>
+                <ol style="margin-top: 0.5rem;">
+                    <li style="margin-bottom: 0.4rem;"><strong>Superred (Supernet):</strong> Entrena una sola red gigantesca.</li>
+                    <li style="margin-bottom: 0.4rem;"><strong>Progressive Shrinking:</strong> Aprende a tolerar que le "apaguen" filtros o capas sin perder precisión (sub-redes).</li>
+                    <li><strong>Despliegue Instantáneo:</strong> Según el hardware, se extrae una sub-red en <em>milisegundos</em>, <strong>sin re-entrenamiento</strong> adicional.</li>
+                </ol>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. Resumen -->
+    <section>
+        <h3>Resumen y Takeaways</h3>
+        <div style="font-size: 0.75em; text-align: left;">
+            <ul style="line-height: 1.5;">
+                <li style="margin-bottom: 0.8rem;"><strong style="color: #8be9fd;">NAS ya no es fuerza bruta:</strong> Con algoritmos como DARTS (búsqueda continua) y Weight Sharing, se puede correr en horas usando una sola GPU.</li>
+                <li style="margin-bottom: 0.8rem;"><strong style="color: #ff79c6;">FLOPs ≠ Latencia:</strong> En HW-NAS, los algoritmos han demostrado que optimizar por cantidad de operaciones engaña respecto de la velocidad real (Hardware in the loop).</li>
+                <li style="margin-bottom: 0.8rem;"><strong style="color: #50fa7b;">Fin del "One Size Fits All":</strong> Técnicas como OFA permiten compresión extrema a medida. Cada chip recibe la arquitectura ideal, en vez de obligar a escalar el mismo modelo.</li>
+            </ul>
+        </div>
+    </section>
+</section>

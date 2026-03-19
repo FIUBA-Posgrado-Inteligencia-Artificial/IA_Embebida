@@ -1,0 +1,66 @@
+<svg viewBox="0 0 500 150"
+    style="width: 100%; display: block; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3)); border-radius: 0.5rem; background: rgba(255,255,255,0.05);">
+    <defs>
+        <marker id="arrow-lenet" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6"
+            orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="rgba(248, 248, 242, 0.4)" />
+        </marker>
+        <filter id="glow-lenet">
+            <feGaussianBlur stdDeviation="2" result="blur" />
+            <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+            </feMerge>
+        </filter>
+    </defs>
+
+    <text x="250" y="25" fill="#f8f8f2" font-size="14" font-weight="bold" font-family="sans-serif"
+        text-anchor="middle">LeNet-5</text>
+
+    <!-- Input -->
+    <rect x="20" y="50" width="30" height="30" fill="rgba(248, 248, 242, 0.2)" stroke="#f8f8f2" stroke-width="2" />
+    <text x="35" y="100" fill="#f8f8f2" font-size="10" font-family="sans-serif" text-anchor="middle">In</text>
+
+    <!-- Conv 1 -->
+    <path d="M 50 65 L 70 65" stroke="rgba(248, 248, 242, 0.4)" stroke-width="2" marker-end="url(#arrow-lenet)" />
+    <rect x="80" y="40" width="15" height="50" fill="rgba(189, 147, 249, 0.5)" stroke="#bd93f9" stroke-width="2"
+        filter="url(#glow-lenet)" />
+    <text x="87" y="110" fill="#bd93f9" font-size="10" font-family="sans-serif" text-anchor="middle">C1</text>
+
+    <!-- Pool 1 -->
+    <path d="M 95 65 L 115 65" stroke="rgba(248, 248, 242, 0.4)" stroke-width="2" marker-end="url(#arrow-lenet)" />
+    <rect x="125" y="50" width="15" height="30" fill="rgba(80, 250, 123, 0.5)" stroke="#50fa7b" stroke-width="2"
+        filter="url(#glow-lenet)" />
+    <text x="132" y="100" fill="#50fa7b" font-size="10" font-family="sans-serif" text-anchor="middle">S2</text>
+
+    <!-- Conv 2 -->
+    <path d="M 140 65 L 160 65" stroke="rgba(248, 248, 242, 0.4)" stroke-width="2" marker-end="url(#arrow-lenet)" />
+    <rect x="170" y="45" width="20" height="40" fill="rgba(189, 147, 249, 0.7)" stroke="#bd93f9" stroke-width="2"
+        filter="url(#glow-lenet)" />
+    <text x="180" y="110" fill="#bd93f9" font-size="10" font-family="sans-serif" text-anchor="middle">C3</text>
+
+    <!-- Pool 2 -->
+    <path d="M 190 65 L 210 65" stroke="rgba(248, 248, 242, 0.4)" stroke-width="2" marker-end="url(#arrow-lenet)" />
+    <rect x="220" y="55" width="20" height="20" fill="rgba(80, 250, 123, 0.7)" stroke="#50fa7b" stroke-width="2"
+        filter="url(#glow-lenet)" />
+    <text x="230" y="100" fill="#50fa7b" font-size="10" font-family="sans-serif" text-anchor="middle">S4</text>
+
+    <!-- Conv 3 (often called C5) -->
+    <path d="M 240 65 L 260 65" stroke="rgba(248, 248, 242, 0.4)" stroke-width="2" marker-end="url(#arrow-lenet)" />
+    <rect x="270" y="60" width="25" height="10" fill="rgba(189, 147, 249, 0.9)" stroke="#bd93f9" stroke-width="2"
+        filter="url(#glow-lenet)" />
+    <text x="282" y="110" fill="#bd93f9" font-size="10" font-family="sans-serif" text-anchor="middle">C5</text>
+
+    <!-- FC 1 -->
+    <path d="M 295 65 L 315 65" stroke="rgba(248, 248, 242, 0.4)" stroke-width="2" marker-end="url(#arrow-lenet)" />
+    <rect x="325" y="40" width="20" height="50" fill="rgba(255, 184, 108, 0.6)" stroke="#ffb86c" stroke-width="2"
+        filter="url(#glow-lenet)" />
+    <text x="335" y="110" fill="#ffb86c" font-size="10" font-family="sans-serif" text-anchor="middle">F6</text>
+
+    <!-- Output -->
+    <path d="M 345 65 L 430 65" stroke="rgba(248, 248, 242, 0.4)" stroke-width="2" marker-end="url(#arrow-lenet)" />
+    <circle cx="445" cy="65" r="15" fill="rgba(255, 85, 85, 0.7)" stroke="#ff5555" stroke-width="2"
+        filter="url(#glow-lenet)" />
+    <text x="445" y="100" fill="#ff5555" font-size="10" font-family="sans-serif" text-anchor="middle">Out</text>
+
+</svg>

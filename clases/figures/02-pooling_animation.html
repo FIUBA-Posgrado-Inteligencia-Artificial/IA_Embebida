@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <style>
+        body {
+            background: transparent;
+            font-family: sans-serif;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .grid {
+            display: grid;
+            gap: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px;
+            border-radius: 4px;
+        }
+
+        .cell {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #f8f8f2;
+            background: #282a36;
+            transition: all 0.3s;
+            border-radius: 2px;
+        }
+
+        .highlight {
+            background: #ff79c6 !important;
+            color: #fff !important;
+            font-weight: bold;
+            transform: scale(1.1);
+            box-shadow: 0 0 10px #ff79c6;
+        }
+
+        .result-cell {
+            width: 40px;
+            height: 40px;
+            font-size: 18px;
+        }
+
+        .arrow {
+            font-size: 24px;
+            color: #6272a4;
+            font-weight: bold;
+        }
+
+        .label {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            color: #bd93f9;
+            white-space: nowrap;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div style="position: relative;">
+            <div class="label">Entrada (4x4)</div>
+            <div id="input-grid" class="grid" style="grid-template-columns: repeat(4, 1fr);"></div>
+        </div>
+        <div class="arrow">&rarr;</div>
+        <div style="position: relative;">
+            <div class="label">Max Pooling (2x2)</div>
+            <div id="output-grid" class="grid" style="grid-template-columns: repeat(2, 1fr);"></div>
+        </div>
+    </div>
+
+    <script>
+        const inGrid = document.getElementById('input-grid');
+        const outGrid = document.getElementById('output-grid');
+        const data = [
+            12, 20, 30, 0,
+            8, 12, 2, 0,
+            34, 70, 37, 4,
+            112, 100, 25, 12
+        ];
+
+        // Create grids
+        for (let i = 0; i < 16; i++) {
+            const div = document.createElement('div');
+            div.className = 'cell';
+            div.id = 'in-' + i;
+            div.textContent = data[i];
+            inGrid.appendChild(div);
+        }
+        for (let i = 0; i < 4; i++) {
+            const div = document.createElement('div');
+            div.className = 'cell result-cell';
+            div.id = 'out-' + i;
+            div.textContent = '-';
+            outGrid.appendChild(div);
+        }
+
+        let step = 0;
+        function animate() {
+            // Reset all highlights
+            document.querySelectorAll('.cell').forEach(c => {
+                c.classList.remove('highlight');
+            });
+
+            const phase = step % 5;
+
+            if (phase === 4) {
+                // Pause step to show completed grid
+            } else {
+                if (phase === 0) {
+                    // Clear outputs at the start of a new loop
+                    document.querySelectorAll('.result-cell').forEach(c => {
+                        c.textContent = '-';
+                    });
+                }
+                const offsets = [
+                    [0, 1, 4, 5],    // top left
+                    [2, 3, 6, 7],    // top right
+                    [8, 9, 12, 13],  // bottom left
+                    [10, 11, 14, 15] // bottom right
+                ];
+
+                const activeIndices = offsets[phase];
+                let maxVal = -1;
+                activeIndices.forEach(idx => {
+                    document.getElementById('in-' + idx).classList.add('highlight');
+                    if (data[idx] > maxVal) maxVal = data[idx];
+                });
+
+                const outCell = document.getElementById('out-' + phase);
+                outCell.textContent = maxVal;
+                outCell.classList.add('highlight');
+            }
+
+            step++;
+            setTimeout(animate, 1000);
+        }
+        animate();
+    </script>
+</body>
+
+</html>
