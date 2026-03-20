@@ -3,6 +3,8 @@ import math
 import json
 import numpy as np
 import tensorflow as tf
+from qkeras_linear import patch_qkeras
+patch_qkeras()
 from tensorflow.keras.models import Model as KerasModel
 from scipy.stats import skew, kurtosis
 from tensorflow.keras.datasets import fashion_mnist
