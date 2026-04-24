@@ -1,0 +1,28 @@
+{
+  "num_classes": 10,
+  "input_w": 32,
+  "input_h": 32,
+  "input_channels": 3,
+  "mean": [
+    113,
+    112,
+    103
+  ],
+  "std": [
+    57,
+    56,
+    57
+  ],
+  "classes": [
+    "airplane",
+    "bird",
+    "car",
+    "deer",
+    "dog",
+    "frog",
+    "horse",
+    "monkey",
+    "ship",
+    "truck"
+  ]
+}

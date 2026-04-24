@@ -1,0 +1,16 @@
+menu "ESP32-CAM Test OTA"
+
+config TEST_OTA_WIFI_SSID
+    string "WiFi SSID"
+    default "MySSID"
+
+config TEST_OTA_WIFI_PASSWORD
+    string "WiFi password"
+    default "MyPassword"
+
+config TEST_OTA_HTTP_PORT
+    int "HTTP server port"
+    range 1 65534
+    default 80
+
+endmenu

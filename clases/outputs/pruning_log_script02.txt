@@ -1,0 +1,44 @@
+[INFO] Usando dispositivo: cpu
+
+============================================================
+PASO 1 — Entrenando CNN baseline
+============================================================
+  Epoch  1/10  loss=0.8227  train_acc=0.7056  test_acc=0.7872  (4.1s)
+  Epoch  2/10  loss=0.4964  train_acc=0.8158  test_acc=0.8274  (3.4s)
+  Epoch  3/10  loss=0.4240  train_acc=0.8474  test_acc=0.8495  (3.7s)
+  Epoch  4/10  loss=0.3867  train_acc=0.8596  test_acc=0.8624  (3.5s)
+  Epoch  5/10  loss=0.3575  train_acc=0.8701  test_acc=0.8576  (3.7s)
+  Epoch  6/10  loss=0.3359  train_acc=0.8776  test_acc=0.8698  (3.8s)
+  Epoch  7/10  loss=0.3187  train_acc=0.8844  test_acc=0.8776  (4.5s)
+  Epoch  8/10  loss=0.3026  train_acc=0.8898  test_acc=0.8760  (3.8s)
+  Epoch  9/10  loss=0.2936  train_acc=0.8930  test_acc=0.8794  (4.0s)
+  Epoch 10/10  loss=0.2830  train_acc=0.8958  test_acc=0.8824  (4.0s)
+
+Baseline  acc=0.8824
+  [Baseline] Parámetros: 44,426  |  MACs: 281,640  |  Tamaño: 173.5 KB
+
+============================================================
+PASO 2 — Pruning iterativo por magnitud de pesos (L1)
+============================================================
+
+  Criterio: importancia(filtro) = ‖W_filtro‖₁
+  Se eliminan los filtros con MENOR importancia.
+
+   Sparsity |  Acc antes FT | Acc después FT |    Paráms |       MACs
+  -----------------------------------------------------------------
+       10% |        0.6441 |         0.8792 |    39,908 |    221,800
+       20% |        0.5580 |         0.8731 |    35,490 |    168,360
+       30% |        0.5670 |         0.8700 |    33,469 |    160,040
+       40% |        0.4293 |         0.8528 |    29,176 |    114,600
+       50% |        0.4248 |         0.8520 |    27,180 |    107,880
+       60% |        0.3744 |         0.8348 |    23,012 |     70,440
+       70% |        0.1760 |         0.7744 |    18,944 |     39,400
+
+[INFO] Gráfico guardado en 'outputs/pruning_magnitud.png'
+[INFO] Resultados guardados en 'outputs/pruning_magnitud_resultados.json'
+
+[CONCLUSIÓN]
+  Criterio: norma L1 de pesos por filtro.
+  Mejor balance en 10% sparsity: acc=0.8792, reducción MACs=21.2%.
+  Limitación: la magnitud de los pesos no captura cuánto contribuye cada filtro
+  a las predicciones reales del modelo. Ver script03.py (activaciones).

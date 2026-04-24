@@ -1,0 +1,29 @@
+idf_component_register(
+    SRCS
+        "app_main.c"
+        "camera.c"
+        "preprocess.c"
+        "inference.cpp"
+        "result_format.c"
+        "serial_trigger.c"
+        "wifi_manager.c"
+        "esp32cam_mqtt.c"
+        "http_stream_server.c"
+        "ota_handler.c"
+    INCLUDE_DIRS
+        "."
+    REQUIRES
+        esp_timer
+        nvs_flash
+        espressif__esp32-camera
+        espressif__esp-dl
+        json
+        driver
+        esp_wifi
+        esp_event
+        esp_netif
+        esp_http_server
+        mqtt
+        app_update
+        esp_partition
+)

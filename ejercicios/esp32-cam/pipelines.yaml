@@ -1,0 +1,216 @@
+# ESP32-CAM pipeline flows.
+# Usage:
+#   uv run python main.py run <flow_name>
+#   uv run python main.py run <flow_name> --dry-run
+#   uv run python main.py flows
+
+# Puerto serie del ESP32-CAM. Se inyecta automáticamente en todos los stage
+# `build` que no definan su propio `port`. Cambialo si tu board está en otra
+# ruta (ej: /dev/ttyUSB0). Dejalo en `auto` para que se autodetecte por
+# (VID, PID) — solo confiable si hay una única placa ESP conectada.
+port: /dev/ttyUSB2
+
+flows:
+
+  # -----------------------------------------------------------------------
+  # DESARROLLO RÁPIDO
+  # Ciclo corto (minutos) para verificar que el pipeline corre de punta
+  # a punta antes de gastar tiempo en un modelo de producción.
+  # Variantes:
+  #   fast_debug                → train → prune → quantize → build (con flash)
+  #   fast_debug_only_build     → sólo flashea el modelo ya cuantizado
+  #   fast_debug_only_monitor   → sólo abre el monitor serie
+  # -----------------------------------------------------------------------
+
+  # Pipeline completo: depthwise rgb 32x32, 5 epochs, termina flasheando.
+  fast_debug:
+    - stage: train
+      params:
+        arch: depthwise
+        input_mode: rgb
+        resolution: 32
+        epochs: 5
+        lr: 1.0e-3
+        batch_size: 512
+
+    - stage: prune
+      source: depthwise_rgb32
+      params:
+        method: activation
+        ratio: 0.3
+        finetune_epochs: 2
+        lr: 2.0e-4
+
+    - stage: quantize
+      source: depthwise_rgb32_pruned_activation_30
+      variant: a
+      params:
+        mode: ptq
+        calib_batches: 32
+
+    - stage: build
+      source: depthwise_rgb32_pruned_activation_30_quantized_ptq
+      params:
+        monitor: true
+        preflight: true
+
+  # Re-flashea sin re-entrenar. Requiere haber corrido fast_debug (o
+  # cualquier quantize) antes para que exista el header en models/.
+  fast_debug_only_build:
+    - stage: build
+      params:
+        monitor: true
+        preflight: true
+
+  # Sólo abre el monitor serie; no toca el firmware que ya está en la placa.
+  fast_debug_only_monitor:
+    - stage: build
+      params:
+        monitor_only: true
+
+
+  # -----------------------------------------------------------------------
+  # MODELOS DE PRODUCCIÓN
+  # Para cada modelo hay tres variantes con el mismo train/prune/quantize:
+  #   <nombre>              → pipeline completo, termina flasheando
+  #   <nombre>_no_build     → hasta quantize — útil para iterar sin placa
+  #   <nombre>_only_build   → sólo flashea un .espdl ya generado
+  # -----------------------------------------------------------------------
+
+  # -- good_model: alta calidad, poca compresión, standard rgb 96x96.
+  # Mayor accuracy; más pesado y más lento en el ESP32.
+
+  # Sin flash — para entrenar una vez y comparar métricas (main.py models).
+  good_model_no_build:
+    - stage: train
+      params:
+        arch: standard
+        input_mode: rgb
+        resolution: 96
+        epochs: 30
+        lr: 1.0e-3
+        batch_size: 128
+
+    - stage: prune
+      source: standard_rgb96
+      params:
+        method: activation
+        ratio: 0.2
+        finetune_epochs: 10
+        lr: 2.0e-4
+
+    - stage: quantize
+      source: standard_rgb96_pruned_activation_20
+      variant: a
+      params:
+        mode: ptq
+        calib_batches: 32
+
+  # Pipeline completo con flash al final.
+  good_model:
+    - stage: train
+      params:
+        arch: standard
+        input_mode: rgb
+        resolution: 96
+        epochs: 30
+        lr: 1.0e-3
+        batch_size: 128
+
+    - stage: prune
+      source: standard_rgb96
+      params:
+        method: activation
+        ratio: 0.2
+        finetune_epochs: 10
+        lr: 2.0e-4
+
+    - stage: quantize
+      source: standard_rgb96_pruned_activation_20
+      variant: a
+      params:
+        mode: ptq
+        calib_batches: 32
+
+    - stage: build
+      source: standard_rgb96_pruned_activation_20_quantized_ptq
+      params:
+        monitor: true
+        preflight: true
+
+  # Re-flashea el .espdl de good_model ya entrenado (sin re-entrenar).
+  good_model_only_build:
+    - stage: build
+      source: standard_rgb96_pruned_activation_20_quantized_ptq
+      params:
+        monitor: true
+        preflight: true
+
+  # -- small_model: compacto, mucha compresión, depthwise rgb 32x32.
+  # Menor tamaño y más veloz en el ESP32; posible caída de accuracy.
+
+  # Sin flash — para entrenar una vez y comparar métricas (main.py models).
+  small_model_no_build:
+    - stage: train
+      params:
+        arch: depthwise
+        input_mode: rgb
+        resolution: 32
+        epochs: 30
+        lr: 1.0e-3
+        batch_size: 512
+
+    - stage: prune
+      source: depthwise_rgb32
+      params:
+        method: activation
+        ratio: 0.5
+        finetune_epochs: 10
+        lr: 2.0e-4
+
+    - stage: quantize
+      source: depthwise_rgb32_pruned_activation_50
+      variant: a
+      params:
+        mode: ptq
+        calib_batches: 32
+
+  # Pipeline completo con flash al final.
+  small_model:
+    - stage: train
+      params:
+        arch: depthwise
+        input_mode: rgb
+        resolution: 32
+        epochs: 30
+        lr: 1.0e-3
+        batch_size: 512
+
+    - stage: prune
+      source: depthwise_rgb32
+      params:
+        method: activation
+        ratio: 0.5
+        finetune_epochs: 10
+        lr: 2.0e-4
+
+    - stage: quantize
+      source: depthwise_rgb32_pruned_activation_50
+      variant: a
+      params:
+        mode: ptq
+        calib_batches: 32
+
+    - stage: build
+      source: depthwise_rgb32_pruned_activation_50_quantized_ptq
+      params:
+        monitor: true
+        preflight: true
+
+  # Re-flashea el .espdl de small_model ya entrenado (sin re-entrenar).
+  small_model_only_build:
+    - stage: build
+      source: depthwise_rgb32_pruned_activation_50_quantized_ptq
+      params:
+        monitor: true
+        preflight: true

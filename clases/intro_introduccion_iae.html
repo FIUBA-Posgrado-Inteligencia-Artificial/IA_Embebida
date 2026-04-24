@@ -1,0 +1,456 @@
+<!-- 4. Introducción a IA embebida -->
+<section>
+
+  <section>
+    <h2 class="gradient-text">4. Introducción a IA embebida</h2>
+    <p>Compresión y despliegue de modelos de IA</p>
+    <ul style="font-size: 0.8em; text-align: left; max-width: 750px; margin: 1.5rem auto;">
+      <li style="margin-bottom: 0.4rem;">Las 5 capas de la IA</li>
+      <li style="margin-bottom: 0.4rem;">Etapas del proyecto: dónde entra la compresión</li>
+      <li style="margin-bottom: 0.4rem;">Complejidad computacional: notación Big O</li>
+      <li style="margin-bottom: 0.4rem;">Métodos de compresión de redes neuronales</li>
+      <ul>
+        <li style="margin-bottom: 0.4rem;">Cuantización: conceptos, PTQ y QAT</li>
+        <li style="margin-bottom: 0.4rem;">Poda</li>
+        <li style="margin-bottom: 0.4rem;">Destilación</li>
+        <li style="margin-bottom: 0.4rem;">Factorización</li>
+        <li style="margin-bottom: 0.4rem;">Neural Architecture Search (NAS)</li>
+      </ul>
+      <li>Estado del arte y direcciones futuras</li>
+    </ul>
+  </section>
+
+  <!-- ===================== LAS 5 CAPAS DE LA IA ===================== -->
+
+  <section data-auto-animate>
+    <h3>Las 5 capas de la IA</h3>
+    <div style="display: flex; gap: 2rem; align-items: center;">
+      <div style="flex: 1;">
+        <img src="./figures/04-capas_de_la_ia.jpeg" style="width: 100%; border-radius: 0.5rem;" id="img-capas">
+        <p style="font-size: 0.6em; font-style: italic; margin-top: 0.8rem;">Una visión estructural (Jensen
+          Huang)</p>
+      </div>
+      <div style="flex: 1; text-align: left;">
+        <ul style="font-size: 0.7em;">
+          <li><strong>1. Energía:</strong> el insumo fundacional.</li>
+          <li><strong>2. Chips e infraestructura:</strong> transformando energía en cómputo.</li>
+          <li><strong>3. Nube y data centers:</strong> la industrialización de la IA.</li>
+          <li><strong>4. Modelos de IA:</strong> el cerebro del sistema.</li>
+          <li><strong>5. Aplicaciones:</strong> donde la IA se convierte en productividad.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section data-auto-animate>
+    <h3>Capa 1: Energía</h3>
+    <div style="display: flex; gap: 2rem; align-items: center;">
+      <div style="flex: 0.7;">
+        <img src="./figures/04-capas_de_la_ia.jpeg" style="width: 100%; border-radius: 0.5rem;" id="img-capas">
+      </div>
+      <div style="flex: 1.3; text-align: left;">
+        <p style="font-size: 0.8em; font-style: italic;">El insumo fundacional de la IA</p>
+        <ul style="font-size: 0.7em;">
+          <li><strong>Insumo base:</strong> el ecosistema requiere <strong>potencia constante 24/365</strong>, sin
+            tolerar microinterrupciones ni variabilidad extrema.</li>
+          <li><strong>Cuello de botella global:</strong> no solo es generar la energía, el verdadero desafío es
+            <strong>entregarla</strong> (transmisión, distribución).
+          </li>
+          <li><strong>Inversión industrial:</strong> convierte a la IA en motor de obras civiles, infraestructura
+            pesada y contratos de largo plazo.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section data-auto-animate>
+    <h3>Capa 2: Chips e infraestructura</h3>
+    <div style="display: flex; gap: 2rem; align-items: center;">
+      <div style="flex: 0.7;">
+        <img src="./figures/04-capas_de_la_ia.jpeg" style="width: 100%; border-radius: 0.5rem;" id="img-capas">
+      </div>
+      <div style="flex: 1.3; text-align: left;">
+        <p style="font-size: 0.8em; font-style: italic;">Donde la energía se transforma en capacidad de cálculo</p>
+        <ul style="font-size: 0.7em;">
+          <li><strong>Hardware crítico:</strong> GPUs, redes de alta velocidad, servidores y sofisticados
+            <strong>sistemas de gestión térmica</strong>.
+          </li>
+          <li><strong>Complejidad industrial:</strong> depende de una integración milimétrica, racks avanzados,
+            metalurgia y encadenamientos logísticos globales.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section data-auto-animate>
+    <h3>Capas 3, 4 y 5</h3>
+    <div style="display: flex; gap: 2rem; align-items: center;">
+      <div style="flex: 0.7;">
+        <img src="./figures/04-capas_de_la_ia.jpeg" style="width: 100%; border-radius: 0.5rem;" id="img-capas">
+      </div>
+      <div style="flex: 1.3; text-align: left;">
+        <ul style="font-size: 0.7em;">
+          <li><strong>3. Data centers:</strong> las fábricas de inteligencia. Requieren suelo, clima propicio, y
+            conectividad extensa por fibra.</li>
+          <li><strong>4. Modelos de IA:</strong> oportunidad de crear modelos especializados para verticales fuertes
+            locales (agro, energía, sector público, etc.).</li>
+          <li><strong>5. Aplicaciones:</strong> el punto de impacto directo para aumentar la productividad sectorial,
+            apoyándose en la economía del conocimiento.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h3>La compresión es transversal</h3>
+    <div style="font-size: 0.75em; text-align: left;">
+      <p style="margin-bottom: 1rem;">Si bien en esta materia nos centraremos en la <strong>IA embebida</strong> (bajar
+        modelos a dispositivos Edge), la eficiencia es un problema global.</p>
+      <div style="display: flex; gap: 1.5rem; margin-top: 1.5rem;">
+        <div
+          style="flex: 1; background: rgba(80,250,123,0.1); border-radius: 0.5rem; padding: 1.2rem; border-left: 3px solid #50fa7b;">
+          <h4 style="color: #50fa7b; margin-top: 0; font-size: 1.1em;">📱 IA Embebida (Edge)</h4>
+          <p style="margin: 0; font-size: 0.9em;">Permite que modelos entren en microcontroladores, celulares o FPGAs
+            con recursos estrictamente limitados de memoria y cómputo.</p>
+        </div>
+        <div
+          style="flex: 1; background: rgba(189,147,249,0.1); border-radius: 0.5rem; padding: 1.2rem; border-left: 3px solid #bd93f9;">
+          <h4 style="color: #bd93f9; margin-top: 0; font-size: 1.1em;">☁️ Grandes Modelos (Cloud)</h4>
+          <p style="margin: 0; font-size: 0.9em;">La compresión reduce el costo y consumo energético en data centers,
+            haciendo técnica y económicamente viable servir grandes modelos (ej. LLMs).</p>
+        </div>
+      </div>
+      <p style="margin-top: 1.5rem; font-style: italic; color: #ffb86c; text-align: center;">
+        💡 Dominar la compresión de modelos es una habilidad valiosa en todo el espectro de hardware.
+      </p>
+    </div>
+  </section>
+
+  <!-- ===================== COMPLEJIDAD COMPUTACIONAL ===================== -->
+
+  <section>
+    <h3>Complejidad computacional</h3>
+    <div style="display: flex; gap: 2rem; align-items: center;">
+      <div style="flex: 1.2; font-size: 0.75em; text-align: left;">
+        <p>Análisis de los recursos necesarios para ejecutar un algoritmo:</p>
+        <ul>
+          <li style="margin-bottom: 0.5rem;"><strong>Complejidad temporal:</strong> tiempo de ejecución
+            en función del tamaño de la entrada.</li>
+          <li><strong>Complejidad espacial:</strong> memoria utilizada
+            en función del tamaño de la entrada.</li>
+        </ul>
+        <p style="margin-top: 0.8rem;">Se expresan con la notación <strong>Big O</strong>,
+          que describe el crecimiento asintótico.</p>
+      </div>
+      <div style="flex: 0.8;">
+        <img src="./figures/general_bigo.png" style="width: 100%; background: white; border-radius: 0.5rem;">
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h3>Notación Big O: ejemplos</h3>
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; font-size: 0.6em;">
+      <div style="background: rgba(80,250,123,0.15); border-radius: 0.5rem; padding: 12px; text-align: center;">
+        <strong style="color: #50fa7b; font-size: 1.3em;">O(1)</strong>
+        <p style="margin: 0.5rem 0 0;">Constante. No depende del tamaño de la entrada.</p>
+      </div>
+      <div style="background: rgba(139,233,253,0.15); border-radius: 0.5rem; padding: 12px; text-align: center;">
+        <strong style="color: #8be9fd; font-size: 1.3em;">O(n)</strong>
+        <p style="margin: 0.5rem 0 0;">Lineal. Si la entrada se duplica, el tiempo se duplica.</p>
+      </div>
+      <div style="background: rgba(255,184,108,0.15); border-radius: 0.5rem; padding: 12px; text-align: center;">
+        <strong style="color: #ffb86c; font-size: 1.3em;">O(n²)</strong>
+        <p style="margin: 0.5rem 0 0;">Cuadrática. Si la entrada se duplica, el tiempo se cuadruplica.</p>
+      </div>
+    </div>
+    <div style="font-size: 0.7em; margin-top: 1rem; text-align: left;">
+      <p><strong>Simplificaciones habituales en Big O:</strong></p>
+      <ul style="font-size: 0.9em;">
+        <li style="margin-bottom: 0.3rem;">Constantes se desprecian: O(2n·m) → O(n·m)</li>
+        <li style="margin-bottom: 0.3rem;">Solo importa el término dominante: O(n² + n·log n) → O(n²)</li>
+        <li>En redes neuronales:
+          <ul>
+            <li>Complejidad temporal: MACs - Multiplaciones y sumas</li>
+            <li>Complejidad espacial: Parámetros - Pesos y sesgos</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h3>Ejercicio en clase: capa densa</h3>
+    <div style="font-size: 0.75em; text-align: left;">
+      <p>Supongamos una capa densa (Fully Connected) con:</p>
+      <ul>
+        <li><strong>N</strong> entradas.</li>
+        <li><strong>M</strong> neuronas (salidas).</li>
+      </ul>
+      <p
+        style="margin: 0.8rem 0; font-family: monospace; background: rgba(0,0,0,0.2); display: inline-block; padding: 0.2rem 0.5rem; border-radius: 0.3rem;">
+        y = &phi;(W &middot; x + b)</p>
+      <p style="margin-top: 1rem; color: #ffb86c;">¿Cuántos <strong>parámetros</strong> y cuántas <strong>operaciones
+          (MACs)</strong> tiene esta capa?</p>
+      <div class="fragment"
+        style="margin-top: 1.5rem; background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 0.5rem; border-left: 3px solid #50fa7b;">
+        <ul style="list-style-type: none; padding: 0;">
+          <li style="margin-bottom: 0.5rem;"><strong style="color: #50fa7b;">Parámetros:</strong>
+            <code>(N × M) pesos + M sesgos</code>
+          </li>
+          <li><strong style="color: #50fa7b;">MACs:</strong> <code>N × M</code> <br><span
+              style="font-size: 0.85em; opacity: 0.8;">(cada salida acumula N multiplicaciones)</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h3>Ejercicio en clase: capa convolucional</h3>
+    <div style="font-size: 0.75em; text-align: left;">
+      <p>Supongamos una capa convolucional con:</p>
+      <ul style="font-size: 0.9em;">
+        <li>Resolución espacial de entrada: <code>H<sub>in</sub> × W<sub>in</sub></code></li>
+        <li>Stride: S = (1,1)</li>
+        <li>Modo: valid</li>
+        <li>Canales de entrada: <code>C<sub>in</sub></code></li>
+        <li>Tamaño del filtro: <code>H<sub>K</sub> × W<sub>K</sub></code></li>
+        <li>Canales de salida: <code>C<sub>out</sub></code></li>
+      </ul>
+      <p style="margin-top: 1rem; color: #ffb86c;">¿Cuántos <strong>parámetros</strong> y <strong>MACs</strong> tiene
+        esta capa?</p>
+      <div class="fragment"
+        style="margin-top: 1rem; background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 0.5rem; border-left: 3px solid #8be9fd;">
+        <ul style="list-style-type: none; padding: 0; font-size: 0.9em;">
+          <li style="margin-bottom: 0.5rem;"><strong style="color: #8be9fd;">Parámetros:</strong>
+            <code>(H<sub>K</sub> × W<sub>K</sub> × C<sub>in</sub>) × C<sub>out</sub> + C<sub>out</sub></code>
+          </li>
+          <li><strong style="color: #8be9fd;">MACs:</strong>
+            <code>(H<sub>K</sub> × W<sub>K</sub> × C<sub>in</sub>) × H<sub>out</sub> × W<sub>out</sub> × C<sub>out</sub></code>
+            <br><span style="font-size: 0.85em; opacity: 0.8;">(donde
+              <code>H<sub>out</sub> = H<sub>in</sub> - H<sub>K</sub> + 1</code> y
+              <code>W<sub>out</sub> = W<sub>in</sub> - W<sub>K</sub> + 1</code> por ser <em>valid</em> con stride
+              1)</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h3>Complejidad en redes neuronales</h3>
+    <div style="font-size: 0.7em; text-align: left;">
+      <p>El concepto de algoritmia clásica sigue siendo vital en redes neuronales (por ejemplo para analizar la
+        escalabilidad de un modelo), pero en IA embebida <strong>también importa diferenciar</strong> el tipo de
+        operación:</p>
+      <div style="display: flex; gap: 1rem; margin-top: 0.8rem;">
+        <div
+          style="flex: 1; background: rgba(255,85,85,0.1); padding: 1rem; border-radius: 0.5rem; border: 1px solid rgba(255,85,85,0.3);">
+          <strong style="color: #ff5555;">No es lo mismo...</strong>
+          <ul style="font-size: 0.9em; margin-top: 0.3rem;">
+            <li>n multiplicaciones que n sumas</li>
+            <li>Operar con 8 bits que con 32 bits</li>
+            <li>FlP que FxP</li>
+          </ul>
+        </div>
+        <div
+          style="flex: 1; background: rgba(80,250,123,0.1); padding: 1rem; border-radius: 0.5rem; border: 1px solid rgba(80,250,123,0.3);">
+          <strong style="color: #50fa7b;">Lo vimos en la sección anterior</strong>
+          <ul style="font-size: 0.9em; margin-top: 0.3rem;">
+            <li>Suma FxP: O(max(b<sup>A</sup>, b<sup>B</sup>))</li>
+            <li>Mult FxP: O(b<sup>A</sup> · b<sup>B</sup>)</li>
+            <li>FlP: aún más costoso</li>
+          </ul>
+        </div>
+      </div>
+      <p style="margin-top: 0.8rem; color: #ffb86c;">
+        ⚡ Por eso reducir bits y elegir formato tiene impacto directo en HW, energía y velocidad.
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <h3>Estrategias para atacar la complejidad</h3>
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; font-size: 0.6em;">
+      <div
+        style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 15px; border-left: 3px solid #8be9fd;">
+        <strong style="color: #8be9fd;">Optimización algorítmica</strong>
+        <p style="margin: 0.3rem 0 0;">Algoritmos más eficientes (ej. SGD en vez de optimización exacta),
+          reducción de dimensionalidad.</p>
+      </div>
+      <div
+        style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 15px; border-left: 3px solid #50fa7b;">
+        <strong style="color: #50fa7b;">Hardware especializado</strong>
+        <p style="margin: 0.3rem 0 0;">GPUs, TPUs, FPGAs: aceleran cada operación pero no reducen el número
+          total de operaciones.</p>
+      </div>
+      <div
+        style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 15px; border-left: 3px solid #ff79c6;">
+        <strong style="color: #ff79c6;">Compresión</strong>
+        <p style="margin: 0.3rem 0 0;">Reducir parámetros y operaciones del modelo, así como también el "costo" en
+          hardware. <strong>Es el foco de esta
+            materia.</strong></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== MÉTODOS DE COMPRESIÓN ===================== -->
+
+  <section>
+    <h3>Compresión de redes neuronales</h3>
+    <p style="font-size: 0.75em; text-align: left;">Reducir tamaño y complejidad sin comprometer significativamente
+      el rendimiento.
+      <strong>Criticidad en la inferencia</strong>: el entrenamiento ocurre una vez, la inferencia se ejecuta
+      continuamente en producción.
+    </p>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 0.55em; margin-top: 0.5rem;">
+      <div
+        style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px; border-left: 3px solid #ff79c6;">
+        <strong style="color: #ff79c6;">Poda (pruning)</strong>
+        <p style="margin: 0.3rem 0 0;">Eliminar conexiones, neuronas o filtros no esenciales.
+          Puede ser estructurado (filtros/capas) o no estructurado (pesos individuales).</p>
+      </div>
+      <div
+        style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px; border-left: 3px solid #8be9fd;">
+        <strong style="color: #8be9fd;">Cuantización</strong>
+        <p style="margin: 0.3rem 0 0;">Reducir la precisión de pesos y activaciones (FP32 → INT8, INT4).
+          Reduce memoria, mejora velocidad y eficiencia energética.</p>
+      </div>
+      <div
+        style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px; border-left: 3px solid #50fa7b;">
+        <strong style="color: #50fa7b;">Factorización de matrices</strong>
+        <p style="margin: 0.3rem 0 0;">Descomponer matrices grandes en productos de matrices más pequeñas (SVD,
+          Tucker, CP).</p>
+      </div>
+      <div
+        style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px; border-left: 3px solid #bd93f9;">
+        <strong style="color: #bd93f9;">Destilación del conocimiento</strong>
+        <p style="margin: 0.3rem 0 0;">Entrenar una red pequeña (estudiante) para imitar una grande (maestro).
+          Transfiere conocimiento implícito.</p>
+      </div>
+      <div
+        style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px; border-left: 3px solid #ffb86c;">
+        <strong style="color: #ffb86c;">NAS (Neural Architecture Search)</strong>
+        <p style="margin: 0.3rem 0 0;">Búsqueda automatizada de la arquitectura óptima que minimice recursos
+          manteniendo rendimiento.</p>
+      </div>
+      <div
+        style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px; border-left: 3px solid #f1fa8c;">
+        <strong style="color: #f1fa8c;">Weight sharing + Codificación</strong>
+        <p style="margin: 0.3rem 0 0;">Técnicas genéricas de compresión de datos aplicadas a los parámetros del
+          modelo (Huffman, etc.).</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== ETAPAS DEL PROYECTO ===================== -->
+
+  <section data-auto-animate>
+    <h3>Recordemos las etapas de un proyecto</h3>
+    <div class="diagram-header" style="margin-top: 1.5rem;">
+      <div data-external-replace="./figures/00_intro-proyecto_ia_diagram.html"></div>
+    </div>
+    <div class="fragment" style="margin-top: 1.5rem;">
+      <h4 style="color: #ffb86c; font-size: 1.1em;">¿Dónde entra la IA embebida?</h4>
+      <p style="font-size: 0.75em; text-align: center; max-width: 800px; margin: 0 auto;">Después del diseño y
+        entrenamiento del modelo, aparecen etapas críticas para adaptar la red a hardware con recursos limitados.</p>
+    </div>
+  </section>
+
+  <section data-auto-animate>
+    <h3>Incorporando IA Embebida</h3>
+    <h4 style="color: #50fa7b; font-size: 0.9em; margin-bottom: 1.5rem;">1. Búsqueda de Arquitectura Neuronal (NAS)</h4>
+    <div class="diagram-header">
+      <div data-external-replace="./figures/00_intro-proyecto_ia_diagram_v1.html"></div>
+    </div>
+    <p style="font-size: 0.65em; margin-top: 1.5rem; color: #f8f8f2;">
+      El proceso se vuelve iterativo desde la <strong style="color: #50fa7b;">Evaluación</strong> hacia la <strong
+        style="color: #50fa7b;">Selección de modelo</strong>.
+    </p>
+  </section>
+
+  <section data-auto-animate>
+    <h3>Incorporando IA Embebida</h3>
+    <h4 style="color: #8be9fd; font-size: 0.9em; margin-bottom: 1.5rem;">2. Métodos de Compresión</h4>
+    <div class="diagram-header">
+      <div data-external-replace="./figures/00_intro-proyecto_ia_diagram_v2.html"></div>
+    </div>
+    <p style="font-size: 0.65em; margin-top: 1.5rem; color: #f8f8f2;">
+      Se añaden etapas de <strong style="color: #8be9fd;">Compresión</strong> y <strong
+        style="color: #8be9fd;">Evaluación post-compresión</strong> antes del despliegue.
+    </p>
+  </section>
+
+  <section data-auto-animate>
+    <h3>Incorporando IA Embebida</h3>
+    <h4 style="color: #ff79c6; font-size: 0.9em; margin-bottom: 1.5rem;">3. NAS + Métodos de Compresión</h4>
+    <div class="diagram-header">
+      <div data-external-replace="./figures/00_intro-proyecto_ia_diagram_v3.html"></div>
+    </div>
+    <p style="font-size: 0.65em; margin-top: 1.5rem; color: #f8f8f2;">
+      El ciclo completo: iteración de arquitectura y optimización del modelo pre-despliegue.
+    </p>
+  </section>
+
+  <section>
+    <h3>Etapas adicionales para IA embebida</h3>
+    <div style="display: flex; gap: 10px; font-size: 0.52em; flex-wrap: wrap; justify-content: center;">
+      <div
+        style="flex: 1; min-width: 160px; background: rgba(255,184,108,0.1); border-radius: 0.5rem; padding: 12px; border-left: 3px solid #ffb86c;">
+        <strong style="color: #ffb86c;">① Eval. de complejidad</strong>
+        <p style="margin: 0.3rem 0 0;">Análisis del modelo (MACs, parámetros, memoria) contra las restricciones del
+          hardware objetivo.</p>
+      </div>
+      <div
+        style="flex: 1; min-width: 160px; background: rgba(80,250,123,0.1); border-radius: 0.5rem; padding: 12px; border-left: 3px solid #50fa7b;">
+        <strong style="color: #50fa7b;">② NAS</strong>
+        <p style="margin: 0.3rem 0 0;">Búsqueda de arquitectura neuronal: encontrar la mejor configuración
+          (capas, neuronas, conexiones) que minimice recursos.</p>
+      </div>
+      <div
+        style="flex: 1; min-width: 160px; background: rgba(139,233,253,0.1); border-radius: 0.5rem; padding: 12px; border-left: 3px solid #8be9fd;">
+        <strong style="color: #8be9fd;">③ Compresión</strong>
+        <p style="margin: 0.3rem 0 0;">Poda, cuantización, factorización, destilación: reducir tamaño y
+          complejidad sin perder rendimiento.</p>
+      </div>
+      <div
+        style="flex: 1; min-width: 160px; background: rgba(255,121,198,0.1); border-radius: 0.5rem; padding: 12px; border-left: 3px solid #ff79c6;">
+        <strong style="color: #ff79c6;">④ Evaluac. post-comp.</strong>
+        <p style="margin: 0.3rem 0 0;">Verificar que el modelo comprimido cumple con las métricas de
+          rendimiento y restricciones del hardware.</p>
+      </div>
+      <div
+        style="flex: 1; min-width: 160px; background: rgba(189,147,249,0.1); border-radius: 0.5rem; padding: 12px; border-left: 3px solid #bd93f9;">
+        <strong style="color: #bd93f9;">⑤ Despliegue</strong>
+        <p style="margin: 0.3rem 0 0;">Implementación en el dispositivo: MCU, FPGA, ASIC, teléfono
+          móvil, etc.</p>
+      </div>
+    </div>
+    <p style="font-size: 0.7em; margin-top: 1rem; color: #ffb86c;">
+      💡 Estos pasos pueden iterarse: si la evaluación falla, se vuelve a comprimir o a buscar otra arquitectura.
+    </p>
+  </section>
+
+  <!-- ===================== CIERRE ===================== -->
+
+  <section>
+    <h3>Resumen: introducción a IA embebida</h3>
+    <ul style="font-size: 0.65em; text-align: left; max-width: 800px; margin: 1rem auto;">
+      <li style="margin-bottom: 0.4rem;">El ecosistema de IA se compone de <strong>5 capas</strong>:
+        energía, chips e infraestructura, data centers, modelos y aplicaciones.</li>
+      <li style="margin-bottom: 0.4rem;">La <strong>IA embebida</strong> (Edge AI) resuelve la inferencia en entornos
+        con memoria y cómputo limitados, aunque los desafíos de eficiencia también aplican a modelos de nube.</li>
+      <li style="margin-bottom: 0.4rem;">Conocer la <strong>complejidad computacional</strong> (parámetros y MACs)
+        es crítico, siendo igual de importante diferenciar el impacto de las operaciones en el hardware de destino.</li>
+      <li style="margin-bottom: 0.4rem;">Frente a esto, existen múltiples estrategias de optimización algorítmica y de
+        hardware, pero la principal en la materia es la <strong>compresión de modelos</strong>.</li>
+      <li style="margin-bottom: 0.4rem;">Por lo tanto, el <strong>ciclo completo del proyecto</strong> suma etapas
+        ineludibles como evaluar la complejidad, aplicar NAS, realizar la compresión y desplegar sobre el hardware
+        objetivo.</li>
+    </ul>
+    <p style="font-size: 0.65em; margin-top: 1.5rem; color: #6272a4; font-style: italic;">
+      A continuación: técnicas de compresión en detalle →
+    </p>
+  </section>
+
+</section>

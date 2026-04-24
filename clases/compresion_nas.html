@@ -1,0 +1,631 @@
+<!-- 10. Neural Architecture Search (NAS) -->
+<section>
+    <section>
+        <h2 class="gradient-text">9. Neural Architecture Search (NAS)</h2>
+        <p>Automatizando el diseño de arquitecturas óptimas</p>
+    </section>
+
+    <!-- 1. ¿Qué es NAS? -->
+    <section>
+        <h3>¿Qué es NAS?</h3>
+        <div style="font-size: 0.75em; text-align: left;">
+            <p>El paso del diseño manual (intuición humana) al diseño automatizado. Subcampo del <strong>AutoML</strong>
+                que usa algoritmos para descubrir la arquitectura óptima.</p>
+            <p style="margin-top: 1rem;"><strong style="color: #8be9fd;">HW-NAS (Hardware-Aware NAS)</strong></p>
+            <p>En compresión, se busca el mejor equilibrio (Trade-off) entre <strong>precisión</strong> y
+                <strong>restricciones de hardware</strong> (Latencia, FLOPs, Memoria RAM/SRAM, Energía).
+            </p>
+            <div
+                style="background: rgba(255,255,255,0.1); padding: 0.8rem; border-radius: 0.5rem; text-align: center; margin: 0.8rem 0; font-size: 1.1em;">
+                <code>L = Error(red) + α · max(0, Latencia(red) - Latencia<sub>target</sub>)</code>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pilares -->
+    <section>
+        <h3>Pilares de un sistema NAS</h3>
+        <div style="font-size: 0.65em; text-align: left;">
+            <div style="display: grid; grid-template-columns: 1fr; gap: 12px;">
+                <div style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px;">
+                    <strong style="color: #ff79c6;">A. Espacio de Búsqueda (Search Space)</strong>
+                    <p style="margin: 0.3rem 0 0;">El "universo" de arquitecturas posibles. <br><strong>Macro:</strong>
+                        estructura global. <br><strong>Micro (Cell-based):</strong> diseño de una "célula" óptima que se
+                        apila (reduce drásticamente el espacio).</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px;">
+                    <strong style="color: #50fa7b;">B. Estrategia de Búsqueda (Search Strategy)</strong>
+                    <p style="margin: 0.3rem 0 0;">Cómo explorar el espacio. <br><strong>Fuerza bruta:</strong> probar
+                        exhaustivamente todas las combinaciones, es computacionalmente
+                        inviable.<br><strong>Reinforcement Learning / Evolutivos:</strong> discretos, pero
+                        computacionalmente costosos.<br><strong>Gradientes (DARTS):</strong> relaja a un espacio
+                        continuo. Suma ponderada de operaciones, extremadamente rápido en pocas GPUs.</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px;">
+                    <strong style="color: #8be9fd;">C. Estrategia de Evaluación (Performance Estimation)</strong>
+                    <p style="margin: 0.3rem 0 0;">Cómo saber si es buena sin entrenar desde cero. <br><strong>Weight
+                            Sharing:</strong> se entrena una gigantesca Superred de donde heredan los pesos.
+                        <br><strong>Zero-cost Proxies:</strong> métricas matemáticas previas al entrenamiento.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Estrategias clásicas: RL y evolutivos -->
+    <section>
+        <h3>Estrategias clásicas: RL y algoritmos evolutivos</h3>
+        <div style="font-size: 0.7em; text-align: left;">
+            <div style="display: flex; gap: 1.2rem; margin-bottom: 1rem;">
+                <div style="flex: 1; background: rgba(255,121,198,0.1); padding: 0.8rem; border-radius: 0.5rem;">
+                    <p style="color: #ff79c6; margin: 0 0 0.4rem;"><strong>Reinforcement Learning — NASNet
+                            (2017)</strong></p>
+                    <p style="margin: 0;">Un controlador RNN genera descripciones de arquitecturas. Cada arquitectura
+                        candidata se entrena y evalúa; su precisión es la recompensa para el controlador.</p>
+                    <p style="margin: 0.5rem 0 0; color: #ffb86c;"><strong>Costo: ~1800 GPU-days</strong> (450 GPUs × 4
+                        días)</p>
+                </div>
+                <div style="flex: 1; background: rgba(80,250,123,0.1); padding: 0.8rem; border-radius: 0.5rem;">
+                    <p style="color: #50fa7b; margin: 0 0 0.4rem;"><strong>Algoritmos evolutivos — AmoebaNet
+                            (2018)</strong></p>
+                    <p style="margin: 0;">Parte de una población de arquitecturas. En cada generación, muta las mejores
+                        (agrega/cambia operaciones) y elimina las peores.</p>
+                    <p style="margin: 0.5rem 0 0; color: #ffb86c;"><strong>Costo: ~3150 GPU-days</strong></p>
+                </div>
+            </div>
+            <div
+                style="background: rgba(255,85,85,0.1); border-left: 3px solid #ff5555; padding: 0.7rem 1rem; border-radius: 0 0.5rem 0.5rem 0;">
+                <p style="color: #ff5555; margin: 0 0 0.3rem;"><strong>El problema compartido</strong></p>
+                <p style="margin: 0;">Cada candidato se <strong>entrena desde cero</strong> para obtener señal de
+                    calidad. Con espacios de miles de arquitecturas posibles, el costo es prohibitivo.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- DARTS: búsqueda diferenciable -->
+    <section>
+        <h3>DARTS: búsqueda por gradiente</h3>
+        <div style="font-size: 0.7em; text-align: left;">
+            <p style="margin-bottom: 0.8rem;"><strong>Idea central:</strong> en lugar de evaluar cada arquitectura por
+                separado, <em>relajar</em> el espacio discreto a uno continuo y optimizar con gradiente.</p>
+            <div
+                style="background: rgba(255,255,255,0.07); padding: 0.7rem; border-radius: 0.5rem; text-align: center; margin-bottom: 0.8rem; font-size: 1.05em;">
+                <code>ō<sup>(i,j)</sup>(x) = Σ<sub>o ∈ O</sub> softmax(α<sub>o</sub><sup>(i,j)</sup>) · o(x)</code>
+            </div>
+            <p style="margin: 0 0 0.5rem;">Cada conexión entre nodos es una <strong>suma ponderada de todas las
+                    operaciones</strong> candidatas (conv3×3, conv5×5, maxpool, identity…). Los pesos α son parámetros
+                aprendibles.</p>
+            <div style="display: flex; gap: 1rem; margin-top: 0.8rem;">
+                <div style="flex: 1; background: rgba(139,233,253,0.1); padding: 0.7rem; border-radius: 0.5rem;">
+                    <p style="color: #8be9fd; margin: 0 0 0.3rem;"><strong>Búsqueda</strong></p>
+                    <p style="margin: 0;">Optimiza W (pesos de la red) y α (pesos de arquitectura) conjuntamente por
+                        gradiente descendente.</p>
+                </div>
+                <div style="flex: 1; background: rgba(189,147,249,0.1); padding: 0.7rem; border-radius: 0.5rem;">
+                    <p style="color: #bd93f9; margin: 0 0 0.3rem;"><strong>Derivación</strong></p>
+                    <p style="margin: 0;">Al terminar, <code>argmax(α)</code> por conexión selecciona la operación
+                        ganadora → arquitectura discreta final.</p>
+                </div>
+                <div style="flex: 1; background: rgba(80,250,123,0.1); padding: 0.7rem; border-radius: 0.5rem;">
+                    <p style="color: #50fa7b; margin: 0 0 0.3rem;"><strong>Costo</strong></p>
+                    <p style="margin: 0;">~4 GPU-days frente a ~1800 de NASNet. <strong>100× más rápido</strong>. Una
+                        GPU de consumo alcanza.</p>
+                </div>
+            </div>
+            <p style="margin-top: 0.7rem; font-size: 0.9em; color: #6272a4;">Liu et al., <em>DARTS: Differentiable
+                    Architecture Search</em>, ICLR 2019. <a href="https://arxiv.org/abs/1806.09055"
+                    style="color: #8be9fd;">arxiv:1806.09055</a></p>
+        </div>
+    </section>
+
+    <!-- DARTS: búsqueda diferenciable IMAGEN -->
+    <section>
+        <h3>DARTS: búsqueda por gradiente</h3>
+        <div style="text-align: center; margin-top: 1.5rem;">
+            <img src="figures/darts_paper.png" alt="Esquema conceptual de DARTS"
+                style="max-height: 550px; border-radius: 0.5rem;">
+        </div>
+    </section>
+
+    <!-- Estrategias de evaluación -->
+    <section>
+        <h3>El siguiente paso: estrategias de evaluación</h3>
+        <div style="font-size: 0.7em; text-align: left;">
+            <p style="margin-bottom: 0.8rem;">Ya vimos que buscar la arquitectura es un juego de equilibrios. Queda la
+                otra gran pregunta: <strong>¿cómo sabemos si una arquitectura es buena sin gastar horas
+                    entrenándola?</strong></p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.8rem;">
+                <div style="background: rgba(255,121,198,0.1); padding: 0.8rem; border-radius: 0.5rem;">
+                    <p style="color: #ff79c6; margin: 0 0 0.4rem; font-size: 1.05em;"><strong>1. Low-fidelity
+                            estimates</strong></p>
+                    <p style="margin: 0;">Entrenar con imágenes más pequeñas, menos epochs o un subconjunto de datos.
+                        Barato, pero introduce sesgo: lo que es rápido en baja fidelidad no siempre gana a alta
+                        fidelidad.</p>
+                </div>
+                <div style="background: rgba(80,250,123,0.1); padding: 0.8rem; border-radius: 0.5rem;">
+                    <p style="color: #50fa7b; margin: 0 0 0.4rem; font-size: 1.05em;"><strong>2. Weight sharing</strong>
+                    </p>
+                    <p style="margin: 0;">Todos los candidatos comparten los mismos pesos (como en DARTS o OFA). Se
+                        entrena una sola <em>supernet</em> y cada sub-arquitectura hereda sus pesos, eliminando el coste
+                        de N entrenamientos independientes.</p>
+                </div>
+                <div style="background: rgba(139,233,253,0.1); padding: 0.8rem; border-radius: 0.5rem;">
+                    <p style="color: #8be9fd; margin: 0 0 0.4rem; font-size: 1.05em;"><strong>3. Zero-cost
+                            proxies</strong></p>
+                    <p style="margin: 0;">La más radical: se analiza la arquitectura <strong>sin entrenarla ni una sola
+                            vez</strong>, solo observando cómo fluye la información a través de ella con pesos
+                        aleatorios.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Zero-cost proxies 1/2 -->
+    <section>
+        <h3>Zero-cost proxies: evaluar sin entrenar</h3>
+        <div style="font-size: 0.65em; text-align: left;">
+            <p style="margin-bottom: 0.7rem;">Rompen el ciclo <em>diseñar → entrenar → evaluar</em>. Predicen la calidad
+                de una red a partir de sus pesos <strong>en la inicialización</strong> (aleatorios, antes de ver datos).
+                Como medir el motor de un coche antes de llevarlo a la pista.</p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.7rem; margin-bottom: 0.8rem;">
+                <div style="background: rgba(255,255,255,0.05); padding: 0.7rem; border-radius: 0.5rem;">
+                    <p style="color: #ff79c6; margin: 0 0 0.3rem;"><strong>SNIP — sensibilidad al gradiente</strong></p>
+                    <p style="margin: 0;">Mide cuánto cambia la pérdida si se elimina virtualmente cada conexión. Una
+                        arquitectura con alta sensibilidad tiene estructura potente para aprender.</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); padding: 0.7rem; border-radius: 0.5rem;">
+                    <p style="color: #50fa7b; margin: 0 0 0.3rem;"><strong>NASWOT — mapas de activación</strong></p>
+                    <p style="margin: 0;"><em>NAS Without Training.</em> Pasa un lote por la red e inspecciona las
+                        activaciones: si imágenes distintas activan patrones únicos, la red tiene alta capacidad de
+                        representación y probablemente aprenderá bien.</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); padding: 0.7rem; border-radius: 0.5rem;">
+                    <p style="color: #8be9fd; margin: 0 0 0.3rem;"><strong>SynFlow — flujo de sinapsis</strong></p>
+                    <p style="margin: 0;">Evalúa cómo se propaga el producto de los pesos por las capas. Detecta
+                        arquitecturas propensas a gradientes explosivos o desvanecientes antes de gastar un solo segundo
+                        de cómputo.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Zero-cost proxies 2/2 -->
+    <section>
+        <h3>Zero-cost proxies: evaluar sin entrenar</h3>
+        <div style="font-size: 0.65em; text-align: left;">
+            <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <div style="flex: 1;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 0.95em;">
+                        <thead>
+                            <tr>
+                                <th
+                                    style="text-align: left; padding: 0.3rem 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.2); color: #50fa7b;">
+                                    Ventaja</th>
+                                <th
+                                    style="text-align: left; padding: 0.3rem 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.2); color: #ff5555;">
+                                    Desventaja</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 0.25rem 0.5rem; vertical-align: top;">Evaluar una arquitectura toma
+                                    milisegundos</td>
+                                <td style="padding: 0.25rem 0.5rem; vertical-align: top;">Correlación imperfecta con el
+                                    rendimiento final</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.25rem 0.5rem; vertical-align: top;">Sin GPUs: filtrar millones de
+                                    candidatos en minutos</td>
+                                <td style="padding: 0.25rem 0.5rem; vertical-align: top;">Sensibles a la inicialización
+                                    de pesos aleatoria</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.25rem 0.5rem; vertical-align: top;">Ahorro masivo de energía</td>
+                                <td style="padding: 0.25rem 0.5rem; vertical-align: top;">Métricas ruidosas; a veces
+                                    prefieren redes excesivamente complejas</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div style="flex: 1; background: rgba(189,147,249,0.1); padding: 0.7rem; border-radius: 0.5rem;">
+                    <p style="color: #bd93f9; margin: 0 0 0.3rem;"><strong>Enfoque híbrido (estado del arte)</strong>
+                    </p>
+                    <p style="margin: 0;">Zero-cost proxy para descartar el 99% de arquitecturas mediocres en minutos →
+                        el 1% restante se evalúa con métodos más pesados (entrenamiento parcial o DARTS). <strong>La
+                            forma del recipiente importa casi tanto como lo que contiene.</strong></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- NAS multi-objetivo -->
+    <section>
+        <h3>NAS multi-objetivo: accuracy vs. eficiencia</h3>
+        <div style="font-size: 0.7em; text-align: left;">
+            <p style="margin-bottom: 0.7rem;">Accuracy y eficiencia suelen ser enemigos: más precisión requiere más
+                parámetros. NAS multi-objetivo trata la eficiencia como una <strong>restricción geométrica del espacio
+                    de búsqueda</strong>, no como algo secundario.</p>
+            <div style="display: flex; gap: 0.8rem; margin-bottom: 0.7rem;">
+                <div style="flex: 1.2; background: rgba(255,255,255,0.06); padding: 0.8rem; border-radius: 0.5rem;">
+                    <p style="color: #ff79c6; margin: 0 0 0.3rem;"><strong>Función de recompensa</strong></p>
+                    <p style="margin: 0 0 0.5rem;">En lugar de optimizar solo el error, se "castiga" a los modelos
+                        lentos:</p>
+                    <div
+                        style="background: rgba(0,0,0,0.25); padding: 0.5rem; border-radius: 0.4rem; text-align: center; font-size: 1.05em;">
+                        <code>Reward = Acc(m) × (Lat(m) / Lat<sub>target</sub>)<sup>β</sup></code>
+                    </div>
+                    <p style="margin: 0.4rem 0 0; font-size: 0.95em; color: #6272a4;">β controla la severidad del
+                        castigo por latencia. Si el modelo es más lento que el objetivo, su recompensa cae drásticamente
+                        aunque sea muy preciso.</p>
+                </div>
+                <div style="flex: 1; background: rgba(255,255,255,0.06); padding: 0.8rem; border-radius: 0.5rem;">
+                    <p style="color: #50fa7b; margin: 0 0 0.3rem;"><strong>Espacios de búsqueda conscientes del
+                            hardware</strong></p>
+                    <p style="margin: 0 0 0.4rem;">Limitar las operaciones candidatas a las que son eficientes en el
+                        hardware objetivo: depthwise separable convolutions (MobileNet), operaciones con acceso de
+                        memoria contiguo…</p>
+                    <p style="color: #8be9fd; margin: 0;"><strong>ProxylessNAS</strong> mide la latencia
+                        <em>directamente en el dispositivo real</em> (un teléfono Android) durante la búsqueda, para que
+                        el algoritmo aprenda qué operaciones son lentas en ese procesador.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Frente de Pareto en NAS 1/2 -->
+    <section>
+        <h3>El frente de Pareto en NAS</h3>
+        <div style="font-size: 0.7em; text-align: left;">
+            <p style="margin-bottom: 0.7rem;">Como no existe una única "mejor" red, NAS busca un <strong>conjunto de
+                    soluciones óptimas</strong>. En una gráfica accuracy (eje Y) vs. tamaño (eje X):</p>
+            <div style="display: flex; gap: 1rem; margin-bottom: 0.7rem;">
+                <div style="flex: 1; background: rgba(255,184,108,0.1); padding: 0.8rem; border-radius: 0.5rem;">
+                    <p style="color: #ffb86c; margin: 0 0 0.3rem;"><strong>Frente de Pareto</strong></p>
+                    <p style="margin: 0;">Modelos en la "frontera óptima": no podés mejorar su precisión sin aumentar el
+                        tamaño, ni reducir el tamaño sin perder precisión. Todo punto debajo de la frontera es
+                        subóptimo.</p>
+                </div>
+                <div style="flex: 1; background: rgba(189,147,249,0.1); padding: 0.8rem; border-radius: 0.5rem;">
+                    <p style="color: #bd93f9; margin: 0 0 0.3rem;"><strong>Elección del punto</strong></p>
+                    <p style="margin: 0;">Una vez hallada la frontera, elegís el modelo según tu restricción de
+                        hardware: "el más preciso que pese menos de 5 MB", "el más pequeño que supere 90% de accuracy".
+                    </p>
+                </div>
+                <div style="flex: 1; background: rgba(80,250,123,0.1); padding: 0.8rem; border-radius: 0.5rem;">
+                    <p style="color: #50fa7b; margin: 0 0 0.3rem;"><strong>OFA: toda la frontera de una vez</strong></p>
+                    <p style="margin: 0;">En lugar de buscar un punto por dispositivo, OFA entrena una supernet que
+                        cubre toda la frontera. Cada sub-red extraída ya está en el frente de Pareto.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Frente de Pareto en NAS 2/2 -->
+    <section>
+        <h3>El frente de Pareto en NAS</h3>
+        <div style="font-size: 0.7em; text-align: left;">
+            <div style="text-align: center;">
+                <img src="../examples/nas/outputs/pareto_mlp.png" style="max-height: 390px; border-radius: 0.4rem;"
+                    onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+                <p style="display:none; color: #ffb86c; font-style: italic;">⚠️ Ejecutar <code>script03.py</code> para
+                    generar la figura</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Medición de latencia -->
+    <section>
+        <h3>Medir latencia en el hardware real</h3>
+        <div style="font-size: 0.7em; text-align: left;">
+            <p style="margin-bottom: 0.7rem;">La latencia no es constante: depende del chip (CPU de servidor, GPU de
+                escritorio, NPU de móvil). Hay dos enfoques para incorporarla al ciclo de búsqueda:</p>
+            <div style="display: flex; gap: 1rem; margin-bottom: 0.8rem;">
+                <div style="flex: 1; background: rgba(255,121,198,0.1); padding: 0.8rem; border-radius: 0.5rem;">
+                    <p style="color: #ff79c6; margin: 0 0 0.4rem;"><strong>Medición directa (on-device)</strong></p>
+                    <p style="margin: 0 0 0.4rem;">El algoritmo envía la arquitectura candidata a un dispositivo real,
+                        ejecuta un benchmark y devuelve el tiempo en ms.</p>
+                    <p style="color: #ff5555; margin: 0;"><strong>Problema:</strong> extremadamente lento con miles de
+                        candidatos. Solo viable para validación final o muestras pequeñas.</p>
+                </div>
+                <div style="flex: 1; background: rgba(80,250,123,0.1); padding: 0.8rem; border-radius: 0.5rem;">
+                    <p style="color: #50fa7b; margin: 0 0 0.4rem;"><strong>Tablas de consulta (lookup tables)</strong>
+                    </p>
+                    <p style="margin: 0 0 0.4rem;">Truco de <strong>MnasNet</strong>: se pre-calcula la latencia de cada
+                        operación individual (conv 3×3 con 64 canales, depthwise conv…) en el hardware objetivo. Durante
+                        la búsqueda, la latencia total se estima <em>sumando</em> los tiempos de cada pieza.</p>
+                    <p style="color: #50fa7b; margin: 0;"><strong>Resultado:</strong> estimación en microsegundos por
+                        candidato, sin necesitar el dispositivo físico durante la búsqueda.</p>
+                </div>
+            </div>
+            <div
+                style="background: rgba(139,233,253,0.08); border-left: 3px solid #8be9fd; padding: 0.6rem 1rem; border-radius: 0 0.5rem 0.5rem 0;">
+                <p style="margin: 0; color: #8be9fd;"><strong>Patrón típico:</strong> lookup table durante la búsqueda
+                    para filtrar el 99% → medición on-device para validar el 1% finalista.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. NAS Edge y Cloud -->
+    <section>
+        <h3>NAS en Edge vs. Cloud</h3>
+        <div style="display: flex; gap: 1.5rem; margin-top: 1rem; font-size: 0.7em; text-align: left;">
+            <div style="flex: 1; background: rgba(80,250,123,0.1); padding: 0.8rem; border-radius: 0.5rem;">
+                <h4 style="color: #50fa7b; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.1em;">Edge / IA Embebida
+                </h4>
+                <p>Limitados por batería, latencia, y RAM (&lt; 1MB).</p>
+                <ul style="margin-top: 0.5rem;">
+                    <li style="margin-bottom: 0.4rem;"><strong>MobileNetV3:</strong> NAS descubrió mezclar capas
+                        asimétricamente según cuellos de botella de memoria.</li>
+                    <li><strong>ProxylessNAS:</strong> evalúa latencia <em>en el hardware real</em>, en lugar de usar
+                        FLOPs como estimación.</li>
+                </ul>
+            </div>
+            <div style="flex: 1; background: rgba(139,233,253,0.1); padding: 0.8rem; border-radius: 0.5rem;">
+                <h4 style="color: #8be9fd; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.1em;">Cloud</h4>
+                <p>El problema es maximizar Throughput y abaratar costo computacional.</p>
+                <ul style="margin-top: 0.5rem;">
+                    <li style="margin-bottom: 0.4rem;"><strong>EfficientNet:</strong> Utilizó NAS para hallar el
+                        "Compound Scaling Rule".</li>
+                    <li>Fórmula matemática exacta para escalar ancho, profundidad y resolución simultáneamente.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- EfficientNet: compound scaling -->
+    <section>
+        <h3>EfficientNet: compound scaling</h3>
+        <div style="font-size: 0.7em; text-align: left;">
+            <p style="margin-bottom: 0.7rem;">Ejemplo paradigmático de NAS aplicado a escalado de modelos. Antes,
+                escalar una red significaba simplemente agregar más capas. NAS demostró que hay una relación matemática
+                precisa entre tres dimensiones:</p>
+            <div style="display: flex; gap: 0.8rem; margin-bottom: 0.8rem;">
+                <div
+                    style="flex: 1; background: rgba(255,255,255,0.06); padding: 0.7rem; border-radius: 0.5rem; text-align: center;">
+                    <p style="color: #ff79c6; margin: 0 0 0.3rem;"><strong>Profundidad (d)</strong></p>
+                    <code>d = α<sup>φ</sup></code>
+                    <p style="margin: 0.3rem 0 0; font-size: 0.9em;">número de capas</p>
+                </div>
+                <div
+                    style="flex: 1; background: rgba(255,255,255,0.06); padding: 0.7rem; border-radius: 0.5rem; text-align: center;">
+                    <p style="color: #50fa7b; margin: 0 0 0.3rem;"><strong>Anchura (w)</strong></p>
+                    <code>w = β<sup>φ</sup></code>
+                    <p style="margin: 0.3rem 0 0; font-size: 0.9em;">canales por capa</p>
+                </div>
+                <div
+                    style="flex: 1; background: rgba(255,255,255,0.06); padding: 0.7rem; border-radius: 0.5rem; text-align: center;">
+                    <p style="color: #8be9fd; margin: 0 0 0.3rem;"><strong>Resolución (r)</strong></p>
+                    <code>r = γ<sup>φ</sup></code>
+                    <p style="margin: 0.3rem 0 0; font-size: 0.9em;">tamaño de imagen</p>
+                </div>
+            </div>
+            <p style="margin-bottom: 0.6rem;">Con la restricción <code>α · β² · γ² ≈ 2</code>: si se duplican los FLOPs
+                (<em>φ</em>=1), se escala cada dimensión en la proporción exacta descubierta por NAS. Escalar una sola
+                dimensión desperdicia recursos.</p>
+            <div style="background: rgba(80,250,123,0.1); padding: 0.7rem; border-radius: 0.5rem;">
+                <p style="color: #50fa7b; margin: 0 0 0.2rem;"><strong>Resultado</strong></p>
+                <p style="margin: 0;">EfficientNet-B0 logra la misma precisión que ResNet-50 siendo <strong>4× más
+                        rápida</strong> y usando <strong>11× menos parámetros</strong>. El "instinto humano" para
+                    diseñar redes tendía a crear modelos sobredimensionados. NAS encontró el punto dulce.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. OFA -->
+    <section>
+        <h3>Estado del Arte: Once-For-All (OFA)</h3>
+        <div style="font-size: 0.7em; text-align: left;">
+            <p>Escalar modelos a miles de dispositivos diferentes eficientemente.</p>
+            <div style="margin-top: 1rem;">
+                <p style="color: #ff5555; margin-bottom: 0.3rem;"><strong>El Problema:</strong></p>
+                <p>Correr NAS por cada hardware diferente (celulares varios, IoT, cloud) cuesta miles de horas de GPU y
+                    una huella de carbono masiva.</p>
+
+                <p style="color: #50fa7b; margin-top: 1rem; margin-bottom: 0.3rem;"><strong>La Solución (MIT):</strong>
+                </p>
+                <ol style="margin-top: 0.5rem;">
+                    <li style="margin-bottom: 0.4rem;"><strong>Superred (Supernet):</strong> Entrena una sola red
+                        gigantesca.</li>
+                    <li style="margin-bottom: 0.4rem;"><strong>Progressive Shrinking:</strong> Aprende a tolerar que le
+                        "apaguen" filtros o capas sin perder precisión (sub-redes).</li>
+                    <li><strong>Despliegue Instantáneo:</strong> Según el hardware, se extrae una sub-red en
+                        <em>milisegundos</em>, <strong>sin re-entrenamiento</strong> adicional.
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. Ejemplo: script01.py -->
+    <section>
+        <h3>Ejemplo en Código: Micro-NAS Manual</h3>
+        <div style="font-size: 0.72em; text-align: left;">
+            <p style="margin-bottom: 0.8rem;">El script <code>examples/nas/script01.py</code> simula un NAS por búsqueda
+                en grilla sobre Fashion MNIST, mostrando exactamente lo que NAS automatiza:</p>
+            <div style="display: flex; gap: 1rem; margin-bottom: 0.8rem;">
+                <div style="flex: 1; background: rgba(255,255,255,0.07); padding: 0.7rem; border-radius: 0.5rem;">
+                    <p style="color: #8be9fd; margin: 0 0 0.3rem;"><strong>Espacio de búsqueda</strong></p>
+                    <p style="margin: 0; font-size: 0.95em;">10 variantes de la CNN:<br>
+                        conv1 ∈ {4, 8, 16} filtros<br>
+                        conv2 ∈ {8, 16, 32} filtros<br>
+                        dense ∈ {32, 64, 128} unidades</p>
+                </div>
+                <div style="flex: 1; background: rgba(255,255,255,0.07); padding: 0.7rem; border-radius: 0.5rem;">
+                    <p style="color: #50fa7b; margin: 0 0 0.3rem;"><strong>Estrategia</strong></p>
+                    <p style="margin: 0; font-size: 0.95em;">Grilla exhaustiva: cada candidato entrena 5 epochs. Total:
+                        50 epochs.<br>
+                        <em>DARTS:</em> gradiente en lugar de grilla.<br>
+                        <em>OFA:</em> 1 supernet en lugar de 10 modelos.
+                    </p>
+                </div>
+                <div style="flex: 1; background: rgba(255,255,255,0.07); padding: 0.7rem; border-radius: 0.5rem;">
+                    <p style="color: #bd93f9; margin: 0 0 0.3rem;"><strong>Análisis</strong></p>
+                    <p style="margin: 0; font-size: 0.95em;">Frente de Pareto (accuracy vs MACs). Budget winner (mejor
+                        acc bajo límite de MACs). Accuracy winner.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4.1. Output de script01.py -->
+    <section>
+        <h3>Ejemplo en Código: Micro-NAS Manual</h3>
+        <h4>Output de script01.py</h4>
+        <div style="font-size: 0.72em; text-align: left; width: 100%;">
+            <pre
+                style="margin: 0; box-shadow: none; background: rgba(0,0,0,0.2);"><code id="log-nas-script01" style="font-family: monospace; font-size: 0.85em; max-height: 500px; overflow-y: auto; padding: 1rem; border-radius: 0.5rem; color: #f8f8f2;">Cargando...</code></pre>
+            <div style="display:none">
+                <img src="load-trigger-nas1" onerror="
+                    fetch('outputs/nas_log_script01.txt')
+                    .then(r => r.ok ? r.text() : Promise.reject(r.status))
+                    .then(t => document.getElementById('log-nas-script01').textContent = t)
+                    .catch(e => document.getElementById('log-nas-script01').textContent = 'Error al cargar: ' + e);
+                ">
+            </div>
+        </div>
+    </section>
+
+    <!-- 4.2. Resultados -->
+    <section>
+        <h3>Ejemplo en Código: Micro-NAS Manual</h3>
+        <h4>Resultados</h4>
+        <div style="display: flex; justify-content: center; align-items: center; margin-top: 1rem;">
+            <img src="outputs/nas_pareto.png" alt="NAS Pareto front"
+                style="max-height: 550px; border-radius: 0.5rem;" onerror="this.style.display='none';">
+        </div>
+    </section>
+
+    <!-- Ejemplo: script02.py — DARTS simplificado -->
+    <section>
+        <h3>Ejemplo en código: DARTS simplificado</h3>
+        <div style="font-size: 0.72em; text-align: left;">
+            <p style="margin-bottom: 0.8rem;">El script <code>examples/nas/script02.py</code> implementa el mecanismo
+                central de DARTS sobre Fashion MNIST en tres fases:</p>
+            <div style="display: flex; gap: 0.8rem; margin-bottom: 0.8rem;">
+                <div style="flex: 1; background: rgba(255,255,255,0.07); padding: 0.7rem; border-radius: 0.5rem;">
+                    <p style="color: #8be9fd; margin: 0 0 0.3rem;"><strong>1. Búsqueda</strong></p>
+                    <p style="margin: 0; font-size: 0.95em;">Red de 3 capas con <code>MixedOp</code> por capa. Cada
+                        <code>MixedOp</code> mezcla 4 operaciones (conv3×3, conv5×5, maxpool3×3, identity) con
+                        <code>softmax(α)</code>. W y α se optimizan conjuntamente.
+                    </p>
+                </div>
+                <div style="flex: 1; background: rgba(255,255,255,0.07); padding: 0.7rem; border-radius: 0.5rem;">
+                    <p style="color: #bd93f9; margin: 0 0 0.3rem;"><strong>2. Derivación</strong></p>
+                    <p style="margin: 0; font-size: 0.95em;"><code>argmax(α)</code> por capa selecciona una operación.
+                        Muestra qué operación "ganó" en cada posición de la arquitectura.</p>
+                </div>
+                <div style="flex: 1; background: rgba(255,255,255,0.07); padding: 0.7rem; border-radius: 0.5rem;">
+                    <p style="color: #50fa7b; margin: 0 0 0.3rem;"><strong>3. Reentrenamiento</strong></p>
+                    <p style="margin: 0; font-size: 0.95em;">La arquitectura derivada se entrena desde cero. Compara
+                        accuracy de búsqueda vs reentrenamiento.</p>
+                </div>
+            </div>
+            <p style="margin-top: 0.5rem; font-size: 0.85em; color: #6272a4;">Para la implementación completa con celdas
+                normal/reducción y optimización bilevel, ver: <a href="https://github.com/quark0/darts"
+                    style="color: #8be9fd;">github.com/quark0/darts</a></p>
+        </div>
+    </section>
+
+    <!-- 5.1. Output de script02.py -->
+    <section>
+        <h3>Ejemplo en código: DARTS simplificado</h3>
+        <h4>Output de script02.py</h4>
+        <div style="font-size: 0.72em; text-align: left; width: 100%;">
+            <pre
+                style="margin: 0; box-shadow: none; background: rgba(0,0,0,0.2);"><code id="log-nas-script02" style="font-family: monospace; font-size: 0.85em; max-height: 500px; overflow-y: auto; padding: 1rem; border-radius: 0.5rem; color: #f8f8f2;">Cargando...</code></pre>
+            <div style="display:none">
+                <img src="load-trigger-nas2" onerror="
+                    fetch('outputs/nas_log_script02.txt')
+                    .then(r => r.ok ? r.text() : Promise.reject(r.status))
+                    .then(t => document.getElementById('log-nas-script02').textContent = t)
+                    .catch(e => document.getElementById('log-nas-script02').textContent = 'Error al cargar: ' + e);
+                ">
+            </div>
+        </div>
+    </section>
+
+    <!-- 5.2. Resultados -->
+    <section>
+        <h3>Ejemplo en código: DARTS simplificado</h3>
+        <h4>Resultados</h4>
+        <div style="display: flex; justify-content: center; align-items: center; margin-top: 1rem;">
+            <img src="outputs/nas_darts.png" alt="NAS Darts Results"
+                style="max-height: 550px; border-radius: 0.5rem;" onerror="this.style.display='none';">
+        </div>
+    </section>
+
+    <!-- Ejemplo: script03.py — Pareto multi-objetivo -->
+    <section>
+        <h3>Ejemplo en código: frente de Pareto multi-objetivo</h3>
+        <div style="font-size: 0.72em; text-align: left;">
+            <p style="margin-bottom: 0.8rem;">El script <code>examples/nas/script03.py</code> muestra NAS multi-objetivo
+                en su forma más simple: un MLP sobre un dataset sintético de clasificación (800 muestras, 20 features, 4
+                clases), que corre en segundos.</p>
+            <div style="display: flex; gap: 0.8rem; margin-bottom: 0.8rem;">
+                <div style="flex: 1; background: rgba(255,255,255,0.07); padding: 0.7rem; border-radius: 0.5rem;">
+                    <p style="color: #8be9fd; margin: 0 0 0.3rem;"><strong>Espacio de búsqueda</strong></p>
+                    <p style="margin: 0; font-size: 0.95em;">15 configuraciones de MLP:<br>
+                        capas ocultas ∈ {1, 2, 3}<br>
+                        neuronas/capa ∈ {8, 16, 32, 64, 128}</p>
+                </div>
+                <div style="flex: 1; background: rgba(255,255,255,0.07); padding: 0.7rem; border-radius: 0.5rem;">
+                    <p style="color: #ff79c6; margin: 0 0 0.3rem;"><strong>Métricas</strong></p>
+                    <p style="margin: 0; font-size: 0.95em;">Accuracy en test y número de parámetros. Frente de Pareto:
+                        maximizar accuracy, minimizar parámetros.</p>
+                </div>
+                <div style="flex: 1; background: rgba(255,255,255,0.07); padding: 0.7rem; border-radius: 0.5rem;">
+                    <p style="color: #50fa7b; margin: 0 0 0.3rem;"><strong>Resultado</strong></p>
+                    <p style="margin: 0; font-size: 0.95em;">Scatter plot con frente de Pareto marcado. Identifica el
+                        "budget winner" (mejor accuracy bajo un límite de parámetros).</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6.1. Output de script03.py -->
+    <section>
+        <h3>Ejemplo en código: frente de Pareto multi-objetivo</h3>
+        <h4>Output de script03.py</h4>
+        <div style="font-size: 0.72em; text-align: left; width: 100%;">
+            <pre
+                style="margin: 0; box-shadow: none; background: rgba(0,0,0,0.2);"><code id="log-nas-script03" style="font-family: monospace; font-size: 0.85em; max-height: 500px; overflow-y: auto; padding: 1rem; border-radius: 0.5rem; color: #f8f8f2;">Cargando...</code></pre>
+            <div style="display:none">
+                <img src="load-trigger-nas3" onerror="
+                    fetch('outputs/nas_log_script03.txt')
+                    .then(r => r.ok ? r.text() : Promise.reject(r.status))
+                    .then(t => document.getElementById('log-nas-script03').textContent = t)
+                    .catch(e => document.getElementById('log-nas-script03').textContent = 'Error al cargar: ' + e);
+                ">
+            </div>
+        </div>
+    </section>
+
+    <!-- 6.2. Resultados -->
+    <section>
+        <h3>Ejemplo en código: frente de Pareto multi-objetivo</h3>
+        <h4>Resultados</h4>
+        <div style="display: flex; justify-content: center; align-items: center; margin-top: 1rem;">
+            <img src="outputs/nas_pareto_mlp.png" alt="NAS Pareto MLP Results"
+                style="max-height: 400px; border-radius: 0.5rem;" onerror="this.style.display='none';">
+        </div>
+    </section>
+
+    <!-- 5. Resumen -->
+    <section>
+        <h3>Resumen y puntos clave</h3>
+        <div style="font-size: 0.75em; text-align: left;">
+            <ul style="line-height: 1.5;">
+                <li style="margin-bottom: 0.8rem;"><strong style="color: #8be9fd;">NAS ya no es fuerza bruta:</strong>
+                    Con algoritmos como DARTS (búsqueda continua) y Weight Sharing, se puede correr en horas usando una
+                    sola GPU.</li>
+                <li style="margin-bottom: 0.8rem;"><strong style="color: #ff79c6;">FLOPs ≠ Latencia:</strong> En HW-NAS,
+                    los algoritmos han demostrado que optimizar por cantidad de operaciones engaña respecto de la
+                    velocidad real (Hardware in the loop).</li>
+                <li style="margin-bottom: 0.8rem;"><strong style="color: #50fa7b;">Fin del "One Size Fits All":</strong>
+                    Técnicas como OFA permiten compresión extrema a medida. Cada chip recibe la arquitectura ideal, en
+                    vez de obligar a escalar el mismo modelo.</li>
+            </ul>
+        </div>
+    </section>
+</section>

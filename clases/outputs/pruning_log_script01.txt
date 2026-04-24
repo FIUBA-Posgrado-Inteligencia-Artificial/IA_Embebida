@@ -1,0 +1,76 @@
+[INFO] Usando dispositivo: cpu
+
+============================================================
+PASO 1 — Entrenando CNN baseline
+============================================================
+  Epoch  1/10  loss=0.8274  train_acc=0.6997  test_acc=0.7825  (4.1s)
+  Epoch  2/10  loss=0.5109  train_acc=0.8098  test_acc=0.8268  (3.5s)
+  Epoch  3/10  loss=0.4334  train_acc=0.8437  test_acc=0.8226  (4.0s)
+  Epoch  4/10  loss=0.3933  train_acc=0.8596  test_acc=0.8619  (3.9s)
+  Epoch  5/10  loss=0.3647  train_acc=0.8685  test_acc=0.8676  (3.9s)
+  Epoch  6/10  loss=0.3423  train_acc=0.8769  test_acc=0.8692  (3.7s)
+  Epoch  7/10  loss=0.3303  train_acc=0.8805  test_acc=0.8768  (3.9s)
+  Epoch  8/10  loss=0.3123  train_acc=0.8864  test_acc=0.8736  (4.2s)
+  Epoch  9/10  loss=0.3018  train_acc=0.8903  test_acc=0.8783  (3.5s)
+  Epoch 10/10  loss=0.2884  train_acc=0.8944  test_acc=0.8746  (4.4s)
+
+Baseline  →  acc=0.8746
+  [Baseline] Parámetros: 44,426  |  MACs: 281,640  |  Tamaño: 173.5 KB
+
+============================================================
+PASO 2 — Pruning NO ESTRUCTURADO  sparsidad=50%
+============================================================
+  Sparsidad real después del pruning: 50.00%
+  Fine-tuning 3 epochs...
+  Epoch  1/3  loss=0.2921  train_acc=0.8950  test_acc=0.8857  (3.9s)
+  Epoch  2/3  loss=0.2726  train_acc=0.9021  test_acc=0.8852  (4.4s)
+  Epoch  3/3  loss=0.2659  train_acc=0.9037  test_acc=0.8848  (4.4s)
+  Acc=0.8848
+  [unstructured_50pct] Parámetros: 44,426  |  MACs: 281,640  |  Tamaño: 173.5 KB
+  ⚠ MACs=281,640  (idéntico al baseline — la sparsidad no estructurada
+     no reduce los MACs en hardware genérico)
+
+============================================================
+PASO 2 — Pruning NO ESTRUCTURADO  sparsidad=75%
+============================================================
+  Sparsidad real después del pruning: 75.00%
+  Fine-tuning 3 epochs...
+  Epoch  1/3  loss=0.5092  train_acc=0.8367  test_acc=0.8668  (3.6s)
+  Epoch  2/3  loss=0.3271  train_acc=0.8841  test_acc=0.8771  (4.4s)
+  Epoch  3/3  loss=0.3054  train_acc=0.8909  test_acc=0.8802  (3.3s)
+  Acc=0.8802
+  [unstructured_75pct] Parámetros: 44,426  |  MACs: 281,640  |  Tamaño: 173.5 KB
+  ⚠ MACs=281,640  (idéntico al baseline — la sparsidad no estructurada
+     no reduce los MACs en hardware genérico)
+
+============================================================
+PASO 3 — Pruning ESTRUCTURADO  (50% filtros eliminados)
+============================================================
+  Acc antes del fine-tuning: 0.2126
+  [Structured-50% (antes FT)] Parámetros: 27,180  |  MACs: 107,880  |  Tamaño: 106.2 KB
+  Fine-tuning 3 epochs...
+  Epoch  1/3  loss=0.7676  train_acc=0.7441  test_acc=0.8271  (4.9s)
+  Epoch  2/3  loss=0.4361  train_acc=0.8477  test_acc=0.8444  (4.6s)
+  Epoch  3/3  loss=0.3995  train_acc=0.8599  test_acc=0.8507  (4.7s)
+  Acc después del fine-tuning: 0.8507
+  [Structured-50% (después FT)] Parámetros: 27,180  |  MACs: 107,880  |  Tamaño: 106.2 KB
+
+============================================================
+TABLA COMPARATIVA
+============================================================
+Modelo                             Acc     Paráms         MACs       KB    Sparsidad
+------------------------------------------------------------------------------------
+Baseline                        0.8746     44,426      281,640    173.5         0.0%
+No estructurado  50%            0.8848     44,426      281,640    173.5        50.0%
+No estructurado  75%            0.8802     44,426      281,640    173.5        75.0%
+Estructurado     50%            0.8507     27,180      107,880    106.2   structured
+
+[INFO] Gráfico guardado en 'outputs/pruning_comparacion.png'
+[INFO] Resultados guardados en 'outputs/pruning_resultados.json'
+
+[CONCLUSIÓN]
+  Baseline:             281,640 MACs
+  Unstruct. 75%:        281,640 MACs  (100.0% del baseline)
+  Estructurado 50% FT:  107,880 MACs  (38.3% del baseline)
+  → Eliminar pesos individuales no reduce los MACs.
+  → Eliminar filtros enteros sí reduce los MACs (y el modelo es genuinamente más pequeño).

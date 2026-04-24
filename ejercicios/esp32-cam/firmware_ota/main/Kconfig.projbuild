@@ -1,0 +1,75 @@
+menu "ESP32-CAM Demo"
+
+config ESP32CAM_WIFI_ENABLED
+    bool "WiFi enabled"
+    default n
+
+config ESP32CAM_WIFI_SSID
+    string "WiFi SSID"
+    depends on ESP32CAM_WIFI_ENABLED
+    default "MySSID"
+
+config ESP32CAM_WIFI_PASSWORD
+    string "WiFi password"
+    depends on ESP32CAM_WIFI_ENABLED
+    default "MyPassword"
+
+config ESP32CAM_HTTP_STREAM_ENABLED
+    bool "HTTP MJPEG stream server (requires WiFi)"
+    depends on ESP32CAM_WIFI_ENABLED
+    default n
+
+config ESP32CAM_HTTP_STREAM_PORT
+    int "HTTP server port"
+    depends on ESP32CAM_HTTP_STREAM_ENABLED
+    range 1 65534
+    default 80
+
+config ESP32CAM_OTA_ENABLED
+    bool "OTA firmware update endpoint (shares HTTP server)"
+    depends on ESP32CAM_HTTP_STREAM_ENABLED
+    default y
+    help
+      Registers POST /ota and GET /ota/info on the existing HTTP server.
+      Requires the dual-OTA partition table (otadata + ota_0 + ota_1).
+
+config ESP32CAM_MQTT_ENABLED
+    bool "MQTT enabled (requires WiFi)"
+    depends on ESP32CAM_WIFI_ENABLED
+    default n
+
+config ESP32CAM_MQTT_BROKER_URI
+    string "MQTT broker URI"
+    depends on ESP32CAM_MQTT_ENABLED
+    default "mqtt://192.168.1.100:1883"
+
+config ESP32CAM_MQTT_USERNAME
+    string "MQTT username (empty = anonymous)"
+    depends on ESP32CAM_MQTT_ENABLED
+    default ""
+
+config ESP32CAM_MQTT_PASSWORD
+    string "MQTT password"
+    depends on ESP32CAM_MQTT_ENABLED
+    default ""
+
+config ESP32CAM_MQTT_TOPIC_CAPTURE
+    string "Subscribe topic (trigger)"
+    depends on ESP32CAM_MQTT_ENABLED
+    default "esp32cam/capture"
+
+config ESP32CAM_MQTT_TOPIC_RESULT
+    string "Publish topic (result)"
+    depends on ESP32CAM_MQTT_ENABLED
+    default "esp32cam/result"
+
+config ESP32CAM_RESIZE_BILINEAR
+    bool "Resize bilinear (off = nearest neighbor)"
+    default y
+
+config ESP32CAM_ENTROPY_WARN_THRESHOLD
+    int "Entropy warn threshold (0-100)"
+    range 0 100
+    default 70
+
+endmenu

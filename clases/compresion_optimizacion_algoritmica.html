@@ -1,0 +1,350 @@
+<!-- 9. Optimización Algorítmica -->
+<section>
+  <section>
+    <h2 class="gradient-text">11. Optimización Algorítmica</h2>
+    <p>La misma matemática, con un costo radicalmente menor</p>
+  </section>
+
+  <!-- 1. ¿Qué es? -->
+  <section>
+    <h3>¿Qué es la Optimización Algorítmica?</h3>
+    <div style="font-size: 0.75em; text-align: left;">
+      <p>Cuantización, pruning y factorización modifican los <strong>valores</strong> de los pesos o la <strong>estructura</strong> de la red.</p>
+      <p style="margin-top: 0.8rem;">La optimización algorítmica es diferente: <strong>la red no cambia</strong>. Lo que cambia es <em>cómo se ejecutan</em> las operaciones.</p>
+      <div style="display: flex; gap: 1.5rem; margin-top: 1rem;">
+        <div style="flex: 1; background: rgba(255,85,85,0.1); padding: 0.8rem; border-radius: 0.5rem;">
+          <p style="color: #ff5555; margin: 0 0 0.4rem;"><strong>Mismo resultado matemático</strong></p>
+          <p style="margin: 0;">Las salidas de la red son idénticas (o numéricamente equivalentes) antes y después de optimizar.</p>
+        </div>
+        <div style="flex: 1; background: rgba(80,250,123,0.1); padding: 0.8rem; border-radius: 0.5rem;">
+          <p style="color: #50fa7b; margin: 0 0 0.4rem;"><strong>Costo radicalmente distinto</strong></p>
+          <p style="margin: 0;">La cantidad de operaciones reales, el uso de caché, o el tipo de instrucciones cambian drásticamente.</p>
+        </div>
+      </div>
+      <p style="margin-top: 1rem;"><strong style="color: #8be9fd;">Ejemplos clave:</strong> Fusión de operadores, folding de BatchNorm, im2col, Winograd, vectorización SIMD.</p>
+    </div>
+  </section>
+
+  <!-- 2. BatchNorm Folding -->
+  <section>
+    <h3>Fusión de Operaciones: BatchNorm Folding</h3>
+    <div style="font-size: 0.73em; text-align: left;">
+      <p>BatchNorm tiene 4 parámetros por canal: <code>γ, β, μ, σ²</code>. En <strong>inferencia</strong> (γ, β, μ, σ² están fijos) la operación BN es lineal y puede <em>absorberse</em> en la Conv precedente.</p>
+      <div style="background: rgba(255,255,255,0.07); padding: 0.8rem; border-radius: 0.5rem; margin: 0.7rem 0; text-align: center; font-size: 1.05em;">
+        <code>W<sub>fold</sub> = W · (γ / √(σ²+ε))</code><br>
+        <code>b<sub>fold</sub> = (b − μ) · (γ / √(σ²+ε)) + β</code>
+      </div>
+      <p>El resultado: <strong>una sola Conv2d con bias</strong>, sin la BN.</p>
+      <div style="display: flex; gap: 1rem; margin-top: 0.8rem;">
+        <div style="flex: 1; background: rgba(255,255,255,0.07); padding: 0.6rem; border-radius: 0.5rem;">
+          <p style="color: #ff79c6; margin: 0 0 0.3rem;"><strong>Antes</strong></p>
+          <p style="margin: 0; font-family: monospace;">Conv2d → BN → ReLU<br>
+          → 3 pases de memoria<br>
+          → 4 tensores extra (γ, β, μ, σ²)</p>
+        </div>
+        <div style="flex: 1; background: rgba(80,250,123,0.1); padding: 0.6rem; border-radius: 0.5rem;">
+          <p style="color: #50fa7b; margin: 0 0 0.3rem;"><strong>Después (Folded)</strong></p>
+          <p style="margin: 0; font-family: monospace;">Conv2d(fold) → ReLU<br>
+          → 1 pase de memoria<br>
+          → 0 parámetros extra</p>
+        </div>
+      </div>
+      <!-- Diagrama CSS: grafo antes y después del folding -->
+      <div style="margin-top: 0.7rem; display: flex; align-items: center; gap: 1rem; font-size: 0.85em;">
+        <div style="flex: 1; display: flex; align-items: center; gap: 0.3rem;">
+          <div style="background: rgba(80,250,123,0.2); border: 1px solid #50fa7b; padding: 0.3rem 0.5rem; border-radius: 0.3rem; text-align: center;">Conv2d</div>
+          <span style="color: #aaa;">→</span>
+          <div style="background: rgba(255,85,85,0.2); border: 1px solid #ff5555; padding: 0.3rem 0.5rem; border-radius: 0.3rem; text-align: center; position: relative;">
+            BN<br><small style="color: #ff5555; font-size: 0.75em;">γ,β,μ,σ²</small>
+          </div>
+          <span style="color: #aaa;">→</span>
+          <div style="background: rgba(139,233,253,0.2); border: 1px solid #8be9fd; padding: 0.3rem 0.5rem; border-radius: 0.3rem; text-align: center;">ReLU</div>
+        </div>
+        <div style="font-size: 1.3em; color: #ffb86c;">⟹</div>
+        <div style="flex: 1; display: flex; align-items: center; gap: 0.3rem;">
+          <div style="background: rgba(80,250,123,0.3); border: 2px solid #50fa7b; padding: 0.3rem 0.5rem; border-radius: 0.3rem; text-align: center;">
+            Conv2d<sub>fold</sub><br><small style="color: #50fa7b; font-size: 0.75em;">γ,β,μ,σ² absorbidos</small>
+          </div>
+          <span style="color: #aaa;">→</span>
+          <div style="background: rgba(139,233,253,0.2); border: 1px solid #8be9fd; padding: 0.3rem 0.5rem; border-radius: 0.3rem; text-align: center;">ReLU</div>
+        </div>
+      </div>
+      <p style="margin-top: 0.5rem;"><strong style="color: #8be9fd;">Importante:</strong> el folding solo es válido en <strong>modo inferencia</strong>. Durante el entrenamiento la BN sigue siendo necesaria.</p>
+    </div>
+  </section>
+
+  <!-- 3. Im2col y organización de memoria -->
+  <section>
+    <h3>Organización de Memoria: im2col</h3>
+    <div style="font-size: 0.73em; text-align: left;">
+      <p>Las CPUs/GPUs están optimizadas para multiplicación de matrices (<strong>GEMM</strong>). Una convolución 3D no es directamente una GEMM, pero se puede transformar:</p>
+      <div style="background: rgba(255,255,255,0.07); padding: 0.8rem; border-radius: 0.5rem; margin: 0.7rem 0;">
+        <p style="color: #8be9fd; margin: 0 0 0.4rem;"><strong>im2col (image to columns)</strong></p>
+        <ol style="padding-left: 1.2rem; line-height: 1.5; margin: 0;">
+          <li>Por cada posición de salida, extraer el parche de entrada correspondiente (H_k × W_k × C_in).</li>
+          <li>Aplanarlo en un vector fila de la matriz de entrada.</li>
+          <li>La convolución completa se convierte en <code>Output = Kernel_matrix × Im2col_matrix</code>.</li>
+        </ol>
+      </div>
+      <div style="display: flex; gap: 1.5rem; margin-top: 0.8rem;">
+        <div style="flex: 1;">
+          <p style="color: #50fa7b; margin: 0 0 0.3rem;"><strong>Ventaja</strong></p>
+          <p style="margin: 0;">Usa librerías GEMM altamente optimizadas (BLAS, cuBLAS, Eigen). La convolución hereda las aceleraciones de la multiplicación de matrices.</p>
+        </div>
+        <div style="flex: 1;">
+          <p style="color: #ff5555; margin: 0 0 0.3rem;"><strong>Costo</strong></p>
+          <p style="margin: 0;">La matriz im2col duplica los datos de entrada (factor ~k² en almacenamiento temporal). En MCUs con RAM mínima, esto es una limitación real.</p>
+        </div>
+      </div>
+      <!-- Diagrama CSS: im2col pipeline -->
+      <div style="margin-top: 0.6rem; display: flex; align-items: center; gap: 0.5rem; font-size: 0.82em;">
+        <!-- Tensor de entrada con parche resaltado -->
+        <div style="text-align: center;">
+          <div style="display: grid; grid-template-columns: repeat(4, 14px); gap: 1px; margin: 0 auto 0.2rem;">
+            <div style="width:14px;height:14px;background:rgba(80,250,123,0.15);border:1px solid #333;border-radius:1px;"></div>
+            <div style="width:14px;height:14px;background:rgba(80,250,123,0.15);border:1px solid #333;border-radius:1px;"></div>
+            <div style="width:14px;height:14px;background:rgba(80,250,123,0.15);border:1px solid #333;border-radius:1px;"></div>
+            <div style="width:14px;height:14px;background:rgba(80,250,123,0.15);border:1px solid #333;border-radius:1px;"></div>
+            <div style="width:14px;height:14px;background:rgba(80,250,123,0.5);border:2px solid #50fa7b;border-radius:1px;"></div>
+            <div style="width:14px;height:14px;background:rgba(80,250,123,0.5);border:2px solid #50fa7b;border-radius:1px;"></div>
+            <div style="width:14px;height:14px;background:rgba(80,250,123,0.15);border:1px solid #333;border-radius:1px;"></div>
+            <div style="width:14px;height:14px;background:rgba(80,250,123,0.15);border:1px solid #333;border-radius:1px;"></div>
+            <div style="width:14px;height:14px;background:rgba(80,250,123,0.5);border:2px solid #50fa7b;border-radius:1px;"></div>
+            <div style="width:14px;height:14px;background:rgba(80,250,123,0.5);border:2px solid #50fa7b;border-radius:1px;"></div>
+            <div style="width:14px;height:14px;background:rgba(80,250,123,0.15);border:1px solid #333;border-radius:1px;"></div>
+            <div style="width:14px;height:14px;background:rgba(80,250,123,0.15);border:1px solid #333;border-radius:1px;"></div>
+            <div style="width:14px;height:14px;background:rgba(80,250,123,0.15);border:1px solid #333;border-radius:1px;"></div>
+            <div style="width:14px;height:14px;background:rgba(80,250,123,0.15);border:1px solid #333;border-radius:1px;"></div>
+            <div style="width:14px;height:14px;background:rgba(80,250,123,0.15);border:1px solid #333;border-radius:1px;"></div>
+            <div style="width:14px;height:14px;background:rgba(80,250,123,0.15);border:1px solid #333;border-radius:1px;"></div>
+          </div>
+          <small style="color: #50fa7b;">Entrada H×W</small>
+        </div>
+        <span style="font-size: 1.4em; color: #aaa;">→</span>
+        <!-- Flecha de desenrollado -->
+        <div style="text-align: center; color: #ffb86c; font-size: 0.9em;">
+          parche<br>2×2×C_in<br>→ fila
+        </div>
+        <span style="font-size: 1.4em; color: #aaa;">→</span>
+        <!-- Matrices de multiplicación -->
+        <div style="display: flex; align-items: center; gap: 0.3rem;">
+          <div style="text-align: center;">
+            <div style="width:30px; height:60px; background: rgba(189,147,249,0.3); border: 1px solid #bd93f9; border-radius: 2px;"></div>
+            <small style="color: #bd93f9;">K<br>C_out×k²C_in</small>
+          </div>
+          <span style="color: #aaa; font-size: 1.1em;">×</span>
+          <div style="text-align: center;">
+            <div style="width:60px; height:30px; background: rgba(80,250,123,0.3); border: 1px solid #50fa7b; border-radius: 2px;"></div>
+            <small style="color: #50fa7b;">Im2col<br>k²C_in×H_out·W_out</small>
+          </div>
+          <span style="color: #aaa; font-size: 1.1em;">=</span>
+          <div style="text-align: center;">
+            <div style="width:60px; height:60px; background: rgba(255,184,108,0.3); border: 1px solid #ffb86c; border-radius: 2px;"></div>
+            <small style="color: #ffb86c;">Output<br>C_out×H·W</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Winograd -->
+  <section>
+    <h3>Menos Multiplicaciones: Winograd y FFT</h3>
+    <div style="font-size: 0.73em; text-align: left;">
+      <p>Las multiplicaciones son más costosas que las sumas en hardware. Winograd's minimal filtering algorithm <strong>intercambia multiplicaciones por sumas/restas</strong>, que son más baratas.</p>
+      <div style="background: rgba(255,255,255,0.07); padding: 0.8rem; border-radius: 0.5rem; margin: 0.7rem 0;">
+        <p style="color: #bd93f9; margin: 0 0 0.4rem;"><strong>Winograd F(2×2, 3×3): convolución 3×3 que produce 2×2 salidas</strong></p>
+        <div style="display: flex; gap: 2rem; text-align: center;">
+          <div>
+            <p style="color: #ff5555; margin: 0 0 0.3rem;">Naive</p>
+            <p style="margin: 0; font-size: 1.1em;"><strong>9 multiplicaciones</strong><br>por 4 salidas = <strong>36 MACs</strong></p>
+          </div>
+          <div style="font-size: 1.5em; display: flex; align-items: center;">→</div>
+          <div>
+            <p style="color: #50fa7b; margin: 0 0 0.3rem;">Winograd</p>
+            <p style="margin: 0; font-size: 1.1em;"><strong>16 multiplicaciones</strong><br>por 4 salidas = <strong>4 MACs</strong> + sumas<br>(≈2.25× menos multiplicaciones)</p>
+          </div>
+        </div>
+      </div>
+      <p style="margin-top: 0.7rem;"><strong style="color: #8be9fd;">FFT-based convolution:</strong> para kernels grandes (≥7×7), la convolución en el dominio de frecuencias reduce de O(k²·HW) a O(HW·log(HW)). cuDNN elige automáticamente el algoritmo óptimo según el tamaño.</p>
+      <!-- Tabla comparativa CSS -->
+      <table style="margin-top: 0.6rem; width: 100%; border-collapse: collapse; font-size: 0.9em;">
+        <thead>
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.3);">
+            <th style="text-align: left; padding: 0.3rem 0.6rem;">Algoritmo</th>
+            <th style="text-align: center; padding: 0.3rem 0.6rem; color: #ff5555;">Multiplicaciones</th>
+            <th style="text-align: center; padding: 0.3rem 0.6rem; color: #aaa;">Sumas/restas</th>
+            <th style="text-align: center; padding: 0.3rem 0.6rem; color: #50fa7b;">Mult/output</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <td style="padding: 0.3rem 0.6rem;">Conv 3×3 naive</td>
+            <td style="text-align: center; padding: 0.3rem 0.6rem; color: #ff5555;">9</td>
+            <td style="text-align: center; padding: 0.3rem 0.6rem; color: #aaa;">8</td>
+            <td style="text-align: center; padding: 0.3rem 0.6rem; color: #ff5555;">9</td>
+          </tr>
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); background: rgba(80,250,123,0.07);">
+            <td style="padding: 0.3rem 0.6rem;">Winograd F(2,3)</td>
+            <td style="text-align: center; padding: 0.3rem 0.6rem; color: #50fa7b;"><strong>16</strong> / 4 out</td>
+            <td style="text-align: center; padding: 0.3rem 0.6rem; color: #aaa;">36</td>
+            <td style="text-align: center; padding: 0.3rem 0.6rem; color: #50fa7b;"><strong>4</strong></td>
+          </tr>
+          <tr style="background: rgba(80,250,123,0.07);">
+            <td style="padding: 0.3rem 0.6rem;">Winograd F(4,3)</td>
+            <td style="text-align: center; padding: 0.3rem 0.6rem; color: #50fa7b;"><strong>~100</strong> / 16 out</td>
+            <td style="text-align: center; padding: 0.3rem 0.6rem; color: #aaa;">~100</td>
+            <td style="text-align: center; padding: 0.3rem 0.6rem; color: #50fa7b;"><strong>6.25</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 5. SIMD y vectorización -->
+  <section>
+    <h3>Vectorización SIMD y Loop Optimization</h3>
+    <div style="font-size: 0.73em; text-align: left;">
+      <p>Los procesadores modernos pueden ejecutar la misma operación sobre <strong>múltiples datos a la vez</strong> con una sola instrucción (SIMD: Single Instruction, Multiple Data).</p>
+      <div style="display: flex; gap: 1.5rem; margin-top: 0.8rem;">
+        <div style="flex: 1; background: rgba(139,233,253,0.1); padding: 0.7rem; border-radius: 0.5rem;">
+          <p style="color: #8be9fd; margin: 0 0 0.4rem;"><strong>ARM NEON (Cortex-A)</strong></p>
+          <ul style="padding-left: 1rem; line-height: 1.4; margin: 0;">
+            <li>128 bits: 4 floats o 8 int16 por instrucción</li>
+            <li>TFLite usa NEON automáticamente</li>
+          </ul>
+        </div>
+        <div style="flex: 1; background: rgba(255,184,108,0.1); padding: 0.7rem; border-radius: 0.5rem;">
+          <p style="color: #ffb86c; margin: 0 0 0.4rem;"><strong>ARM Cortex-M (MCU)</strong></p>
+          <ul style="padding-left: 1rem; line-height: 1.4; margin: 0;">
+            <li>CMSIS-NN: kernels optimizados para Cortex-M4/M7</li>
+            <li>SIMD 32-bit (DSP), 2–4× vs C estándar</li>
+          </ul>
+        </div>
+        <div style="flex: 1; background: rgba(80,250,123,0.1); padding: 0.7rem; border-radius: 0.5rem;">
+          <p style="color: #50fa7b; margin: 0 0 0.4rem;"><strong>x86 AVX/AVX-512</strong></p>
+          <ul style="padding-left: 1rem; line-height: 1.4; margin: 0;">
+            <li>256–512 bits: 8–16 floats por instrucción</li>
+            <li>PyTorch/NumPy los usan automáticamente</li>
+          </ul>
+        </div>
+      </div>
+      <div style="background: rgba(255,255,255,0.07); padding: 0.7rem; border-radius: 0.5rem; margin-top: 0.8rem;">
+        <p style="margin: 0;"><strong>Loop tiling / blocking:</strong> reorganizar el orden de los bucles para maximizar el reuso de datos en la caché L1/L2. El compilador puede hacerlo, pero entenderlo ayuda a <em>elegir el hardware correcto</em> para un modelo dado.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. Ejemplo: script01.py -->
+  <section>
+    <h3>Ejemplo en Código: BN Folding</h3>
+    <div style="font-size: 0.72em; text-align: left;">
+      <p style="margin-bottom: 0.8rem;">El script <code>examples/optimization/script01.py</code> demuestra el BN folding sobre una CNN entrenada en Fashion MNIST:</p>
+      <div style="display: flex; gap: 1rem; margin-bottom: 0.8rem;">
+        <div style="flex: 1; background: rgba(255,255,255,0.07); padding: 0.7rem; border-radius: 0.5rem;">
+          <p style="color: #8be9fd; margin: 0 0 0.3rem;"><strong>Procedimiento</strong></p>
+          <ol style="padding-left: 1.2rem; line-height: 1.5; margin: 0;">
+            <li>Entrenar CNN con BN (5 epochs)</li>
+            <li>Calcular W_fold y b_fold analíticamente</li>
+            <li>Construir nueva CNN sin BN</li>
+            <li>Verificar equivalencia numérica de logits</li>
+          </ol>
+        </div>
+        <div style="flex: 1; background: rgba(255,255,255,0.07); padding: 0.7rem; border-radius: 0.5rem;">
+          <p style="color: #50fa7b; margin: 0 0 0.3rem;"><strong>Resultados medidos</strong></p>
+          <ul style="padding-left: 1rem; line-height: 1.5; margin: 0;">
+            <li>Accuracy: idéntico</li>
+            <li>Parámetros: menos (BN eliminado)</li>
+            <li>MACs: igual (la aritmética Conv no cambia)</li>
+            <li>Inferencia: mediblemente más rápida</li>
+          </ul>
+        </div>
+      </div>
+      <div style="text-align: center;">
+        <img src="../examples/optimization/outputs/bn_folding_resultados.png"
+             style="max-height: 210px; border-radius: 0.4rem;"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+        <p style="display:none; color: #ffb86c; font-style: italic;">⚠️ Ejecutar <code>script01.py</code> para generar la figura</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. Ejemplo avanzado: script02.py — BN Folding: dos casos -->
+  <section>
+    <h3>BN Folding: el orden de capas importa</h3>
+    <div style="font-size: 0.72em; text-align: left;">
+      <p style="margin-bottom: 0.6rem;">El script <code>examples/optimization/script02.py</code> contrasta dos patrones comunes y cómo cambia la fusión:</p>
+      <div style="display: flex; gap: 1rem; margin-bottom: 0.8rem;">
+        <!-- Caso A -->
+        <div style="flex: 1; background: rgba(80,250,123,0.1); border: 1px solid #50fa7b44; padding: 0.7rem; border-radius: 0.5rem;">
+          <p style="color: #50fa7b; margin: 0 0 0.5rem; font-weight: bold;">Caso A — Conv → BN → Act</p>
+          <!-- diagrama CSS -->
+          <div style="display: flex; align-items: center; gap: 0.3rem; font-size: 0.85em; margin-bottom: 0.5rem; flex-wrap: wrap;">
+            <span style="background: rgba(80,250,123,0.2); border: 1px solid #50fa7b; padding: 0.2rem 0.4rem; border-radius: 0.3rem;">Conv</span>
+            <span style="color: #aaa;">→</span>
+            <span style="background: rgba(255,85,85,0.2); border: 1px solid #ff5555; padding: 0.2rem 0.4rem; border-radius: 0.3rem; text-decoration: line-through;">BN</span>
+            <span style="color: #aaa;">→</span>
+            <span style="background: rgba(139,233,253,0.2); border: 1px solid #8be9fd; padding: 0.2rem 0.4rem; border-radius: 0.3rem;">Act</span>
+            <span style="color: #aaa; font-size: 1.2em;">⟹</span>
+            <span style="background: rgba(80,250,123,0.2); border: 1px solid #50fa7b; padding: 0.2rem 0.4rem; border-radius: 0.3rem;">Conv<sub>fold</sub></span>
+            <span style="color: #aaa;">→</span>
+            <span style="background: rgba(139,233,253,0.2); border: 1px solid #8be9fd; padding: 0.2rem 0.4rem; border-radius: 0.3rem;">Act</span>
+          </div>
+          <p style="margin: 0; color: #ccc; font-size: 0.9em;">BN se absorbe <strong>hacia atrás</strong> en Conv:<br>
+          <code>W_fold = W · scale</code><br>
+          <code>b_fold = (b−μ)·scale + β</code></p>
+        </div>
+        <!-- Caso B -->
+        <div style="flex: 1; background: rgba(189,147,249,0.1); border: 1px solid #bd93f944; padding: 0.7rem; border-radius: 0.5rem;">
+          <p style="color: #bd93f9; margin: 0 0 0.5rem; font-weight: bold;">Caso B — Conv → Act → BN</p>
+          <!-- diagrama CSS -->
+          <div style="display: flex; align-items: center; gap: 0.3rem; font-size: 0.85em; margin-bottom: 0.5rem; flex-wrap: wrap;">
+            <span style="background: rgba(80,250,123,0.2); border: 1px solid #50fa7b; padding: 0.2rem 0.4rem; border-radius: 0.3rem;">Conv</span>
+            <span style="color: #aaa;">→</span>
+            <span style="background: rgba(139,233,253,0.2); border: 1px solid #8be9fd; padding: 0.2rem 0.4rem; border-radius: 0.3rem;">Act</span>
+            <span style="color: #aaa;">→</span>
+            <span style="background: rgba(255,85,85,0.2); border: 1px solid #ff5555; padding: 0.2rem 0.4rem; border-radius: 0.3rem; text-decoration: line-through;">BN</span>
+            <span style="color: #aaa; font-size: 1.2em;">⟹</span>
+            <span style="background: rgba(80,250,123,0.2); border: 1px solid #50fa7b; padding: 0.2rem 0.4rem; border-radius: 0.3rem;">Conv</span>
+            <span style="color: #aaa;">→</span>
+            <span style="background: rgba(139,233,253,0.2); border: 1px solid #8be9fd; padding: 0.2rem 0.4rem; border-radius: 0.3rem;">Act</span>
+            <span style="color: #aaa;">→</span>
+            <span style="background: rgba(255,184,108,0.2); border: 1px solid #ffb86c; padding: 0.2rem 0.4rem; border-radius: 0.3rem;">Conv<sub>next,fold</sub></span>
+          </div>
+          <p style="margin: 0; color: #ccc; font-size: 0.9em;">La no-linealidad <em>impide</em> fusión hacia atrás.<br>BN se absorbe <strong>hacia adelante</strong> en la Conv siguiente:<br>
+          <code>W_fold = W · scale.view(1,C,1,1)</code></p>
+        </div>
+      </div>
+      <div style="text-align: center;">
+        <img src="../examples/optimization/outputs/bn_folding_casos_resultados.png"
+             style="max-height: 190px; border-radius: 0.4rem;"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+        <p style="display:none; color: #ffb86c; font-style: italic;">⚠️ Ejecutar <code>script02.py</code> para generar la figura</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. Resumen -->
+  <section>
+    <h3>Resumen y puntos clave</h3>
+    <div style="font-size: 0.75em; text-align: left;">
+      <ul style="line-height: 1.6;">
+        <li style="margin-bottom: 0.8rem;">
+          <strong style="color: #50fa7b;">BN Folding</strong> — optimización gratuita: cero pérdida de accuracy, menos parámetros y más velocidad. TFLite y TorchScript la aplican automáticamente al exportar.
+        </li>
+        <li style="margin-bottom: 0.8rem;">
+          <strong style="color: #8be9fd;">im2col</strong> — convierte la convolución en GEMM, heredando décadas de optimizaciones de álgebra lineal. Costo: memoria temporal.
+        </li>
+        <li style="margin-bottom: 0.8rem;">
+          <strong style="color: #bd93f9;">Winograd / FFT</strong> — reducen multiplicaciones a cambio de sumas. cuDNN elige el algoritmo automáticamente. Para MCUs, Winograd está disponible en CMSIS-NN.
+        </li>
+        <li>
+          <strong style="color: #ffb86c;">SIMD y Loop Tiling</strong> — los frameworks modernos los aplican automáticamente. Entenderlos ayuda a <em>elegir el hardware</em> y a <em>diagnosticar cuellos de botella</em>.
+        </li>
+      </ul>
+      <p style="margin-top: 1rem; background: rgba(255,255,255,0.07); padding: 0.6rem; border-radius: 0.4rem;">
+        <strong>Mensaje clave:</strong> antes de comprimir un modelo, aplicar estas optimizaciones algorítmicas puede dar aceleraciones gratuitas. Son el primer paso del pipeline de despliegue.
+      </p>
+    </div>
+  </section>
+</section>

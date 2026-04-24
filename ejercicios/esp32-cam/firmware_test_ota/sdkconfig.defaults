@@ -1,0 +1,39 @@
+# Firmware minimalista para probar OTA en aislamiento (sin cámara, sin esp-dl).
+# Si esto no anda, el problema no es el stack de cámara/inference.
+
+# Target: ESP32-D0WD-V3 (rev 3.0). REV_MIN=300 deshabilita el
+# SPIRAM_CACHE_WORKAROUND (no lo necesitamos en rev3) que rompía el timing
+# del PHY init en el firmware anterior.
+CONFIG_ESP32_REV_MIN_FULL=300
+
+# PSRAM: el HTTP+OTA no necesita la RAM extra, pero sin PSRAM el device
+# brown-out'ea al arrancar WiFi PHY (el init de PSRAM carga los caps del
+# 3.3V y estabiliza la línea antes del pico de consumo del PA). Lo dejamos
+# prendido por estabilidad, no por memoria.
+CONFIG_ESP32_SPIRAM_SUPPORT=y
+CONFIG_SPIRAM_USE_MALLOC=y
+CONFIG_SPIRAM_MALLOC_RESERVE_INTERNAL=32768
+
+# Limitamos TX power para bajar el pico de corriente del PA. Default=20dBm
+# (100mW); 15dBm es ~30mW, suficiente para red local y más gentil con la
+# fuente. Si después necesitamos más alcance, lo subimos.
+CONFIG_ESP_PHY_MAX_WIFI_TX_POWER=15
+
+# Particiones custom (dual OTA)
+CONFIG_PARTITION_TABLE_CUSTOM=y
+CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions.csv"
+
+# 4MB flash
+CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y
+CONFIG_ESPTOOLPY_FLASHSIZE="4MB"
+
+# Main task stack
+CONFIG_ESP_MAIN_TASK_STACK_SIZE=8192
+
+# UART0 a 115200
+CONFIG_ESP_CONSOLE_UART_DEFAULT=y
+CONFIG_ESP_CONSOLE_UART_BAUDRATE=115200
+
+# OTA: necesitamos que el httpd acepte POST de 1.5MB+ de un tirón.
+# Subimos max_uri_handlers y stack por defecto.
+CONFIG_HTTPD_MAX_REQ_HDR_LEN=1024

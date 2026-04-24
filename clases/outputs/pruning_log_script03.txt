@@ -1,0 +1,47 @@
+[INFO] Usando dispositivo: cpu
+
+============================================================
+PASO 1 — Entrenando CNN baseline
+============================================================
+  Epoch  1/10  loss=0.8038  train_acc=0.7055  test_acc=0.7903  (3.5s)
+  Epoch  2/10  loss=0.4844  train_acc=0.8201  test_acc=0.8321  (3.5s)
+  Epoch  3/10  loss=0.4157  train_acc=0.8495  test_acc=0.8441  (4.3s)
+  Epoch  4/10  loss=0.3760  train_acc=0.8631  test_acc=0.8590  (3.8s)
+  Epoch  5/10  loss=0.3505  train_acc=0.8725  test_acc=0.8694  (4.0s)
+  Epoch  6/10  loss=0.3322  train_acc=0.8792  test_acc=0.8743  (4.1s)
+  Epoch  7/10  loss=0.3150  train_acc=0.8837  test_acc=0.8776  (3.7s)
+  Epoch  8/10  loss=0.3019  train_acc=0.8887  test_acc=0.8755  (3.9s)
+  Epoch  9/10  loss=0.2931  train_acc=0.8926  test_acc=0.8804  (4.5s)
+  Epoch 10/10  loss=0.2813  train_acc=0.8951  test_acc=0.8829  (3.7s)
+
+Baseline  acc=0.8829
+  [Baseline] Parámetros: 44,426  |  MACs: 281,640  |  Tamaño: 173.5 KB
+
+============================================================
+PASO 2 — Calibración: activación media por filtro
+============================================================
+  Conv1 (6 filtros) — activación media mín/máx: 0.494 / 1.280
+  Conv2 (16 filtros) — activación media mín/máx: 0.921 / 1.395
+
+============================================================
+PASO 3 — Comparación: activaciones vs magnitud de pesos
+============================================================
+
+   Sparsity |  Activaciones (FT) |  Magnitud (FT) |        Δ
+  ---------------------------------------------------------
+       10% |             0.8767 |         0.8874 |  -0.0107
+       20% |             0.8677 |         0.8722 |  -0.0045
+       30% |             0.8665 |         0.8671 |  -0.0006
+       40% |             0.8516 |         0.8567 |  -0.0051
+       50% |             0.8452 |         0.8532 |  -0.0080
+       60% |             0.7892 |         0.8177 |  -0.0285
+       70% |             0.7669 |         0.7629 |  +0.0040
+
+[INFO] Gráfico guardado en 'outputs/pruning_activaciones.png'
+[INFO] Resultados guardados en 'outputs/pruning_activaciones_resultados.json'
+
+[CONCLUSIÓN]
+  Criterio de activaciones supera al de magnitud en 1/7 niveles.
+  Ventaja promedio: -0.0076 accuracy.
+  Razón: la activación media captura cuánto 'usa' la red cada filtro,
+  mientras que la magnitud de los pesos puede ser alta aunque la activación sea baja.

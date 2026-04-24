@@ -1,0 +1,37 @@
+{
+    "baseline": {
+        "acc": 0.9049,
+        "params": 206922,
+        "macs": 1218048
+    },
+    "tucker_ratio_25": {
+        "ratio": 0.25,
+        "rank_out": 4,
+        "rank_in": 1,
+        "acc_ptq": 0.5701,
+        "acc_ft": 0.8918,
+        "macs": 400336,
+        "mac_reduction": 0.6713,
+        "max_diff_logits": 7.237085
+    },
+    "tucker_ratio_50": {
+        "ratio": 0.5,
+        "rank_out": 8,
+        "rank_in": 1,
+        "acc_ptq": 0.8924,
+        "acc_ft": 0.9077,
+        "macs": 710800,
+        "mac_reduction": 0.4164,
+        "max_diff_logits": 4.152843
+    },
+    "tucker_ratio_75": {
+        "ratio": 0.75,
+        "rank_out": 9,
+        "rank_in": 1,
+        "acc_ptq": 0.8977,
+        "acc_ft": 0.9063,
+        "macs": 1075360,
+        "mac_reduction": 0.1171,
+        "max_diff_logits": 0.933047
+    }
+}

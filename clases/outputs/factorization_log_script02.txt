@@ -1,0 +1,41 @@
+[INFO] Usando dispositivo: cpu
+
+============================================================
+PASO 1 — Entrenando CNN baseline
+============================================================
+  Epoch  1/10  loss=0.6321  train_acc=0.7815  test_acc=0.8215  (6.4s)
+  Epoch  2/10  loss=0.3811  train_acc=0.8635  test_acc=0.8661  (5.9s)
+  Epoch  3/10  loss=0.3294  train_acc=0.8814  test_acc=0.8745  (6.4s)
+  Epoch  4/10  loss=0.3012  train_acc=0.8915  test_acc=0.8845  (6.6s)
+  Epoch  5/10  loss=0.2786  train_acc=0.8997  test_acc=0.8908  (6.5s)
+  Epoch  6/10  loss=0.2580  train_acc=0.9059  test_acc=0.8953  (6.8s)
+  Epoch  7/10  loss=0.2447  train_acc=0.9109  test_acc=0.8935  (7.6s)
+  Epoch  8/10  loss=0.2313  train_acc=0.9158  test_acc=0.9000  (6.4s)
+  Epoch  9/10  loss=0.2202  train_acc=0.9185  test_acc=0.9001  (7.0s)
+  Epoch 10/10  loss=0.2087  train_acc=0.9234  test_acc=0.9049  (6.3s)
+
+Baseline  acc=0.9049
+  [Baseline] Parámetros: 206,922  |  MACs: 1,218,048  |  Tamaño: 808.3 KB
+
+============================================================
+PASO 2 — Tucker-2 Decomposition para distintos rangos
+  Rank ratio = fracción de canales conservados (R/C)
+============================================================
+
+   Ratio |  R_out   R_in |  Acc PTQ |   Acc FT |         MACs |  Reducción |  Diff logits
+  -------------------------------------------------------------------------------------
+    0.25 |      4      1 |   0.5701 |   0.8918 |      400,336 |      67.1% |     7.24e+00
+    0.50 |      8      1 |   0.8924 |   0.9077 |      710,800 |      41.6% |     4.15e+00
+    0.75 |      9      1 |   0.8977 |   0.9063 |    1,075,360 |      11.7% |     9.33e-01
+
+[INFO] Gráfico guardado en 'outputs/tucker_resultados.png'
+[INFO] Resultados guardados en 'outputs/tucker_resultados.json'
+
+[CONCLUSIÓN]
+  Tucker-2 descompone W^(C_out×C_in×kH×kW) en tres Conv2d:
+    (C_in→R_in, 1×1) → (R_in→R_out, kH×kW) → (R_out→C_out, 1×1)
+  Relación con script01.py:
+    - SVD Dense: descompone matrices 2D
+    - Tucker-2:  extiende SVD a tensores 4D preservando la estructura espacial
+    - Depthwise: caso extremo de Tucker con R_in=C_in, R_out=1
+  Con ratio=0.5: 41.6% menos MACs con fine-tuning de 3 epochs.

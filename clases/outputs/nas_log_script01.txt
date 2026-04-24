@@ -1,0 +1,70 @@
+[INFO] Usando dispositivo: cpu
+
+⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ 
+ENFOQUE INGENUO: este script evalúa cada arquitectura por separado.
+Con 10 candidatos × 5 epochs, ya es costoso.
+En un espacio real (miles de arqs.) esto es inviable → ver script02.py (DARTS).
+⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ 
+
+Espacio de búsqueda: 10 candidatos × 5 epochs cada uno
+=================================================================
+
+[1/10] c1=4 c2=8 d=32
+  acc=0.8440  params=5,370  MACs=113,216  21.0 KB
+
+[2/10] c1=4 c2=8 d=64
+  acc=0.8379  params=9,818  MACs=117,632  38.4 KB
+
+[3/10] c1=4 c2=16 d=32
+  acc=0.8467  params=10,274  MACs=168,512  40.1 KB
+
+[4/10] c1=8 c2=8 d=32
+  acc=0.8423  params=6,274  MACs=222,016  24.5 KB
+
+[5/10] c1=8 c2=16 d=64
+  acc=0.8694  params=20,522  MACs=337,024  80.2 KB
+
+[6/10] c1=8 c2=32 d=64
+  acc=0.8738  params=40,122  MACs=558,208  156.7 KB
+
+[7/10] c1=8 c2=16 d=128
+  acc=0.8714  params=37,610  MACs=354,048  146.9 KB
+
+[8/10] c1=16 c2=16 d=64
+  acc=0.8710  params=23,930  MACs=657,024  93.5 KB
+
+[9/10] c1=16 c2=32 d=64
+  acc=0.8741  params=46,730  MACs=1,083,008  182.5 KB
+
+[10/10] c1=16 c2=32 d=128
+  acc=0.8838  params=80,202  MACs=1,116,416  313.3 KB
+
+=================================================================
+TABLA (ordenada por MACs)
+Config                                  Acc       MACs      KB  Pareto
+-----------------------------------------------------------------
+c1=4 c2=8 d=32                       0.8440    113,216    21.0  ★
+c1=4 c2=8 d=64                       0.8379    117,632    38.4
+c1=4 c2=16 d=32                      0.8467    168,512    40.1  ★
+c1=8 c2=8 d=32                       0.8423    222,016    24.5
+c1=8 c2=16 d=64                      0.8694    337,024    80.2  ★
+c1=8 c2=16 d=128                     0.8714    354,048   146.9  ★
+c1=8 c2=32 d=64                      0.8738    558,208   156.7  ★
+c1=16 c2=16 d=64                     0.8710    657,024    93.5
+c1=16 c2=32 d=64                     0.8741  1,083,008   182.5  ★
+c1=16 c2=32 d=128                    0.8838  1,116,416   313.3  ★
+
+★ Pareto-óptimos: 7 candidatos
+  Budget winner (MACs ≤ 0.35M):  c1=8 c2=16 d=64  acc=0.8694
+  Accuracy winner:  c1=16 c2=32 d=128  acc=0.8838
+
+[INFO] Gráfico guardado en 'outputs/nas_pareto.png'
+[INFO] Resultados guardados en 'outputs/nas_resultados.json'
+
+[CONCLUSIÓN — POR QUÉ ESTE ENFOQUE NO ESCALA]
+  Evaluamos 10 arquitecturas en ~50 epochs totales.
+  El frente de Pareto tiene 7 candidatos óptimos.
+  Con conv1∈{4,8,16}, conv2∈{8,16,32}, dense∈{32,64,128} hay 3³=27 combinaciones.
+  En NAS real: espacio de búsqueda con >10^18 combinaciones.
+  → DARTS (script02.py) resuelve esto en O(1) pases con búsqueda diferenciable.
+  → OFA / Weight sharing: un único supernet en lugar de 10 entrenamientos.

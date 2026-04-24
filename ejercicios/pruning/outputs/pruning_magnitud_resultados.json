@@ -1,0 +1,58 @@
+{
+    "baseline": {
+        "acc": 0.8824,
+        "params": 44426,
+        "macs": 281640,
+        "size_kb": 173.54,
+        "sparsity": 0.0
+    },
+    "magnitude_10pct": {
+        "sparsity": 0.1,
+        "acc_before_ft": 0.6441,
+        "acc_after_ft": 0.8792,
+        "params": 39908,
+        "macs": 221800
+    },
+    "magnitude_20pct": {
+        "sparsity": 0.2,
+        "acc_before_ft": 0.558,
+        "acc_after_ft": 0.8731,
+        "params": 35490,
+        "macs": 168360
+    },
+    "magnitude_30pct": {
+        "sparsity": 0.3,
+        "acc_before_ft": 0.567,
+        "acc_after_ft": 0.87,
+        "params": 33469,
+        "macs": 160040
+    },
+    "magnitude_40pct": {
+        "sparsity": 0.4,
+        "acc_before_ft": 0.4293,
+        "acc_after_ft": 0.8528,
+        "params": 29176,
+        "macs": 114600
+    },
+    "magnitude_50pct": {
+        "sparsity": 0.5,
+        "acc_before_ft": 0.4248,
+        "acc_after_ft": 0.852,
+        "params": 27180,
+        "macs": 107880
+    },
+    "magnitude_60pct": {
+        "sparsity": 0.6,
+        "acc_before_ft": 0.3744,
+        "acc_after_ft": 0.8348,
+        "params": 23012,
+        "macs": 70440
+    },
+    "magnitude_70pct": {
+        "sparsity": 0.7,
+        "acc_before_ft": 0.176,
+        "acc_after_ft": 0.7744,
+        "params": 18944,
+        "macs": 39400
+    }
+}

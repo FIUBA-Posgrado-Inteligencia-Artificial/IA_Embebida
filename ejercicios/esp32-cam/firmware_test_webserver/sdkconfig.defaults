@@ -1,0 +1,19 @@
+# Target: ESP32 classic @ 240 MHz, 80 MHz QIO flash, 1 kHz FreeRTOS tick.
+# Values taken verbatim from
+# espressif/esp32-camera/examples/camera_example/sdkconfig.defaults
+# with S2/S3-specific lines removed (we target ESP32 classic only).
+CONFIG_ESP32_DEFAULT_CPU_FREQ_240=y
+CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y
+CONFIG_PARTITION_TABLE_OFFSET=0x10000
+CONFIG_FREERTOS_HZ=1000
+CONFIG_ESPTOOLPY_FLASHFREQ_80M=y
+CONFIG_ESPTOOLPY_FLASHMODE_QIO=y
+
+# PSRAM: required for VGA JPEG frame buffers.
+CONFIG_SPIRAM=y
+CONFIG_ESP32_SPIRAM_SUPPORT=y
+CONFIG_SPIRAM_SPEED_80M=y
+
+# Custom partitions: bumps factory from 1500K (singleapp_large) to 3M.
+CONFIG_PARTITION_TABLE_CUSTOM=y
+CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions.csv"

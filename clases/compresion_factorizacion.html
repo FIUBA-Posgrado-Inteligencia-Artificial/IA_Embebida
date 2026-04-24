@@ -1,0 +1,209 @@
+<!-- 8. Factorización -->
+<section>
+    <section>
+        <h2 class="gradient-text">8. Factorización</h2>
+        <p>Comprimiendo tensores sin perder su esencia matemática</p>
+    </section>
+
+    <!-- 1. Concepto Central -->
+    <section>
+        <h3>El Concepto: Rango (Rank) y Redundancia</h3>
+        <div style="font-size: 0.75em; text-align: left;">
+            <p>Las redes neuronales tienen gigantescas matrices de pesos, pero suelen ser de <strong>rango bajo (low-rank)</strong>. Gran parte de la información es redundante o linealmente dependiente.</p>
+            <div style="background: rgba(255,255,255,0.1); padding: 0.8rem; border-radius: 0.5rem; text-align: center; margin: 0.8rem 0; font-size: 1.1em;">
+                <code>W ≈ U × V</code>
+            </div>
+            <p>Se aproxima la gran matriz <strong>W (m × n)</strong> multiplicando dos más chicas: <strong>U (m × r)</strong> y <strong>V (r × n)</strong>, donde el rango <em>r ≪ m, n</em>.</p>
+            <p style="margin-top: 1rem;"><strong style="color: #50fa7b;">El gran ahorro:</strong></p>
+            <ul style="margin-top: 0.5rem; padding-left: 1.2rem;">
+                <li style="margin-bottom: 0.3rem;">En vez de calcular <em>m · n</em> parámetros, procesamos <em>r · (m + n)</em>.</li>
+                <li>Si m=1000, n=1000 y r=10: Pasamos de <strong>1.000.000</strong> a solo <strong>20.000</strong> parámetros.</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- 2. Técnicas Clásicas -->
+    <section>
+        <h3>Técnicas Clásicas en la Realidad</h3>
+        <div style="display: flex; gap: 1.5rem; margin-top: 1rem; font-size: 0.7em; text-align: left;">
+            <div style="flex: 1; background: rgba(189,147,249,0.1); padding: 0.8rem; border-radius: 0.5rem;">
+                <h4 style="color: #bd93f9; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.1em;">A. SVD Truncado</h4>
+                <p>Descompone la matriz en tres (<code>W = U Σ V<sup>T</sup></code>) y desecha los valores singulares más pequeños en la diagonal de <em>Σ</em>.</p>
+                <p style="margin-top: 0.8rem;"><strong style="color: #bd93f9;">Uso Real:</strong> Compresión de enormes capas de <em>Embeddings</em> en NLP y recomendadores (vocabulario gigante y ralo).</p>
+            </div>
+            <div style="flex: 1; background: rgba(80,250,123,0.1); padding: 0.8rem; border-radius: 0.5rem;">
+                <h4 style="color: #50fa7b; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.1em;">B. Descomposición Espacial</h4>
+                <p>Factorización de Tensores. Matemáticamente complejo (Tucker/CP), pero en la práctica significa <strong>separar convoluciones</strong>.</p>
+                <p style="margin-top: 0.8rem;"><strong style="color: #50fa7b;">Uso Real:</strong> Reemplazar Conv 3x3 por 3x1 seguida de 1x3 (Edge). Reduce drásticamente FLOPs manteniendo el campo receptor.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. LoRA -->
+    <section>
+        <h3>Estado del Arte en Cloud: LoRA</h3>
+        <div style="font-size: 0.7em; text-align: left;">
+            <p><strong>LoRA (Low-Rank Adaptation):</strong> La técnica que salvaguardó la revolución de los LLMs democratizando el Fine-Tuning.</p>
+            <div style="margin-top: 1rem;">
+                <p style="color: #ff5555; margin-bottom: 0.3rem;"><strong>El Problema:</strong></p>
+                <p>Actualizar un modelo masivo genera gastos inasumibles de memoria VRAM (costo por cálculos sobre miles de millones).</p>
+                
+                <p style="color: #50fa7b; margin-top: 1rem; margin-bottom: 0.3rem;"><strong>La Solución Factorizada:</strong></p>
+                <ol style="margin-top: 0.5rem; line-height: 1.4;">
+                    <li style="margin-bottom: 0.4rem;">Congela la matriz original <code>W<sub>0</sub></code>.</li>
+                    <li style="margin-bottom: 0.4rem;">Asume que la <em>actualización</em> de pesos (<code>ΔW</code>) tiene rango muy bajo.</li>
+                    <li>Inyecta y entrena solo dos matrices muy diminutas (A y B): <code>W<sub>nueva</sub> = W<sub>0</sub> + (A × B)</code>.</li>
+                </ol>
+                <p style="margin-top: 1rem;"><strong style="color: #bd93f9;">Impacto Real:</strong> De actualizar Gigabytes a solo Megabytes. Permite personalizar LLMs en GPUs hogareñas convencionales.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. Factorización Binaria -->
+    <section>
+        <h3>Extremo del Edge: Factorización Binaria</h3>
+        <div style="font-size: 0.7em; text-align: left;">
+            <p>Para MCU con minúsculas baterías o cosecha de energía (Harvesting), la factorización de rango clásico sigue siendo limitante.</p>
+            <div style="margin-top: 1rem;">
+                <p style="color: #ffb86c; margin-bottom: 0.3rem;"><strong>El Concepto:</strong></p>
+                <p>Aproximar <code>W</code> por matrices de valores únicamente <strong>+1 o -1</strong>, compensados por un escalar: <code>W ≈ α · B</code>.</p>
+                
+                <p style="color: #50fa7b; margin-top: 1rem; margin-bottom: 0.3rem;"><strong>El Milagro en Hardware:</strong></p>
+                <ul style="margin-top: 0.5rem; line-height: 1.4; padding-left: 1.2rem;">
+                    <li style="margin-bottom: 0.4rem;">Poniendo entradas y pesos en {-1,+1}, se eluden las onerosas operaciones de multiplicación y suma fraccional reales (MAC).</li>
+                    <li style="margin-bottom: 0.4rem;">Los cálculos se ejecutan usando compuertas <strong>XNOR</strong> bit a bit, junto a un veloz <strong>Popcount</strong> (conteo de de '1's).</li>
+                    <li><strong style="color: #8be9fd;">Uso Real:</strong> Micro-sensores IoT ("Oye Siri", vibración) a costa de ínfimos microvatios (µW).</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. Ejemplo en código: script01.py -->
+    <section>
+        <h3>Ejemplo en Código: SVD + Conv. Separable</h3>
+        <div style="font-size: 0.72em; text-align: left;">
+            <p style="margin-bottom: 0.8rem;">El script <code>examples/factorization/script01.py</code> demuestra los dos tipos de factorización clásica sobre Fashion MNIST:</p>
+            <div style="display: flex; gap: 1rem; margin-bottom: 0.8rem;">
+                <div style="flex: 1; background: rgba(189,147,249,0.1); padding: 0.7rem; border-radius: 0.5rem;">
+                    <p style="color: #bd93f9; margin: 0 0 0.3rem;"><strong>Parte A — SVD en MLP</strong></p>
+                    <ul style="padding-left: 1rem; line-height: 1.4;">
+                        <li>Entrena MLP baseline</li>
+                        <li>Factoriza cada Linear con SVD truncado a rango r ∈ {4, 8, 16, 32}</li>
+                        <li>Mide accuracy antes y después de fine-tuning</li>
+                        <li>Visualiza el espectro de valores singulares</li>
+                    </ul>
+                </div>
+                <div style="flex: 1; background: rgba(80,250,123,0.1); padding: 0.7rem; border-radius: 0.5rem;">
+                    <p style="color: #50fa7b; margin: 0 0 0.3rem;"><strong>Parte B — Conv. Separable en CNN</strong></p>
+                    <ul style="padding-left: 1rem; line-height: 1.4;">
+                        <li>CNN estándar: Conv2d(k, 5×5)</li>
+                        <li>CNN separable: DepthwiseConv(5×5) + PointwiseConv(1×1)</li>
+                        <li>Compara MACs y accuracy</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5.1. Output de script01.py -->
+    <section>
+        <h3>Ejemplo en Código: SVD + Conv. Separable</h3>
+        <h4>Output de script01.py</h4>
+        <div style="font-size: 0.72em; text-align: left; width: 100%;">
+            <pre style="margin: 0; box-shadow: none; background: rgba(0,0,0,0.2);"><code id="log-fact-script01" style="font-family: monospace; font-size: 0.85em; max-height: 500px; overflow-y: auto; padding: 1rem; border-radius: 0.5rem; color: #f8f8f2;">Cargando...</code></pre>
+            <div style="display:none">
+                <img src="load-trigger-fact1" onerror="
+                    fetch('outputs/factorization_log_script01.txt')
+                    .then(r => r.ok ? r.text() : Promise.reject(r.status))
+                    .then(t => document.getElementById('log-fact-script01').textContent = t)
+                    .catch(e => document.getElementById('log-fact-script01').textContent = 'Error al cargar: ' + e);
+                ">
+            </div>
+        </div>
+    </section>
+
+    <!-- 5.2. Resultados -->
+    <section>
+        <h3>Ejemplo en Código: SVD + Conv. Separable</h3>
+        <h4>Resultados</h4>
+        <div style="display: flex; justify-content: center; align-items: center; margin-top: 1rem;">
+            <img src="outputs/factorization_resultados.png" alt="Factorization Results"
+                style="max-height: 480px; border-radius: 0.5rem;" onerror="this.style.display='none';">
+        </div>
+    </section>
+
+    <!-- 6. Ejemplo avanzado: script02.py — Tucker-2 -->
+    <section>
+        <h3>Avanzado: Tucker-2 Decomposition en Conv2d</h3>
+        <div style="font-size: 0.72em; text-align: left;">
+            <p style="margin-bottom: 0.6rem;">El script <code>examples/factorization/script02.py</code> extiende SVD a tensores 4D usando <strong>HOSVD</strong> (Higher-Order SVD):</p>
+            <!-- Fórmula -->
+            <div style="background: rgba(255,255,255,0.08); padding: 0.6rem 1rem; border-radius: 0.5rem; text-align: center; font-size: 1.05em; margin-bottom: 0.8rem;">
+                <code>W<sup>(C<sub>out</sub>×C<sub>in</sub>×kH×kW)</sup> ≈ G ×₁ U<sub>out</sub> ×₂ U<sub>in</sub></code>
+            </div>
+            <!-- Diagrama de las 3 capas -->
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.8rem; font-size: 0.9em;">
+                <div style="background: rgba(80,250,123,0.15); border: 1px solid #50fa7b; padding: 0.4rem 0.6rem; border-radius: 0.4rem; text-align: center; min-width: 5.5rem;">
+                    <div style="color: #50fa7b; font-weight: bold;">Conv 1×1</div>
+                    <div style="font-size: 0.85em; color: #ccc;">C<sub>in</sub> → R<sub>in</sub></div>
+                    <div style="font-size: 0.75em; color: #aaa;">U<sub>in</sub><sup>T</sup></div>
+                </div>
+                <div style="color: #aaa; font-size: 1.4em;">→</div>
+                <div style="background: rgba(189,147,249,0.15); border: 1px solid #bd93f9; padding: 0.4rem 0.6rem; border-radius: 0.4rem; text-align: center; min-width: 5.5rem;">
+                    <div style="color: #bd93f9; font-weight: bold;">Conv kH×kW</div>
+                    <div style="font-size: 0.85em; color: #ccc;">R<sub>in</sub> → R<sub>out</sub></div>
+                    <div style="font-size: 0.75em; color: #aaa;">núcleo G</div>
+                </div>
+                <div style="color: #aaa; font-size: 1.4em;">→</div>
+                <div style="background: rgba(255,184,108,0.15); border: 1px solid #ffb86c; padding: 0.4rem 0.6rem; border-radius: 0.4rem; text-align: center; min-width: 5.5rem;">
+                    <div style="color: #ffb86c; font-weight: bold;">Conv 1×1</div>
+                    <div style="font-size: 0.85em; color: #ccc;">R<sub>out</sub> → C<sub>out</sub></div>
+                    <div style="font-size: 0.75em; color: #aaa;">U<sub>out</sub></div>
+                </div>
+                <div style="flex: 1; padding-left: 0.8rem; color: #ccc; font-size: 0.85em;">
+                    <p style="margin: 0 0 0.3rem;"><strong style="color: #8be9fd;">Rank ratio</strong> controla el tradeoff:</p>
+                    <p style="margin: 0;">ratio=0.5 → R = C/2<br>→ ~50% menos MACs</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6.1. Output de script02.py -->
+    <section>
+        <h3>Avanzado: Tucker-2 Decomposition en Conv2d</h3>
+        <h4>Output de script02.py</h4>
+        <div style="font-size: 0.72em; text-align: left; width: 100%;">
+            <pre style="margin: 0; box-shadow: none; background: rgba(0,0,0,0.2);"><code id="log-fact-script02" style="font-family: monospace; font-size: 0.85em; max-height: 500px; overflow-y: auto; padding: 1rem; border-radius: 0.5rem; color: #f8f8f2;">Cargando...</code></pre>
+            <div style="display:none">
+                <img src="load-trigger-fact2" onerror="
+                    fetch('outputs/factorization_log_script02.txt')
+                    .then(r => r.ok ? r.text() : Promise.reject(r.status))
+                    .then(t => document.getElementById('log-fact-script02').textContent = t)
+                    .catch(e => document.getElementById('log-fact-script02').textContent = 'Error al cargar: ' + e);
+                ">
+            </div>
+        </div>
+    </section>
+
+    <!-- 6.2. Resultados -->
+    <section>
+        <h3>Avanzado: Tucker-2 Decomposition en Conv2d</h3>
+        <h4>Resultados</h4>
+        <div style="display: flex; justify-content: center; align-items: center; margin-top: 1rem;">
+            <img src="outputs/factorization_tucker_resultados.png" alt="Tucker-2 Results"
+                style="max-height: 550px; border-radius: 0.5rem;" onerror="this.style.display='none';">
+        </div>
+    </section>
+
+    <!-- 7. Resumen -->
+    <section>
+        <h3>Resumen (Cloud vs. Edge)</h3>
+        <div style="font-size: 0.75em; text-align: left;">
+            <ul style="line-height: 1.5;">
+                <li style="margin-bottom: 0.8rem;"><strong style="color: #bd93f9;">En el Cloud:</strong> La factorización arrasa para entrenar/adaptar masivamente bajo costo (<strong>LoRA</strong>) o aliviar formidables Embeddings (<strong>SVD</strong>).</li>
+                <li style="margin-bottom: 0.8rem;"><strong style="color: #8be9fd;">En el Edge Móvil:</strong> La factorización espacial/de tensores (Conv separables, como 3x1 + 1x3) se ha consagrado como el cimiento de arquitecturas de tiempo real eficientes.</li>
+                <li style="margin-bottom: 0.8rem;"><strong style="color: #50fa7b;">En el Edge Extremo (IoT):</strong> La <strong>Factorización Binaria</strong> reforma por completo las imposiciones matemáticas previas, abaratando transistores en una lógica llana y ultrarrápida.</li>
+            </ul>
+        </div>
+    </section>
+</section>

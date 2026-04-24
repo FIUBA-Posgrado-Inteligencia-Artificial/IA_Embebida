@@ -1,0 +1,35 @@
+[project]
+name = "ia-embebida-esp32cam"
+version = "0.1.0"
+description = "CEIA IA Embebida - ESP32-CAM compression pipeline"
+requires-python = ">=3.10,<3.12"
+dependencies = [
+    "torch>=2.0.0",
+    "torchvision>=0.15.0",
+    "numpy>=1.24.0",
+    "matplotlib>=3.7.0",
+    "tqdm>=4.65.0",
+    "torchao>=0.17.0",
+    "brevitas>=0.12.1",
+    "onnx>=1.14.0",
+    "onnxscript>=0.7.0",
+    "onnxoptimizer>=0.4.2",
+    "pyyaml>=6.0",
+    "pyserial>=3.5",
+    "esp-ppq @ git+https://github.com/espressif/esp-ppq.git",
+]
+
+[dependency-groups]
+dev = ["pytest>=7.4.0"]
+
+[tool.uv]
+managed = true
+override-dependencies = [
+    "onnx>=1.14.0",
+    "setuptools>=0.0",
+]
+
+[tool.pytest.ini_options]
+markers = [
+    "slow: smoke tests de cuantización que entrenan un paso (lento — deselect con -m 'not slow')",
+]

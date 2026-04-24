@@ -1,0 +1,133 @@
+{
+  "models": [
+    {
+      "name": "depthwise_rgb32",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-cam/models/depthwise_rgb32.pth",
+      "stage": "baseline",
+      "size_bytes": 73775,
+      "modified": "2026-04-23T20:09:54",
+      "notes": ""
+    },
+    {
+      "name": "depthwise_rgb32_pruned_activation_20",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-cam/models/depthwise_rgb32_pruned_activation_20.pth",
+      "stage": "pruned",
+      "size_bytes": 55241,
+      "modified": "2026-04-23T20:20:27",
+      "notes": ""
+    },
+    {
+      "name": "depthwise_rgb32_pruned_activation_50",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-cam/models/depthwise_rgb32_pruned_activation_50.pth",
+      "stage": "pruned",
+      "size_bytes": 34953,
+      "modified": "2026-04-23T20:21:07",
+      "notes": ""
+    },
+    {
+      "name": "depthwise_rgb32_pruned_activation_50_quantized_ptq.espdl",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-cam/models/depthwise_rgb32_pruned_activation_50_quantized_ptq.espdl",
+      "stage": "espdl",
+      "size_bytes": 15056,
+      "modified": "2026-04-23T20:28:08",
+      "notes": ""
+    },
+    {
+      "name": "depthwise_rgb32_pruned_activation_80",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-cam/models/depthwise_rgb32_pruned_activation_80.pth",
+      "stage": "pruned",
+      "size_bytes": 21513,
+      "modified": "2026-04-23T20:44:03",
+      "notes": ""
+    },
+    {
+      "name": "depthwise_rgb32_pruned_weight_50",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-cam/models/depthwise_rgb32_pruned_weight_50.pth",
+      "stage": "pruned",
+      "size_bytes": 34753,
+      "modified": "2026-04-23T20:22:12",
+      "notes": ""
+    },
+    {
+      "name": "depthwise_rgb32_pruned_weight_80",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-cam/models/depthwise_rgb32_pruned_weight_80.pth",
+      "stage": "pruned",
+      "size_bytes": 20993,
+      "modified": "2026-04-23T20:44:42",
+      "notes": ""
+    },
+    {
+      "name": "depthwise_rgb96",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-cam/models/depthwise_rgb96.pth",
+      "stage": "baseline",
+      "size_bytes": 73775,
+      "modified": "2026-04-23T20:08:19",
+      "notes": ""
+    },
+    {
+      "name": "standard_gray32",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-cam/models/standard_gray32.pth",
+      "stage": "baseline",
+      "size_bytes": 389894,
+      "modified": "2026-04-23T20:06:25",
+      "notes": ""
+    },
+    {
+      "name": "standard_rgb32",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-cam/models/standard_rgb32.pth",
+      "stage": "baseline",
+      "size_bytes": 392169,
+      "modified": "2026-04-23T20:05:05",
+      "notes": ""
+    },
+    {
+      "name": "standard_rgb96",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-cam/models/standard_rgb96.pth",
+      "stage": "baseline",
+      "size_bytes": 392169,
+      "modified": "2026-04-23T19:58:25",
+      "notes": ""
+    },
+    {
+      "name": "standard_rgb96_pruned_activation_20",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-cam/models/standard_rgb96_pruned_activation_20.pth",
+      "stage": "pruned",
+      "size_bytes": 252746,
+      "modified": "2026-04-23T20:25:07",
+      "notes": ""
+    },
+    {
+      "name": "standard_rgb96_pruned_activation_20_quantized_ptq.espdl",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-cam/models/standard_rgb96_pruned_activation_20_quantized_ptq.espdl",
+      "stage": "espdl",
+      "size_bytes": 68416,
+      "modified": "2026-04-23T20:27:54",
+      "notes": ""
+    },
+    {
+      "name": "standard_rgb96_pruned_activation_50",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-cam/models/standard_rgb96_pruned_activation_50.pth",
+      "stage": "pruned",
+      "size_bytes": 108298,
+      "modified": "2026-04-23T20:25:53",
+      "notes": ""
+    },
+    {
+      "name": "standard_rgb96_pruned_weight_50",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-cam/models/standard_rgb96_pruned_weight_50.pth",
+      "stage": "pruned",
+      "size_bytes": 108182,
+      "modified": "2026-04-23T20:26:39",
+      "notes": ""
+    },
+    {
+      "name": "standard_rgb96_quantized_ptq.espdl",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-cam/models/standard_rgb96_quantized_ptq.espdl",
+      "stage": "espdl",
+      "size_bytes": 102864,
+      "modified": "2026-04-23T20:45:07",
+      "notes": ""
+    }
+  ],
+  "updated_at": "2026-04-23T21:20:25"
+}

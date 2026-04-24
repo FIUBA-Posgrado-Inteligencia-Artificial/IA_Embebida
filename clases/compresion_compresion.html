@@ -1,0 +1,156 @@
+<!-- 5. Compresión -->
+<section>
+    <section>
+        <h2 class="gradient-text">5. Compresión</h2>
+        <p>Optimizando redes neuronales para entornos restringidos</p>
+    </section>
+    
+    <section>
+        <h3>El problema central</h3>
+        <div style="font-size: 0.75em; text-align: left;">
+            <p>Para implementar modelos de Deep Learning en entornos con capacidades limitadas debemos encontrar un equilibrio entre la <strong>precisión</strong> y la <strong>eficiencia</strong>.</p>
+            <!-- Diagrama CSS: modelo grande vs. modelo comprimido -->
+            <div style="display: flex; align-items: center; gap: 0.8rem; margin: 0.8rem 0; font-size: 0.9em;">
+                <div style="flex: 1; text-align: center;">
+                    <!-- Modelo grande (pila de bloques) -->
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 2px; margin: 0 auto; width: 80px;">
+                        <div style="width: 80px; height: 14px; background: rgba(80,250,123,0.6); border-radius: 2px;"></div>
+                        <div style="width: 80px; height: 14px; background: rgba(80,250,123,0.5); border-radius: 2px;"></div>
+                        <div style="width: 80px; height: 14px; background: rgba(80,250,123,0.4); border-radius: 2px;"></div>
+                        <div style="width: 80px; height: 14px; background: rgba(80,250,123,0.3); border-radius: 2px;"></div>
+                        <div style="width: 80px; height: 14px; background: rgba(80,250,123,0.2); border-radius: 2px;"></div>
+                    </div>
+                    <p style="margin: 0.3rem 0 0; color: #50fa7b;">Modelo original<br><small>alta precisión<br>alto costo</small></p>
+                </div>
+                <div style="font-size: 1.8em; color: #ffb86c;">⟹</div>
+                <div style="flex: 0.4; text-align: center; background: rgba(255,184,108,0.15); border: 1px dashed #ffb86c; border-radius: 0.5rem; padding: 0.5rem;">
+                    <div style="font-size: 1.4em; color: #ffb86c;">⚙</div>
+                    <small style="color: #ffb86c;">compresión</small>
+                </div>
+                <div style="font-size: 1.8em; color: #ffb86c;">⟹</div>
+                <div style="flex: 1; text-align: center;">
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 2px; margin: 0 auto; width: 50px;">
+                        <div style="width: 50px; height: 12px; background: rgba(139,233,253,0.6); border-radius: 2px;"></div>
+                        <div style="width: 50px; height: 12px; background: rgba(139,233,253,0.4); border-radius: 2px;"></div>
+                        <div style="width: 50px; height: 12px; background: rgba(139,233,253,0.2); border-radius: 2px;"></div>
+                    </div>
+                    <p style="margin: 0.3rem 0 0; color: #8be9fd;">Modelo comprimido<br><small>precisión aceptable<br>bajo costo</small></p>
+                </div>
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <div style="flex: 1; background: rgba(255,255,255,0.05); padding: 0.7rem; border-radius: 0.5rem; border-top: 3px solid #8be9fd;">
+                    <strong style="color: #8be9fd;">Requerimientos de la aplicación</strong>
+                    <ul style="margin-top: 0.4rem; font-size: 0.9em; padding-left: 1.2em;">
+                        <li>Rendimiento · Latencia</li>
+                        <li>Energía y potencia · Costos</li>
+                    </ul>
+                </div>
+                <div style="flex: 1; background: rgba(255,255,255,0.05); padding: 0.7rem; border-radius: 0.5rem; border-top: 3px solid #ff79c6;">
+                    <strong style="color: #ff79c6;">Limitaciones de la plataforma</strong>
+                    <ul style="margin-top: 0.4rem; font-size: 0.9em; padding-left: 1.2em;">
+                        <li>Cómputo · Memoria</li>
+                        <li>Ancho de banda</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h3>Requerimientos de la aplicación</h3>
+        <div style="font-size: 0.65em; text-align: left;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div style="background: rgba(80,250,123,0.1); padding: 15px; border-radius: 8px;">
+                    <strong style="color: #50fa7b;">Rendimiento (Throughput)</strong>
+                    <p style="margin: 5px 0 0;">Cantidad de datos procesados en un tiempo determinado (e.g. video a altos cuadros por segundo).</p>
+                </div>
+                <div style="background: rgba(255,184,108,0.1); padding: 15px; border-radius: 8px;">
+                    <strong style="color: #ffb86c;">Retardo (Latencia)</strong>
+                    <p style="margin: 5px 0 0;">Tiempo mínimo desde la entrada del dato hasta la obtención de la salida (vital en aplicaciones críticas como conducción autónoma).</p>
+                </div>
+                <div style="background: rgba(189,147,249,0.1); padding: 15px; border-radius: 8px;">
+                    <strong style="color: #bd93f9;">Costos</strong>
+                    <p style="margin: 5px 0 0;">Incluye tanto los costos computacionales (recursos necesarios) como los de implementación y mantenimiento general de la solución.</p>
+                </div>
+                <div style="background: rgba(255,121,198,0.1); padding: 15px; border-radius: 8px;">
+                    <strong style="color: #ff79c6;">Energía y Potencia</strong>
+                    <ul style="margin: 5px 0 0; padding-left: 1.2em;">
+                        <li><strong>Energía (Joules)</strong>: Consumo acumulado (batería, impacto ambiental). El modelo debe requerir baja energía por inferencia.</li>
+                        <li><strong>Potencia (Watts)</strong>: Tasa de consumo energético por unidad de tiempo. Límite físico en operación sostenida, acota cuánto cómputo podemos permitir por inferencia.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h3>Limitaciones de hardware</h3>
+        <div style="font-size: 0.7em; text-align: left; display: flex; gap: 1.5rem; align-items: flex-start;">
+            <div style="flex: 1;">
+                <ul style="line-height: 1.5;">
+                    <li style="margin-bottom: 0.8rem;"><strong style="color: #8be9fd;">Memoria:</strong> Restringe el tamaño del modelo y lotes de procesamiento.
+                        <ul style="font-size: 0.9em; margin-top:0.3rem;">
+                            <li><strong>Interna (on-chip):</strong> Alta velocidad, muy escasa, bajo costo energético.</li>
+                            <li><strong>Externa (off-chip):</strong> Abundante, pero lenta y energéticamente costosa.</li>
+                        </ul>
+                    </li>
+                    <li style="margin-bottom: 0.8rem;"><strong style="color: #50fa7b;">Ancho de banda:</strong> Cuello de botella principal (procesador ↔ memoria externa). Maximizar reutilización on-chip es clave.</li>
+                    <li><strong style="color: #ff79c6;">Capacidad de cómputo:</strong> Operaciones por segundo limitan las arquitecturas aplicables.</li>
+                </ul>
+            </div>
+            <!-- Pirámide CSS de jerarquía de memoria -->
+            <div style="flex: 0 0 auto; text-align: center; font-size: 0.85em;">
+                <div style="margin: 0 auto 2px; width: 60px; background: rgba(80,250,123,0.5); border-radius: 3px; padding: 4px 0;">
+                    <span style="font-size: 0.8em; color: #fff;">Registros<br>~KB</span>
+                </div>
+                <div style="margin: 0 auto 2px; width: 90px; background: rgba(80,250,123,0.35); border-radius: 3px; padding: 4px 0;">
+                    <span style="font-size: 0.8em; color: #fff;">L1/L2 Cache<br>~MB</span>
+                </div>
+                <div style="margin: 0 auto 2px; width: 120px; background: rgba(139,233,253,0.35); border-radius: 3px; padding: 4px 0;">
+                    <span style="font-size: 0.8em; color: #fff;">SRAM on-chip<br>~MB</span>
+                </div>
+                <div style="margin: 0 auto 2px; width: 150px; background: rgba(189,147,249,0.35); border-radius: 3px; padding: 4px 0;">
+                    <span style="font-size: 0.8em; color: #fff;">DRAM off-chip<br>~GB</span>
+                </div>
+                <div style="margin: 0 auto; width: 180px; background: rgba(255,85,85,0.35); border-radius: 3px; padding: 4px 0;">
+                    <span style="font-size: 0.8em; color: #fff;">Flash / Storage<br>~GB–TB</span>
+                </div>
+                <p style="margin-top: 0.4rem; color: #aaa; font-size: 0.8em;">↑ más rápido · menor capacidad</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h3>Métodos de compresión de redes</h3>
+        <div style="font-size: 0.65em; text-align: left;">
+            <p>Reducen la complejidad de un modelo con un objetivo claro: <span class="gradient-text">alta eficiencia durante la inferencia</span> sin sacrificar la precisión original del resultado.</p>
+            <!-- Pipeline visual: técnica → efecto -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 0.8rem;">
+                <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; border-left: 4px solid #8be9fd; display: flex; align-items: center; gap: 0.6rem;">
+                    <div style="font-size: 1.6em; line-height: 1;">🔢</div>
+                    <div><strong style="color: #8be9fd;">Cuantización</strong><br>FP32 → INT8/4: 4–8× menos memoria, aritmética entera más rápida</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; border-left: 4px solid #50fa7b; display: flex; align-items: center; gap: 0.6rem;">
+                    <div style="font-size: 1.6em; line-height: 1;">✂️</div>
+                    <div><strong style="color: #50fa7b;">Poda (Pruning)</strong><br>Elimina conexiones / filtros irrelevantes → menos MACs</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; border-left: 4px solid #ff79c6; display: flex; align-items: center; gap: 0.6rem;">
+                    <div style="font-size: 1.6em; line-height: 1;">🔀</div>
+                    <div><strong style="color: #ff79c6;">Factorización</strong><br>W ≈ U×V o Tucker: menos parámetros con estructura conservada</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; border-left: 4px solid #ffb86c; display: flex; align-items: center; gap: 0.6rem;">
+                    <div style="font-size: 1.6em; line-height: 1;">⚡</div>
+                    <div><strong style="color: #ffb86c;">Optimización algorítmica</strong><br>BN folding, Winograd, SIMD: misma red, menos operaciones reales</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; border-left: 4px solid #ffb86c; display: flex; align-items: center; gap: 0.6rem;">
+                    <div style="font-size: 1.6em; line-height: 1;">🔍</div>
+                    <div><strong style="color: #ffb86c;">NAS</strong><br>Diseño automático de arquitecturas óptimas para el hardware objetivo</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; border-left: 4px solid #f1fa8c; display: flex; align-items: center; gap: 0.6rem;">
+                    <div style="font-size: 1.6em; line-height: 1;">🎓</div>
+                    <div><strong style="color: #f1fa8c;">Destilación</strong><br>Alumno pequeño aprende del profesor grande → misma tarea, menos cómputo</div>
+                </div>
+            </div>
+        </div>
+    </section>
+</section>

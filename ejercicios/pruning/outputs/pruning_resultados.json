@@ -1,0 +1,30 @@
+{
+    "baseline": {
+        "acc": 0.8746,
+        "params": 44426,
+        "macs": 281640,
+        "size_kb": 173.54,
+        "sparsity": 0.0
+    },
+    "unstructured_50pct": {
+        "acc": 0.8848,
+        "params": 44426,
+        "macs": 281640,
+        "size_kb": 173.54,
+        "sparsity": 0.5
+    },
+    "unstructured_75pct": {
+        "acc": 0.8802,
+        "params": 44426,
+        "macs": 281640,
+        "size_kb": 173.54,
+        "sparsity": 0.75
+    },
+    "structured_50pct": {
+        "acc": 0.8507,
+        "params": 27180,
+        "macs": 107880,
+        "size_kb": 106.17,
+        "sparsity": "structured"
+    }
+}

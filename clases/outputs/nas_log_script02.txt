@@ -1,0 +1,12 @@
+[INFO] Usando dispositivo: cpu
+
+=================================================================
+FASE 1 — Búsqueda DARTS (W + α conjuntamente)
+=================================================================
+  Epoch  1/15 — train=0.7040  test=0.7542  [L1: conv5x5(0.27) | L2: conv5x5(0.27) | L3: conv5x5(0.26)]
+  Epoch  2/15 — train=0.8330  test=0.8106  [L1: conv5x5(0.28) | L2: conv5x5(0.28) | L3: conv5x5(0.27)]
+  Epoch  3/15 — train=0.8664  test=0.8455  [L1: conv5x5(0.29) | L2: conv5x5(0.29) | L3: conv5x5(0.28)]
+  Epoch  4/15 — train=0.8844  test=0.8297  [L1: conv5x5(0.30) | L2: conv5x5(0.30) | L3: conv5x5(0.29)]
+  Epoch  5/15 — train=0.8956  test=0.8089  [L1: conv5x5(0.31) | L2: conv5x5(0.31) | L3: conv5x5(0.30)]
+  Epoch  6/15 — train=0.9053  test=0.8093  [L1: conv5x5(0.31) | L2: conv5x5(0.32) | L3: conv5x5(0.31)]
+  Epoch  7/15 — train=0.9117  test=0.8640  [L1: conv5x5(0.32) | L2: conv5x5(0.33) | L3: conv5x5(0.32)]

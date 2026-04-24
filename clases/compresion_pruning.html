@@ -1,0 +1,519 @@
+<!-- 7. Pruning -->
+<section>
+    <section>
+        <h2 class="gradient-text">7. Pruning (Poda)</h2>
+        <p>Eliminando las conexiones redundantes de la red</p>
+    </section>
+
+    <!-- 1. ¿Qué es Pruning? -->
+    <section>
+        <h3>¿Qué es el Pruning?</h3>
+        <div style="display: flex; gap: 1.5rem; align-items: center; font-size: 0.72em; text-align: left;">
+            <div style="flex: 1.2;">
+                <p>Si NAS es encontrar los planos perfectos para construir una casa, <strong>Pruning</strong> es tomar
+                    una casa ya construida, y quitarle los muros no estructurales sin que se derrumbe.</p>
+                <p style="margin-top: 0.8rem;"><strong style="color: #8be9fd;">La máscara binaria</strong></p>
+                <p>Las redes modernas están <em>sobreparametrizadas</em>. Un peso cercano a cero tiene impacto mínimo.
+                </p>
+                <div
+                    style="background: rgba(255,255,255,0.1); padding: 0.6rem; border-radius: 0.5rem; text-align: center; margin: 0.6rem 0; font-size: 1.1em;">
+                    <code>W<sub>pruned</sub> = W ⊙ M</code>
+                </div>
+                <p>El desafío es <strong>qué forma tiene M</strong>: pesos individuales, canales, bloques…</p>
+            </div>
+            <!-- CSS diagram: weight matrix with mask -->
+            <div style="flex: 0.8; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+                <div style="font-size: 0.75em; color: #8be9fd; margin-bottom: 0.2rem;">Antes del pruning</div>
+                <div style="display: grid; grid-template-columns: repeat(4, 2rem); gap: 3px;">
+                    <div
+                        style="width:2rem;height:2rem;background:#4C72B0;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:0.6em;color:white;">
+                        0.8</div>
+                    <div
+                        style="width:2rem;height:2rem;background:#2a3a5c;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:0.6em;color:#aaa;">
+                        0.1</div>
+                    <div
+                        style="width:2rem;height:2rem;background:#4C72B0;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:0.6em;color:white;">
+                        0.6</div>
+                    <div
+                        style="width:2rem;height:2rem;background:#1a2030;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:0.6em;color:#555;">
+                        0.0</div>
+                    <div
+                        style="width:2rem;height:2rem;background:#1a2030;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:0.6em;color:#555;">
+                        0.0</div>
+                    <div
+                        style="width:2rem;height:2rem;background:#55A868;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:0.6em;color:white;">
+                        0.9</div>
+                    <div
+                        style="width:2rem;height:2rem;background:#2a3a5c;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:0.6em;color:#aaa;">
+                        0.1</div>
+                    <div
+                        style="width:2rem;height:2rem;background:#4C72B0;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:0.6em;color:white;">
+                        0.7</div>
+                </div>
+                <div style="font-size: 1.2em; color: #50fa7b; margin: 0.2rem 0;">⊙</div>
+                <div style="font-size: 0.75em; color: #ff79c6; margin-bottom: 0.2rem;">Máscara M</div>
+                <div style="display: grid; grid-template-columns: repeat(4, 2rem); gap: 3px;">
+                    <div
+                        style="width:2rem;height:2rem;background:rgba(80,250,123,0.3);border-radius:3px;border:1px solid #50fa7b;display:flex;align-items:center;justify-content:center;font-size:0.7em;color:#50fa7b;">
+                        1</div>
+                    <div
+                        style="width:2rem;height:2rem;background:rgba(255,85,85,0.2);border-radius:3px;border:1px solid #ff5555;display:flex;align-items:center;justify-content:center;font-size:0.7em;color:#ff5555;">
+                        0</div>
+                    <div
+                        style="width:2rem;height:2rem;background:rgba(80,250,123,0.3);border-radius:3px;border:1px solid #50fa7b;display:flex;align-items:center;justify-content:center;font-size:0.7em;color:#50fa7b;">
+                        1</div>
+                    <div
+                        style="width:2rem;height:2rem;background:rgba(255,85,85,0.2);border-radius:3px;border:1px solid #ff5555;display:flex;align-items:center;justify-content:center;font-size:0.7em;color:#ff5555;">
+                        0</div>
+                    <div
+                        style="width:2rem;height:2rem;background:rgba(255,85,85,0.2);border-radius:3px;border:1px solid #ff5555;display:flex;align-items:center;justify-content:center;font-size:0.7em;color:#ff5555;">
+                        0</div>
+                    <div
+                        style="width:2rem;height:2rem;background:rgba(80,250,123,0.3);border-radius:3px;border:1px solid #50fa7b;display:flex;align-items:center;justify-content:center;font-size:0.7em;color:#50fa7b;">
+                        1</div>
+                    <div
+                        style="width:2rem;height:2rem;background:rgba(255,85,85,0.2);border-radius:3px;border:1px solid #ff5555;display:flex;align-items:center;justify-content:center;font-size:0.7em;color:#ff5555;">
+                        0</div>
+                    <div
+                        style="width:2rem;height:2rem;background:rgba(80,250,123,0.3);border-radius:3px;border:1px solid #50fa7b;display:flex;align-items:center;justify-content:center;font-size:0.7em;color:#50fa7b;">
+                        1</div>
+                </div>
+                <div style="font-size: 0.65em; color: #aaa; margin-top: 0.4rem;">50% de pesos eliminados</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. Granularidad -->
+    <section>
+        <h3>El Espectro de la Granularidad</h3>
+        <p style="font-size: 0.65em; text-align: left; margin-bottom: 0.8rem;">¿Qué podamos? ¿Hojas individuales, o
+            ramas y troncos enteros?</p>
+        <div style="display: flex; gap: 1rem; font-size: 0.68em; text-align: left;">
+            <div style="flex: 1; background: rgba(255,121,198,0.1); padding: 0.8rem; border-radius: 0.5rem;">
+                <h4 style="color: #ff79c6; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.1em;">No estructurado</h4>
+                <!-- CSS visualization: individual zeros scattered -->
+                <div style="display: grid; grid-template-columns: repeat(6, 1.2rem); gap: 2px; margin-bottom: 0.5rem;">
+                    <div style="width:1.2rem;height:1.2rem;background:#4C72B0;border-radius:2px;"></div>
+                    <div
+                        style="width:1.2rem;height:1.2rem;background:rgba(255,255,255,0.05);border-radius:2px;border:1px dashed #555;">
+                    </div>
+                    <div style="width:1.2rem;height:1.2rem;background:#4C72B0;border-radius:2px;"></div>
+                    <div
+                        style="width:1.2rem;height:1.2rem;background:rgba(255,255,255,0.05);border-radius:2px;border:1px dashed #555;">
+                    </div>
+                    <div style="width:1.2rem;height:1.2rem;background:#4C72B0;border-radius:2px;"></div>
+                    <div style="width:1.2rem;height:1.2rem;background:#4C72B0;border-radius:2px;"></div>
+                    <div
+                        style="width:1.2rem;height:1.2rem;background:rgba(255,255,255,0.05);border-radius:2px;border:1px dashed #555;">
+                    </div>
+                    <div style="width:1.2rem;height:1.2rem;background:#4C72B0;border-radius:2px;"></div>
+                    <div
+                        style="width:1.2rem;height:1.2rem;background:rgba(255,255,255,0.05);border-radius:2px;border:1px dashed #555;">
+                    </div>
+                    <div style="width:1.2rem;height:1.2rem;background:#4C72B0;border-radius:2px;"></div>
+                    <div style="width:1.2rem;height:1.2rem;background:#4C72B0;border-radius:2px;"></div>
+                    <div
+                        style="width:1.2rem;height:1.2rem;background:rgba(255,255,255,0.05);border-radius:2px;border:1px dashed #555;">
+                    </div>
+                </div>
+                <p style="font-size: 0.9em; color: #aaa; margin-bottom: 0.4rem;">Ceros dispersos → matriz irregular</p>
+                <ul style="padding-left: 1.2rem; line-height: 1.4;">
+                    <li><strong style="color: #50fa7b;">Preserva accuracy</strong> a 90-95% de sparsity</li>
+                    <li><strong style="color: #ff5555;">Problema:</strong> no hay aceleración real en HW genérico</li>
+                </ul>
+            </div>
+            <div style="flex: 1; background: rgba(80,250,123,0.1); padding: 0.8rem; border-radius: 0.5rem;">
+                <h4 style="color: #50fa7b; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.1em;">Estructurado
+                    (filtros)</h4>
+                <!-- CSS visualization: whole rows eliminated -->
+                <div style="display: grid; grid-template-columns: repeat(6, 1.2rem); gap: 2px; margin-bottom: 0.5rem;">
+                    <div style="width:1.2rem;height:1.2rem;background:#55A868;border-radius:2px;"></div>
+                    <div style="width:1.2rem;height:1.2rem;background:#55A868;border-radius:2px;"></div>
+                    <div style="width:1.2rem;height:1.2rem;background:#55A868;border-radius:2px;"></div>
+                    <div style="width:1.2rem;height:1.2rem;background:#55A868;border-radius:2px;"></div>
+                    <div style="width:1.2rem;height:1.2rem;background:#55A868;border-radius:2px;"></div>
+                    <div style="width:1.2rem;height:1.2rem;background:#55A868;border-radius:2px;"></div>
+                    <div
+                        style="width:1.2rem;height:1.2rem;background:rgba(255,255,255,0.05);border-radius:2px;border:1px dashed #555;">
+                    </div>
+                    <div
+                        style="width:1.2rem;height:1.2rem;background:rgba(255,255,255,0.05);border-radius:2px;border:1px dashed #555;">
+                    </div>
+                    <div
+                        style="width:1.2rem;height:1.2rem;background:rgba(255,255,255,0.05);border-radius:2px;border:1px dashed #555;">
+                    </div>
+                    <div
+                        style="width:1.2rem;height:1.2rem;background:rgba(255,255,255,0.05);border-radius:2px;border:1px dashed #555;">
+                    </div>
+                    <div
+                        style="width:1.2rem;height:1.2rem;background:rgba(255,255,255,0.05);border-radius:2px;border:1px dashed #555;">
+                    </div>
+                    <div
+                        style="width:1.2rem;height:1.2rem;background:rgba(255,255,255,0.05);border-radius:2px;border:1px dashed #555;">
+                    </div>
+                </div>
+                <p style="font-size: 0.9em; color: #aaa; margin-bottom: 0.4rem;">Filas/canales eliminados → matriz densa
+                    más pequeña</p>
+                <ul style="padding-left: 1.2rem; line-height: 1.4;">
+                    <li><strong style="color: #50fa7b;">Aceleración real</strong> en cualquier HW</li>
+                    <li><strong style="color: #ff5555;">Más destructivo</strong> al mismo nivel de sparsity</li>
+                </ul>
+            </div>
+            <div style="flex: 1; background: rgba(139,233,253,0.08); padding: 0.8rem; border-radius: 0.5rem;">
+                <h4 style="color: #8be9fd; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.1em;">Semi-estructurado
+                    2:4</h4>
+                <!-- CSS: 2:4 pattern -->
+                <div style="display: flex; flex-wrap: wrap; gap: 3px; margin-bottom: 0.5rem;">
+                    <div style="display: flex; gap: 2px;">
+                        <div style="width:1.1rem;height:1.1rem;background:#8be9fd;border-radius:2px;"></div>
+                        <div
+                            style="width:1.1rem;height:1.1rem;background:rgba(255,255,255,0.05);border-radius:2px;border:1px dashed #555;">
+                        </div>
+                        <div style="width:1.1rem;height:1.1rem;background:#8be9fd;border-radius:2px;"></div>
+                        <div
+                            style="width:1.1rem;height:1.1rem;background:rgba(255,255,255,0.05);border-radius:2px;border:1px dashed #555;">
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 2px;">
+                        <div
+                            style="width:1.1rem;height:1.1rem;background:rgba(255,255,255,0.05);border-radius:2px;border:1px dashed #555;">
+                        </div>
+                        <div style="width:1.1rem;height:1.1rem;background:#8be9fd;border-radius:2px;"></div>
+                        <div
+                            style="width:1.1rem;height:1.1rem;background:rgba(255,255,255,0.05);border-radius:2px;border:1px dashed #555;">
+                        </div>
+                        <div style="width:1.1rem;height:1.1rem;background:#8be9fd;border-radius:2px;"></div>
+                    </div>
+                    <div style="display: flex; gap: 2px;">
+                        <div style="width:1.1rem;height:1.1rem;background:#8be9fd;border-radius:2px;"></div>
+                        <div style="width:1.1rem;height:1.1rem;background:#8be9fd;border-radius:2px;"></div>
+                        <div
+                            style="width:1.1rem;height:1.1rem;background:rgba(255,255,255,0.05);border-radius:2px;border:1px dashed #555;">
+                        </div>
+                        <div
+                            style="width:1.1rem;height:1.1rem;background:rgba(255,255,255,0.05);border-radius:2px;border:1px dashed #555;">
+                        </div>
+                    </div>
+                </div>
+                <p style="font-size: 0.9em; color: #aaa; margin-bottom: 0.4rem;">Exactamente 2 de cada 4 son cero</p>
+                <ul style="padding-left: 1.2rem; line-height: 1.4;">
+                    <li><strong style="color: #50fa7b;">2× speedup</strong> en Tensor Cores (NVIDIA A100+)</li>
+                    <li>Mínima pérdida de accuracy</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. Pruning en la práctica -->
+    <section>
+        <h3>Pruning en la Práctica</h3>
+        <div style="display: flex; gap: 1.5rem; margin-top: 0.5rem; font-size: 0.7em; text-align: left;">
+            <div style="flex: 1; background: rgba(139,233,253,0.1); padding: 0.8rem; border-radius: 0.5rem;">
+                <h4 style="color: #8be9fd; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.1em;">Cloud (HPC /
+                    Datacenters)</h4>
+                <p>Mandan las <strong>GPUs y Tensor Cores</strong>.</p>
+                <ul style="margin-top: 0.5rem; padding-left: 1.2rem; line-height: 1.5;">
+                    <li style="margin-bottom: 0.4rem;">Esparsidad híbrida 2:4 (NVIDIA Ampere).</li>
+                    <li>Para <strong>LLMs</strong>: <em>SparseGPT</em>, <em>Wanda</em> — comprimen modelos inmensos sin
+                        degradación notable.</li>
+                </ul>
+            </div>
+            <div style="flex: 1; background: rgba(255,184,108,0.1); padding: 0.8rem; border-radius: 0.5rem;">
+                <h4 style="color: #ffb86c; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.1em;">Edge / IoT (IA
+                    Embebida)</h4>
+                <p>Mandan los <strong>MCU y NPUs</strong>.</p>
+                <ul style="margin-top: 0.5rem; padding-left: 1.2rem; line-height: 1.5;">
+                    <li style="margin-bottom: 0.4rem;">Sin hardware para patrones irregulares.</li>
+                    <li><strong>Channel Pruning es el rey:</strong> reduce footprint de SRAM/Flash y costo energético.
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <!-- Workflow diagram -->
+        <div
+            style="margin-top: 1rem; display: flex; align-items: center; justify-content: center; gap: 0.4rem; font-size: 0.65em;">
+            <div
+                style="background: rgba(76,114,176,0.3); border: 1px solid #4C72B0; padding: 0.4rem 0.7rem; border-radius: 0.4rem; text-align: center;">
+                Entrenar<br>red densa</div>
+            <div style="color: #50fa7b; font-size: 1.4em;">→</div>
+            <div
+                style="background: rgba(255,184,108,0.2); border: 1px solid #ffb86c; padding: 0.4rem 0.7rem; border-radius: 0.4rem; text-align: center;">
+                Evaluar<br>importancia</div>
+            <div style="color: #50fa7b; font-size: 1.4em;">→</div>
+            <div
+                style="background: rgba(255,85,85,0.2); border: 1px solid #ff5555; padding: 0.4rem 0.7rem; border-radius: 0.4rem; text-align: center;">
+                Podar<br>pesos/filtros</div>
+            <div style="color: #50fa7b; font-size: 1.4em;">→</div>
+            <div
+                style="background: rgba(80,250,123,0.2); border: 1px solid #50fa7b; padding: 0.4rem 0.7rem; border-radius: 0.4rem; text-align: center;">
+                Fine-<br>tuning</div>
+            <div style="color: #50fa7b; font-size: 1.4em;">→</div>
+            <div
+                style="background: rgba(139,233,253,0.2); border: 1px solid #8be9fd; padding: 0.4rem 0.7rem; border-radius: 0.4rem; text-align: center;">
+                Evaluar<br>y repetir</div>
+        </div>
+    </section>
+
+    <!-- 4. Ejemplo script07a -->
+    <section>
+        <h3>Ejemplo: no estructurado vs estructurado</h3>
+        <div style="font-size: 0.72em; text-align: left;">
+            <p style="margin-bottom: 0.6rem;"><code>examples/pruning/script01.py</code> — entrena CNN en Fashion MNIST y
+                compara las estrategias. <strong>Mensaje clave: la sparsidad no estructurada no reduce los
+                    MACs.</strong></p>
+            <div style="display: flex; gap: 1rem;">
+                <div style="flex: 1; background: rgba(255,255,255,0.07); padding: 0.8rem; border-radius: 0.5rem;">
+                    <p style="color: #8be9fd; margin: 0 0 0.4rem;"><strong>Estrategias comparadas</strong></p>
+                    <ul style="padding-left: 1.2rem; line-height: 1.5;">
+                        <li>Baseline (sin pruning)</li>
+                        <li>No estructurado 50% + fine-tuning</li>
+                        <li>No estructurado 75% + fine-tuning</li>
+                        <li>Estructurado 50% filtros + fine-tuning</li>
+                    </ul>
+                </div>
+                <div style="flex: 1; background: rgba(255,255,255,0.07); padding: 0.8rem; border-radius: 0.5rem;">
+                    <p style="color: #50fa7b; margin: 0 0 0.4rem;"><strong>Qué se mide</strong></p>
+                    <ul style="padding-left: 1.2rem; line-height: 1.5;">
+                        <li>Accuracy en test</li>
+                        <li>MACs (operaciones reales)</li>
+                        <li>Tamaño del modelo (KB)</li>
+                    </ul>
+                    <p style="margin-top: 0.6rem; color: #ffb86c;">Unstruct-75% → MACs <strong>idénticos</strong> al
+                        baseline.<br>Struct-50% → MACs genuinamente menores.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4.1. Output de script01.py -->
+    <section>
+        <h3>Ejemplo: no estructurado vs estructurado</h3>
+        <h4>Output de script01.py</h4>
+        <div style="font-size: 0.72em; text-align: left; width: 100%;">
+            <pre
+                style="margin: 0; box-shadow: none; background: rgba(0,0,0,0.2);"><code id="log-script01" style="font-family: monospace; font-size: 0.85em; max-height: 500px; overflow-y: auto; padding: 1rem; border-radius: 0.5rem; color: #f8f8f2;">Cargando...</code></pre>
+            <div style="display:none">
+                <img src="load-trigger" onerror="
+                    fetch('outputs/pruning_log_script01.txt')
+                    .then(r => r.ok ? r.text() : Promise.reject(r.status))
+                    .then(t => document.getElementById('log-script01').textContent = t)
+                    .catch(e => document.getElementById('log-script01').textContent = 'Error al cargar: ' + e);
+                ">
+            </div>
+        </div>
+    </section>
+
+    <!-- 4.2. Gráfico -->
+    <section>
+        <h3>Ejemplo: no estructurado vs estructurado</h3>
+        <h4>Resultados</h4>
+        <div style="display: flex; justify-content: center; align-items: center; margin-top: 1rem;">
+            <img src="outputs/pruning_comparacion.png" alt="Comparación Pruning"
+                style="max-height: 550px; border-radius: 0.5rem;" onerror="this.style.display='none';">
+        </div>
+    </section>
+
+    <!-- 5. Ejemplo script07b — Magnitude-based pruning -->
+    <section>
+        <h3>Ejemplo: criterio de magnitud de pesos</h3>
+        <div style="font-size: 0.72em; text-align: left;">
+            <p style="margin-bottom: 0.6rem;"><code>examples/pruning/script02.py</code> — pruning estructurado usando la
+                norma L1 de cada filtro como criterio de importancia.</p>
+            <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <div style="flex: 1.2;">
+                    <div
+                        style="background: rgba(255,255,255,0.07); padding: 0.7rem; border-radius: 0.5rem; margin-bottom: 0.6rem;">
+                        <p style="color: #8be9fd; margin: 0 0 0.4rem;"><strong>Criterio: norma L1 por filtro</strong>
+                        </p>
+                        <div
+                            style="background: rgba(0,0,0,0.3); padding: 0.4rem; border-radius: 0.3rem; text-align: center; font-size: 1.05em;">
+                            <code>importancia(f) = ‖W<sub>f</sub>‖₁ = Σ|w<sub>i</sub>|</code>
+                        </div>
+                        <p style="margin-top: 0.5rem;">Se eliminan los filtros con <strong>menor magnitud
+                                acumulada</strong>. Simple, sin datos de calibración.</p>
+                    </div>
+                    <ul style="padding-left: 1.2rem; line-height: 1.5;">
+                        <li style="margin-bottom: 0.3rem;">Barrido de sparsity: 10% → 70% de filtros eliminados</li>
+                        <li style="margin-bottom: 0.3rem;">Fine-tuning de 2 epochs después de cada paso</li>
+                        <li style="color: #ffb86c;">Limitación: los pesos grandes no siempre son los más usados</li>
+                    </ul>
+                </div>
+                <!-- Visual: filter importance ranking -->
+                <div style="flex: 0.9; display: flex; flex-direction: column; gap: 0.3rem;">
+                    <p style="font-size: 0.85em; color: #8be9fd; margin: 0 0 0.3rem; text-align: center;">Importancia de
+                        filtros (L1)</p>
+                    <div style="display: flex; flex-direction: column; gap: 3px;">
+                        <div style="display: flex; align-items: center; gap: 0.4rem;">
+                            <span style="font-size: 0.8em; color: #aaa; width: 1.5rem;">f₁</span>
+                            <div style="height: 0.9rem; width: 90%; background: #4C72B0; border-radius: 2px;"></div>
+                            <span style="font-size: 0.75em; color: #50fa7b;">✓</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.4rem;">
+                            <span style="font-size: 0.8em; color: #aaa; width: 1.5rem;">f₂</span>
+                            <div style="height: 0.9rem; width: 70%; background: #4C72B0; border-radius: 2px;"></div>
+                            <span style="font-size: 0.75em; color: #50fa7b;">✓</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.4rem;">
+                            <span style="font-size: 0.8em; color: #aaa; width: 1.5rem;">f₃</span>
+                            <div style="height: 0.9rem; width: 45%; background: #DD8452; border-radius: 2px;"></div>
+                            <span style="font-size: 0.75em; color: #50fa7b;">✓</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.4rem;">
+                            <span style="font-size: 0.8em; color: #aaa; width: 1.5rem;">f₄</span>
+                            <div style="height: 0.9rem; width: 20%; background: #ff5555; border-radius: 2px;"></div>
+                            <span style="font-size: 0.75em; color: #ff5555;">✗ poda</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.4rem;">
+                            <span style="font-size: 0.8em; color: #aaa; width: 1.5rem;">f₅</span>
+                            <div style="height: 0.9rem; width: 8%; background: #ff5555; border-radius: 2px;"></div>
+                            <span style="font-size: 0.75em; color: #ff5555;">✗ poda</span>
+                        </div>
+                    </div>
+                    <p style="font-size: 0.75em; color: #aaa; text-align: center; margin-top: 0.3rem;">umbral de
+                        sparsity</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5.1. Output de script02.py -->
+    <section>
+        <h3>Ejemplo: criterio de magnitud de pesos</h3>
+        <h4>Output de script02.py</h4>
+        <div style="font-size: 0.72em; text-align: left; width: 100%;">
+            <pre
+                style="margin: 0; box-shadow: none; background: rgba(0,0,0,0.2);"><code id="log-script02" style="font-family: monospace; font-size: 0.85em; max-height: 500px; overflow-y: auto; padding: 1rem; border-radius: 0.5rem; color: #f8f8f2;">Cargando...</code></pre>
+            <div style="display:none">
+                <img src="load-trigger2" onerror="
+                    fetch('outputs/pruning_log_script02.txt')
+                    .then(r => r.ok ? r.text() : Promise.reject(r.status))
+                    .then(t => document.getElementById('log-script02').textContent = t)
+                    .catch(e => document.getElementById('log-script02').textContent = 'Error al cargar: ' + e);
+                ">
+            </div>
+        </div>
+    </section>
+
+    <!-- 5.2. Resultados -->
+    <section>
+        <h3>Ejemplo: criterio de magnitud de pesos</h3>
+        <h4>Resultados</h4>
+        <div style="display: flex; justify-content: center; align-items: center; margin-top: 1rem;">
+            <img src="outputs/pruning_magnitud.png" alt="Magnitude pruning"
+                style="max-height: 550px; border-radius: 0.5rem;" onerror="this.style.display='none';">
+        </div>
+    </section>
+
+    <!-- 6. Ejemplo script07c — Activation-based pruning -->
+    <section>
+        <h3>Ejemplo: criterio basado en activaciones</h3>
+        <div style="font-size: 0.72em; text-align: left;">
+            <p style="margin-bottom: 0.6rem;"><code>examples/pruning/script03.py</code> — usa la activación media de
+                cada filtro sobre un batch de calibración como criterio. <strong>Muestra que activa ≻ magnitud.</strong>
+            </p>
+            <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <div style="flex: 1;">
+                    <div
+                        style="background: rgba(80,250,123,0.08); padding: 0.7rem; border-radius: 0.5rem; margin-bottom: 0.6rem;">
+                        <p style="color: #50fa7b; margin: 0 0 0.4rem;"><strong>Criterio: activación media por
+                                filtro</strong></p>
+                        <div
+                            style="background: rgba(0,0,0,0.3); padding: 0.4rem; border-radius: 0.3rem; text-align: center; font-size: 1.0em;">
+                            <code>importancia(f) = E<sub>x</sub>[‖A<sub>f</sub>(x)‖₁]</code>
+                        </div>
+                        <p style="margin-top: 0.5rem; font-size: 0.95em;">Pasa un batch de calibración y mide cuánto
+                            <em>activa</em> realmente cada filtro durante la inferencia.
+                        </p>
+                    </div>
+                    <p style="color: #8be9fd; margin-bottom: 0.3rem;"><strong>¿Por qué es mejor?</strong></p>
+                    <ul style="padding-left: 1.2rem; line-height: 1.5;">
+                        <li style="margin-bottom: 0.3rem;">Un filtro puede tener pesos grandes pero producir
+                            activaciones casi nulas</li>
+                        <li style="margin-bottom: 0.3rem;">Las activaciones capturan el comportamiento real con los
+                            datos</li>
+                        <li style="color: #50fa7b;">Compara directamente vs magnitud al mismo nivel de sparsity</li>
+                    </ul>
+                </div>
+                <!-- Conceptual comparison diagram -->
+                <div style="flex: 0.9; display: flex; flex-direction: column; gap: 0.4rem;">
+                    <p style="font-size: 0.85em; color: #aaa; text-align: center; margin: 0;">Peso ≠ activación</p>
+                    <div
+                        style="background: rgba(255,255,255,0.05); padding: 0.6rem; border-radius: 0.4rem; font-size: 0.85em;">
+                        <div
+                            style="display: flex; justify-content: space-between; color: #8be9fd; margin-bottom: 0.3rem; font-size: 0.9em;">
+                            <span>Filtro</span><span>‖W‖₁</span><span>‖Act‖₁</span><span>Decisión</span>
+                        </div>
+                        <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 0.3rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                                <span style="color: #aaa;">f₁</span><span style="color: #4C72B0;">alto</span><span
+                                    style="color: #50fa7b;">alto</span><span style="color: #50fa7b;">✓ ambos</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                                <span style="color: #aaa;">f₂</span><span style="color: #4C72B0;">alto</span><span
+                                    style="color: #ff5555;">bajo</span><span style="color: #ff79c6;">↔ difieren</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                                <span style="color: #aaa;">f₃</span><span style="color: #ff5555;">bajo</span><span
+                                    style="color: #50fa7b;">alto</span><span style="color: #ff79c6;">↔ difieren</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: #aaa;">f₄</span><span style="color: #ff5555;">bajo</span><span
+                                    style="color: #ff5555;">bajo</span><span style="color: #ff5555;">✗ ambos</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p style="font-size: 0.75em; color: #ffb86c; text-align: center;">f₂ y f₃ son casos donde los
+                        criterios discrepan — y la activación acierta más.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6.1. Output de script03.py -->
+    <section>
+        <h3>Ejemplo: criterio basado en activaciones</h3>
+        <h4>Output de script03.py</h4>
+        <div style="font-size: 0.72em; text-align: left; width: 100%;">
+            <pre
+                style="margin: 0; box-shadow: none; background: rgba(0,0,0,0.2);"><code id="log-script03" style="font-family: monospace; font-size: 0.85em; max-height: 500px; overflow-y: auto; padding: 1rem; border-radius: 0.5rem; color: #f8f8f2;">Cargando...</code></pre>
+            <div style="display:none">
+                <img src="load-trigger3" onerror="
+                    fetch('outputs/pruning_log_script03.txt')
+                    .then(r => r.ok ? r.text() : Promise.reject(r.status))
+                    .then(t => document.getElementById('log-script03').textContent = t)
+                    .catch(e => document.getElementById('log-script03').textContent = 'Error al cargar: ' + e);
+                ">
+            </div>
+        </div>
+    </section>
+
+    <!-- 6.2. Resultados -->
+    <section>
+        <h3>Ejemplo: criterio basado en activaciones</h3>
+        <h4>Resultados</h4>
+        <div style="display: flex; justify-content: center; align-items: center; margin-top: 1rem;">
+            <img src="outputs/pruning_activaciones.png" alt="Activation pruning"
+                style="max-height: 550px; border-radius: 0.5rem;" onerror="this.style.display='none';">
+        </div>
+    </section>
+
+    <!-- 7. Resumen -->
+    <section>
+        <h3>Resumen y puntos clave</h3>
+        <div style="font-size: 0.75em; text-align: left;">
+            <ul style="line-height: 1.6;">
+                <li style="margin-bottom: 0.7rem;"><strong style="color: #ff79c6;">Sparsity ≠ aceleración:</strong> Un
+                    90% de ceros no sirve sin hardware que los explote. El pruning estructurado sí acela en cualquier
+                    HW.</li>
+                <li style="margin-bottom: 0.7rem;"><strong style="color: #8be9fd;">Criterio importa:</strong> Magnitud
+                    de pesos (L1) es simple pero ignora cómo usa la red esos filtros. Las activaciones medias son una
+                    señal más fiel del impacto real.</li>
+                <li style="margin-bottom: 0.7rem;"><strong style="color: #50fa7b;">Fine-tuning recupera:</strong> Ambos
+                    criterios necesitan unos pocos epochs de ajuste tras la poda. El pruning iterativo (en pasos) suele
+                    dar mejor resultado que one-shot.</li>
+                <li><strong style="color: #ffb86c;">Co-diseño HW/SW:</strong> Cloud → 2:4 estructurado para Tensor
+                    Cores. Edge → channel pruning para reducir SRAM/Flash.</li>
+            </ul>
+        </div>
+    </section>
+</section>

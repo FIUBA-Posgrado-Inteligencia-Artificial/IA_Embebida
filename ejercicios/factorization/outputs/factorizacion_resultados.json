@@ -1,0 +1,37 @@
+{
+    "mlp_baseline": {
+        "acc": 0.8611,
+        "params": 53018,
+        "macs": 52896
+    },
+    "mlp_svd_rank4": {
+        "acc_no_ft": 0.1685,
+        "acc_ft": 0.775,
+        "params": 4194
+    },
+    "mlp_svd_rank8": {
+        "acc_no_ft": 0.7637,
+        "acc_ft": 0.8458,
+        "params": 8266
+    },
+    "mlp_svd_rank16": {
+        "acc_no_ft": 0.8358,
+        "acc_ft": 0.8619,
+        "params": 15898
+    },
+    "mlp_svd_rank32": {
+        "acc_no_ft": 0.858,
+        "acc_ft": 0.8701,
+        "params": 29978
+    },
+    "cnn_baseline": {
+        "acc": 0.8821,
+        "params": 44426,
+        "macs": 281640
+    },
+    "cnn_separable": {
+        "acc": 0.8374,
+        "params": 42160,
+        "macs": 75240
+    }
+}

@@ -1,0 +1,61 @@
+{
+    "model_type": "cnn",
+    "bits": 8,
+    "high_bits": 8,
+    "low_bits": 4,
+    "float_acc": 0.8906999826431274,
+    "fp32_mem_kb": 241.04,
+    "fp32_macs": 416520,
+    "steps": [
+        {
+            "ptq_acc": 0.8892999887466431,
+            "qat_acc": 0.0,
+            "mem_bytes": 61706.0,
+            "macs": 416520,
+            "tag": "Paso1-Uniforme",
+            "label": "Paso 1 — Uniforme (8b global)",
+            "step": 1,
+            "clip": "max"
+        },
+        {
+            "ptq_acc": 0.8889999985694885,
+            "qat_acc": 0.0,
+            "mem_bytes": 61706.0,
+            "macs": 416520,
+            "tag": "Paso2a-Mixta/max",
+            "label": "Paso 2a — Mixta int-bits / max (8b)",
+            "step": 2,
+            "clip": "max"
+        },
+        {
+            "ptq_acc": 0.8804000020027161,
+            "qat_acc": 0.0,
+            "mem_bytes": 61706.0,
+            "macs": 416520,
+            "tag": "Paso2b-Mixta/p95",
+            "label": "Paso 2b — Mixta int-bits / p95 (8b)",
+            "step": 2,
+            "clip": "p95"
+        },
+        {
+            "ptq_acc": 0.8093000054359436,
+            "qat_acc": 0.0,
+            "mem_bytes": 61706.0,
+            "macs": 416520,
+            "tag": "Paso2c-Mixta/p75",
+            "label": "Paso 2c — Mixta int-bits / p75 (8b)",
+            "step": 2,
+            "clip": "p75"
+        },
+        {
+            "ptq_acc": 0.8823000192642212,
+            "qat_acc": 0.0,
+            "mem_bytes": 31356.0,
+            "macs": 416520,
+            "tag": "Paso3-Completa/p95",
+            "label": "Paso 3 — Mixta completa / p95 (8b/4b)",
+            "step": 3,
+            "clip": "p95"
+        }
+    ]
+}

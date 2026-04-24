@@ -1,0 +1,158 @@
+{
+    "candidates": [
+        {
+            "config": {
+                "conv1_filters": 4,
+                "conv2_filters": 8,
+                "dense_units": 32
+            },
+            "label": "c1=4 c2=8 d=32",
+            "acc": 0.844,
+            "params": 5370,
+            "macs": 113216,
+            "size_kb": 20.98
+        },
+        {
+            "config": {
+                "conv1_filters": 4,
+                "conv2_filters": 8,
+                "dense_units": 64
+            },
+            "label": "c1=4 c2=8 d=64",
+            "acc": 0.8379,
+            "params": 9818,
+            "macs": 117632,
+            "size_kb": 38.35
+        },
+        {
+            "config": {
+                "conv1_filters": 4,
+                "conv2_filters": 16,
+                "dense_units": 32
+            },
+            "label": "c1=4 c2=16 d=32",
+            "acc": 0.8467,
+            "params": 10274,
+            "macs": 168512,
+            "size_kb": 40.13
+        },
+        {
+            "config": {
+                "conv1_filters": 8,
+                "conv2_filters": 8,
+                "dense_units": 32
+            },
+            "label": "c1=8 c2=8 d=32",
+            "acc": 0.8423,
+            "params": 6274,
+            "macs": 222016,
+            "size_kb": 24.51
+        },
+        {
+            "config": {
+                "conv1_filters": 8,
+                "conv2_filters": 16,
+                "dense_units": 64
+            },
+            "label": "c1=8 c2=16 d=64",
+            "acc": 0.8694,
+            "params": 20522,
+            "macs": 337024,
+            "size_kb": 80.16
+        },
+        {
+            "config": {
+                "conv1_filters": 8,
+                "conv2_filters": 32,
+                "dense_units": 64
+            },
+            "label": "c1=8 c2=32 d=64",
+            "acc": 0.8738,
+            "params": 40122,
+            "macs": 558208,
+            "size_kb": 156.73
+        },
+        {
+            "config": {
+                "conv1_filters": 8,
+                "conv2_filters": 16,
+                "dense_units": 128
+            },
+            "label": "c1=8 c2=16 d=128",
+            "acc": 0.8714,
+            "params": 37610,
+            "macs": 354048,
+            "size_kb": 146.91
+        },
+        {
+            "config": {
+                "conv1_filters": 16,
+                "conv2_filters": 16,
+                "dense_units": 64
+            },
+            "label": "c1=16 c2=16 d=64",
+            "acc": 0.871,
+            "params": 23930,
+            "macs": 657024,
+            "size_kb": 93.48
+        },
+        {
+            "config": {
+                "conv1_filters": 16,
+                "conv2_filters": 32,
+                "dense_units": 64
+            },
+            "label": "c1=16 c2=32 d=64",
+            "acc": 0.8741,
+            "params": 46730,
+            "macs": 1083008,
+            "size_kb": 182.54
+        },
+        {
+            "config": {
+                "conv1_filters": 16,
+                "conv2_filters": 32,
+                "dense_units": 128
+            },
+            "label": "c1=16 c2=32 d=128",
+            "acc": 0.8838,
+            "params": 80202,
+            "macs": 1116416,
+            "size_kb": 313.29
+        }
+    ],
+    "pareto_idx": [
+        0,
+        2,
+        4,
+        5,
+        6,
+        8,
+        9
+    ],
+    "budget_winner": {
+        "config": {
+            "conv1_filters": 8,
+            "conv2_filters": 16,
+            "dense_units": 64
+        },
+        "label": "c1=8 c2=16 d=64",
+        "acc": 0.8694,
+        "params": 20522,
+        "macs": 337024,
+        "size_kb": 80.16
+    },
+    "acc_winner": {
+        "config": {
+            "conv1_filters": 16,
+            "conv2_filters": 32,
+            "dense_units": 128
+        },
+        "label": "c1=16 c2=32 d=128",
+        "acc": 0.8838,
+        "params": 80202,
+        "macs": 1116416,
+        "size_kb": 313.29
+    },
+    "macs_budget": 345536.0
+}

@@ -1,0 +1,32 @@
+# Chip rev: this firmware targets ESP32-D0WD-V3 (rev 3.0).
+# Setting REV_MIN=300 disables SPIRAM_CACHE_WORKAROUND (-mfix-esp32-psram-cache-issue),
+# which is not needed on rev3 (silicon fix) and breaks WiFi PHY init timing.
+CONFIG_ESP32_REV_MIN_FULL=300
+
+# PSRAM (AI-Thinker ESP32-CAM tiene PSRAM)
+CONFIG_ESP32_SPIRAM_SUPPORT=y
+CONFIG_SPIRAM_USE_MALLOC=y
+CONFIG_SPIRAM_MALLOC_RESERVE_INTERNAL=32768
+
+# Partición custom
+CONFIG_PARTITION_TABLE_CUSTOM=y
+CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions.csv"
+
+# 4MB flash
+CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y
+CONFIG_ESPTOOLPY_FLASHSIZE="4MB"
+
+# Main task stack
+CONFIG_ESP_MAIN_TASK_STACK_SIZE=8192
+
+# Log por serie (UART0) a 115200
+CONFIG_ESP_CONSOLE_UART_DEFAULT=y
+CONFIG_ESP_CONSOLE_UART_BAUDRATE=115200
+
+# Task watchdog: inference on ESP32 with standard_rgb96 model takes ~7s,
+# which trips the default 5s WDT on IDLE0 (esp-dl doesn't yield during
+# conv2d). Bump timeout to 30s and disable IDLE checks so legit long
+# inference runs don't spam the console with false-alarm backtraces.
+CONFIG_ESP_TASK_WDT_TIMEOUT_S=30
+CONFIG_ESP_TASK_WDT_CHECK_IDLE_TASK_CPU0=n
+CONFIG_ESP_TASK_WDT_CHECK_IDLE_TASK_CPU1=n

@@ -22,7 +22,7 @@ sleep 1
 
 # Abrir Google Chrome en la URL de las clases
 echo "Abriendo la presentación en Google Chrome..."
-google-chrome "http://localhost:${PORT}/clases/clases.html" 2>/dev/null || xdg-open "http://localhost:${PORT}/clases/clases.html"
+google-chrome "http://localhost:${PORT}/clases/main.html" 2>/dev/null || xdg-open "http://localhost:${PORT}/clases/main.html"
 
 echo "Presiona Ctrl+C para detener el servidor."
 

@@ -1,0 +1,158 @@
+<!-- 11. Knowledge Distillation -->
+<section>
+    <section>
+        <h2 class="gradient-text">10. Knowledge Distillation (KD)</h2>
+        <p>Transfiriendo sabiduría: del Profesor al Alumno</p>
+    </section>
+
+    <!-- 1. Concepto y Temperatura -->
+    <section>
+        <h3>El Concepto: Más allá del Hard Target</h3>
+        <div style="font-size: 0.75em; text-align: left;">
+            <p>Si NAS construye la casa, Pruning quita los muros y Factorización comprime, KD es el proceso de transferir "los apuntes resumidos" del modelo gigante al modelo minúsculo.</p>
+            <p style="margin-top: 1rem;"><strong style="color: #8be9fd;">Soft Targets y el "Dark Knowledge"</strong></p>
+            <p>Las etiquetas duras o <em>Hard Targets</em> (ej. 100% Perro, 0% Gato) destruyen información relacional. Un Profesor destila <em>Soft Targets</em> (90% Perro, 9% Gato), revelando similitudes de características.</p>
+            <div style="background: rgba(255,255,255,0.1); padding: 0.8rem; border-radius: 0.5rem; text-align: center; margin: 0.8rem 0; font-size: 1em;">
+                <code>q<sub>i</sub> = exp(z<sub>i</sub> / T) / Σ exp(z<sub>j</sub> / T)</code>
+            </div>
+            <p>Para amplificar esto se usa la <strong>Temperatura (T)</strong>. Al subir <em>T</em>, la distribución de probabilidad se suaviza, permitiendo al Alumno percibir las conexiones diminutas y estructurales entre clases.</p>
+            <p style="color: #50fa7b; margin-top: 0.8rem;">El Alumno entrena minimizando el error contra las etiquetas reales <strong>+</strong> imitando la distribución de soft-targets del Profesor.</p>
+        </div>
+    </section>
+
+    <!-- 2. Formas de aplicar KD -->
+    <section>
+        <h3>Formas Prácticas en CNNs</h3>
+        <div style="font-size: 0.65em; text-align: left;">
+            <div style="display: grid; grid-template-columns: 1fr; gap: 12px;">
+                <div style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px;">
+                    <strong style="color: #ff79c6;">A. Response-Based KD (Destilación de Salidas)</strong>
+                    <p style="margin: 0.3rem 0 0;">El método clásico. El Alumno imita únicamente los Logits finales del Profesor. Barato computacionalmente, ideal para condensar múltiples modelos en la nube (<em>Ensembles</em>) en un solo modelo.</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px;">
+                    <strong style="color: #50fa7b;">B. Feature-Based KD (Mapas de Características)</strong>
+                    <p style="margin: 0.3rem 0 0;">El Alumno imita los tensores internos convolucionales (pide el "procedimiento" y no solo el resultado). <strong>Solución al diferente tamaño de capas:</strong> se insertan convoluciones 1x1 en el Alumno para igualar canales (ej. de 64 a 256) posibilitando el error MSE con el Profesor.</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px;">
+                    <strong style="color: #8be9fd;">C. Relation-Based KD (Destilación de Relaciones)</strong>
+                    <p style="margin: 0.3rem 0 0;">El alumno imita la <em>topología espacial</em> o relación entre distintas imágenes del lote (ej. usando matrices de Gram). Genera un entendimiento del espacio latente y extrema robustez al ruido.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. Problemas Reales -->
+    <section>
+        <h3>Problemas de la Realidad y Soluciones</h3>
+        <div style="display: flex; gap: 1.5rem; margin-top: 1rem; font-size: 0.7em; text-align: left;">
+            <div style="flex: 1; background: rgba(255,85,85,0.1); padding: 0.8rem; border-radius: 0.5rem;">
+                <h4 style="color: #ff5555; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.1em;">1. El "Capacity Gap"</h4>
+                <p>Destilar un profesor enorme (ResNet-152) directo a un alumno diminuto (MobileNet-V1) suele <strong>fracasar</strong>: el Alumno no tiene rango matemático para captar el modelo previo.</p>
+                <p style="margin-top: 0.8rem;"><strong style="color: #50fa7b;">Solución:</strong> <em>Teacher Assistants (TA)</em>. Se destila en pasos graduales mediante redes puente (Gigante → Mediano → Diminuto).</p>
+            </div>
+            <div style="flex: 1; background: rgba(189,147,249,0.1); padding: 0.8rem; border-radius: 0.5rem;">
+                <h4 style="color: #bd93f9; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.1em;">2. KD como "Pegamento" (Ortogonalidad)</h4>
+                <p>KD es acumulable sinérgicamente con otras metodologías de compresión de bajo nivel.</p>
+                <p style="margin-top: 0.8rem;"><strong style="color: #50fa7b;">En la realidad industrial:</strong> Se aplica KD <strong>al mismo tiempo</strong> que se cuantiza (QAT) o se poda el modelo, haciendo que el Profesor guíe la degradación hacia un límite seguro.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. Ejemplo: script01.py -->
+    <section>
+        <h3>Ejemplo en Código: CNN Teacher → MLP Student</h3>
+        <div style="font-size: 0.72em; text-align: left;">
+            <p style="margin-bottom: 0.8rem;">El script <code>examples/knowledge_distillation/script01.py</code> implementa Response-Based KD en Fashion MNIST:</p>
+            <div style="display: flex; gap: 1rem; margin-bottom: 0.8rem;">
+                <div style="flex: 1; background: rgba(255,255,255,0.07); padding: 0.7rem; border-radius: 0.5rem;">
+                    <p style="color: #8be9fd; margin: 0 0 0.3rem;"><strong>Configuración</strong></p>
+                    <p style="margin: 0; font-size: 0.95em;">Teacher: CNN LeNet-5 (~44K params)<br>
+                    Student: MLP pequeño (784→64→32→16→10)<br>
+                    T=4, α=0.7 para el entrenamiento con KD</p>
+                </div>
+                <div style="flex: 1; background: rgba(255,255,255,0.07); padding: 0.7rem; border-radius: 0.5rem;">
+                    <p style="color: #50fa7b; margin: 0 0 0.3rem;"><strong>Pérdida KD</strong></p>
+                    <p style="margin: 0; font-size: 0.95em;">(1−α)·CE(student, labels)<br>
+                    + α·T²·KL(softmax(s/T), softmax(t/T))<br>
+                    Factor T² compensa la escala del gradiente KL.</p>
+                </div>
+                <div style="flex: 1; background: rgba(255,255,255,0.07); padding: 0.7rem; border-radius: 0.5rem;">
+                    <p style="color: #bd93f9; margin: 0 0 0.3rem;"><strong>Análisis</strong></p>
+                    <p style="margin: 0; font-size: 0.95em;">Barrido T∈{1,2,4,8} (5 epochs c/u).<br>
+                    Dark knowledge: correlación entre patrones de error Teacher vs Student KD.</p>
+                </div>
+            </div>
+            <div style="text-align: center;">
+                <img src="../examples/knowledge_distillation/outputs/kd_resultados.png"
+                     style="max-height: 210px; border-radius: 0.4rem;"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+                <p style="display:none; color: #ffb86c; font-style: italic;">⚠️ Ejecutar <code>script01.py</code> para generar la figura</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. Ejemplo avanzado: script02.py — Feature-based KD -->
+    <section>
+        <h3>Avanzado: Feature-Based KD (FitNets)</h3>
+        <div style="font-size: 0.72em; text-align: left;">
+            <p style="margin-bottom: 0.6rem;">El script <code>examples/knowledge_distillation/script02.py</code> enseña al alumno a imitar representaciones internas del profesor, no solo sus logits finales:</p>
+            <!-- Diagrama de flujo -->
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.8rem; font-size: 0.88em;">
+                <div style="background: rgba(80,250,123,0.15); border: 1px solid #50fa7b; padding: 0.5rem 0.8rem; border-radius: 0.4rem; text-align: center;">
+                    <div style="color: #50fa7b; font-weight: bold;">Teacher CNN</div>
+                    <div style="color: #ccc; font-size: 0.85em;">feat (B,16,8,8)</div>
+                    <div style="color: #aaa; font-size: 0.8em;">+ logits</div>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: center; color: #aaa; font-size: 0.85em;">
+                    <span>MSE hint</span>
+                    <span style="font-size: 1.2em;">↕</span>
+                </div>
+                <div style="background: rgba(255,184,108,0.15); border: 1px solid #ffb86c; padding: 0.5rem 0.8rem; border-radius: 0.4rem; text-align: center;">
+                    <div style="color: #ffb86c; font-weight: bold;">Projector</div>
+                    <div style="color: #ccc; font-size: 0.85em;">Linear(64→1024)</div>
+                    <div style="color: #aaa; font-size: 0.8em;">adapta dim</div>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: center; color: #aaa; font-size: 0.85em;">
+                    <span>&nbsp;</span>
+                    <span style="font-size: 1.2em;">←</span>
+                </div>
+                <div style="background: rgba(189,147,249,0.15); border: 1px solid #bd93f9; padding: 0.5rem 0.8rem; border-radius: 0.4rem; text-align: center;">
+                    <div style="color: #bd93f9; font-weight: bold;">Student MLP</div>
+                    <div style="color: #ccc; font-size: 0.85em;">hint (B,64)</div>
+                    <div style="color: #aaa; font-size: 0.8em;">+ logits</div>
+                </div>
+            </div>
+            <!-- Fórmula de pérdida -->
+            <div style="background: rgba(255,255,255,0.08); padding: 0.5rem 1rem; border-radius: 0.4rem; text-align: center; margin-bottom: 0.7rem; font-size: 0.95em;">
+                <code>Loss = (1−λ)·CE(student, labels) + λ·MSE(projector(hint_s), hint_t.detach())</code>
+            </div>
+            <div style="display: flex; gap: 1rem; margin-bottom: 0.7rem; font-size: 0.9em;">
+                <div style="flex: 1; background: rgba(255,255,255,0.06); padding: 0.5rem; border-radius: 0.4rem;">
+                    <p style="color: #50fa7b; margin: 0 0 0.2rem;"><strong>Ventaja vs response-based</strong></p>
+                    <p style="margin: 0;">Al imitar representaciones internas, el alumno aprende <em>cómo</em> resolver el problema, no solo el resultado final → mejor generalización.</p>
+                </div>
+                <div style="flex: 1; background: rgba(255,255,255,0.06); padding: 0.5rem; border-radius: 0.4rem;">
+                    <p style="color: #bd93f9; margin: 0 0 0.2rem;"><strong>Comparación en el script</strong></p>
+                    <p style="margin: 0;">Baseline MLP sin KD · KD response-based (T=4, α=0.7) · KD feature-based (λ=0.5). Mismo alumno, mismos epochs.</p>
+                </div>
+            </div>
+            <div style="text-align: center;">
+                <img src="../examples/knowledge_distillation/outputs/feature_kd_resultados.png"
+                     style="max-height: 185px; border-radius: 0.4rem;"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+                <p style="display:none; color: #ffb86c; font-style: italic;">⚠️ Ejecutar <code>script02.py</code> para generar la figura (script avanzado)</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. Cloud vs Edge -->
+    <section>
+        <h3>Resumen (Cloud vs. Edge)</h3>
+        <div style="font-size: 0.75em; text-align: left;">
+            <ul style="line-height: 1.5;">
+                <li style="margin-bottom: 0.8rem;"><strong style="color: #bd93f9;">En el Cloud (HPC):</strong> El empleo primordial del KD es unificar engranajes (<strong>Ensembles</strong>). En vez de costear 10 modelos concurrentes, se condensan abaratando el balance final de la ejecución en la granja de servidores.</li>
+                <li style="margin-bottom: 0.8rem;"><strong style="color: #50fa7b;">En la IA Embebida (Edge):</strong> Se erige como la herramienta cumbre. Exprimimos el silicio local con un <em>HW-NAS</em> para lograr compresión, y luego usamos <em>Feature-based KD</em> para inculcarle a ese pequeñísimo chip las intuiciones del modelo original de las mega-GPUs.</li>
+            </ul>
+        </div>
+    </section>
+</section>
