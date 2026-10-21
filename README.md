@@ -20,7 +20,7 @@ dependencias — al ejecutar `uv sync` se crea automáticamente el `.venv`.
 | `ejercicios/optimization/` | PyTorch |
 | `ejercicios/nas/` | PyTorch |
 | `ejercicios/knowledge_distillation/` | PyTorch |
-| `ejercicios/esp32-cam/` | PyTorch + esp-ppq + torchao + brevitas |
+| `ejercicios/esp32-pipelines/` | PyTorch + esp-ppq + torchao + brevitas |
 
 Instalar dependencias y correr un script:
 
