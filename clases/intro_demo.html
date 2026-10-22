@@ -80,13 +80,13 @@ uv run python demo/clasificar.py --modelo chico  demo/imagenes/*.png
         <pre style="font-size: 0.42em;"><code class="language-plaintext" data-trim>
 Modelo grande: entrada 96x96, 60,532 parámetros, 59.63 M MACs, accuracy (test) 59.0%
 
-auto.png       -> car 57%  |  truck 32%  |  ship 3%   (1.6 ms en PC)
+auto.png       -> car 63%  |  truck 15%  |  bird 8%   (1.7 ms en PC)
 avion.png      -> ship 49%  |  airplane 46%  |  truck 2%   (1.5 ms en PC)
 caballo.png    -> horse 73%  |  deer 13%  |  dog 7%   (1.5 ms en PC)
 ...
 Modelo chico: entrada 32x32, 4,206 parámetros, 0.39 M MACs, accuracy (test) 41.6%
 
-auto.png       -> car 41%  |  truck 18%  |  ship 15%   (0.6 ms en PC)
+auto.png       -> car 22%  |  horse 20%  |  truck 19%   (0.7 ms en PC)
 caballo.png    -> deer 19%  |  horse 19%  |  dog 18%   (0.5 ms en PC)
 ...
         </code></pre>
