@@ -30,6 +30,11 @@
         <img src="./figures/00_intro-ia_ml_ann_dl.png" style="width: 50%;">
       </div>
     </div>
+    <aside class="notes">
+      Mostrar la figura completa antes de explicar: son conjuntos anidados.
+      Pregunta para el grupo: ¿dónde ubicarían algo que usen en su trabajo (un filtro de Kalman,
+      un clasificador, un LLM)?
+    </aside>
   </section>
 
   <section>
@@ -51,6 +56,12 @@
         </p>
       </div>
     </div>
+    <aside class="notes">
+      Ir mostrando las definiciones de a una (fragmentos).
+      IA es el paraguas; ML aprende de datos en vez de reglas escritas a mano; las redes
+      neuronales son un tipo de modelo de ML; deep learning son redes con muchas capas.
+      En la materia trabajamos casi todo el tiempo dentro de DL.
+    </aside>
   </section>
 
   <section>
@@ -59,6 +70,11 @@
     <div class="diagram-header">
       <div data-external-replace="./figures/00_intro-proyecto_ia_diagram.html"></div>
     </div>
+    <aside class="notes">
+      Presentar el ciclo completo. La idea para CESE: un proyecto de IA no es solo "el modelo";
+      la mayor parte del trabajo está en los datos y en llevarlo a producción.
+      Las flechas de vuelta muestran que es iterativo.
+    </aside>
   </section>
 
   <!-- 1. Adquisición -->
@@ -72,6 +88,10 @@
       <li><strong>Materia prima:</strong> sensores, imágenes, texto, IoT.</li>
       <li><strong>Calidad:</strong> "Garbage in, garbage out".</li>
     </ul>
+    <aside class="notes">
+      Los datos vienen de sensores, cámaras, texto, IoT: muchas veces de un sistema embebido.
+      "Garbage in, garbage out": un modelo no puede ser mejor que sus datos.
+    </aside>
   </section>
 
   <!-- 2. Preparación -->
@@ -85,6 +105,10 @@
       <li><strong>Limpieza y etiquetado:</strong> ordenar la casa.</li>
       <li><strong>Esfuerzo:</strong> representa el <strong>80% del tiempo</strong> del proyecto.</li>
     </ul>
+    <aside class="notes">
+      Limpiar, etiquetar, balancear clases, separar en entrenamiento/validación/test.
+      Suele ser la etapa que más tiempo lleva (el 80 % es una cifra habitual, orientativa).
+    </aside>
   </section>
 
   <!-- 3. Diseño -->
@@ -95,6 +119,10 @@
     </div>
     <h4>Diseño de modelos</h4>
     <p style="font-size: 0.8em;">Búsqueda de la representación matemática ideal para aprender patrones.</p>
+    <aside class="notes">
+      Elegir el tipo de modelo y su arquitectura. Para nosotros, acá aparece la primera
+      decisión de "embebido": elegir desde el principio un modelo que pueda entrar en el hardware.
+    </aside>
   </section>
 
   <!-- 4. Entrenamiento e Inferencia -->
@@ -108,6 +136,11 @@
       <li><strong>Entrenamiento:</strong> proceso de aprendizaje (requiere GPU y energía).</li>
       <li><strong>Inferencia:</strong> uso del modelo en producción (ejecución).</li>
     </ul>
+    <aside class="notes">
+      Distinción clave para toda la materia: entrenar es caro y se hace una vez (en GPU, en la
+      nube o en una PC); la inferencia se hace millones de veces y es lo que corre en el dispositivo.
+      La compresión apunta sobre todo a abaratar la inferencia.
+    </aside>
   </section>
 
   <!-- 5. Evaluación: Clasificación -->
@@ -133,6 +166,12 @@
         </p>
       </div>
     </div>
+    <aside class="notes">
+      Accuracy sola puede engañar con clases desbalanceadas.
+      Precisión: de lo que marqué como positivo, cuánto era positivo. Recall: de los positivos
+      reales, cuántos encontré. F1 combina ambas.
+      La tabla de la derecha es de referencia; no recorrerla entera.
+    </aside>
   </section>
 
   <!-- 5. Evaluación: Regresión -->
@@ -147,6 +186,10 @@
       <li><strong>MAE (Mean Absolute Error):</strong> más fácil de interpretar.</li>
       <li><strong>R² (coeficiente de determinación):</strong> ¿qué tan bien se ajusta la curva?</li>
     </ul>
+    <aside class="notes">
+      MSE castiga más los errores grandes (por el cuadrado); MAE está en las mismas unidades que
+      la variable; R² dice qué fracción de la variabilidad explica el modelo (1 = perfecto).
+    </aside>
   </section>
 
   <!-- 6. Despliegue -->
@@ -160,6 +203,11 @@
       <li>Llevar la IA al mundo real (App, Microcontrolador, Cloud).</li>
       <li><strong>Desafíos:</strong> latencia, escalabilidad y mantenimiento.</li>
     </ul>
+    <aside class="notes">
+      Despliegue es llevar el modelo a donde se usa: una app, un servidor o un microcontrolador.
+      Es la etapa de la que trata gran parte de esta materia. Aparecen requisitos nuevos:
+      latencia, memoria, energía, actualizaciones.
+    </aside>
   </section>
 
   <section>
@@ -173,6 +221,11 @@
       <li>La evaluación debe ser rigurosa y penalizar el impacto real.</li>
       <li>El despliegue cierra el ciclo pero requiere monitoreo constante.</li>
     </ul>
+    <aside class="notes">
+      Cerrar el ciclo con tres ideas: los datos pesan más que el algoritmo, evaluar con la
+      métrica que importa para la aplicación, y el despliegue requiere monitoreo (los datos reales
+      cambian con el tiempo: data drift).
+    </aside>
   </section>
 
   <section>
@@ -191,6 +244,11 @@
     <p style="font-size: 0.8em; margin-top: 1rem; font-style: italic;">
       Los datos son la materia prima de los algoritmos de IA.
     </p>
+    <aside class="notes">
+      Las dos grandes familias de problemas supervisados.
+      Ejemplos: regresión = estimar temperatura o distancia; clasificación = qué objeto hay en la
+      imagen (como en la demo).
+    </aside>
   </section>
 
   <section>
@@ -217,6 +275,10 @@
         <img src="./figures/00_intro-regression.png" style="width: 100%; margin-top: 0; background: transparent;">
       </div>
     </div>
+    <aside class="notes">
+      El modelo más simple. Tiene solución cerrada: los coeficientes se calculan en un paso
+      (mínimos cuadrados). Esto contrasta con lo que viene: casi nada más en ML tiene solución cerrada.
+    </aside>
   </section>
 
   <section>
@@ -242,6 +304,12 @@
           style="width: 100%; margin-top: 0; background: transparent; border-radius: 1rem;">
       </div>
     </div>
+    <aside class="notes">
+      A pesar del nombre, es un clasificador: la sigmoide convierte una salida lineal en una
+      probabilidad entre 0 y 1.
+      No tiene solución cerrada: hay que optimizar numéricamente (descenso por gradiente).
+      Una neurona con activación sigmoide es exactamente una regresión logística.
+    </aside>
   </section>
 
   <section>
@@ -267,6 +335,11 @@
         </p>
       </div>
     </div>
+    <aside class="notes">
+      El cambio de paradigma: en vez de diseñar el algoritmo y las features a mano, se define un
+      modelo grande y se lo ajusta con datos. Funciona porque hoy hay muchos datos y mucho cómputo.
+      Consecuencia para nosotros: los modelos resultantes son grandes, y hay que achicarlos.
+    </aside>
   </section>
 
   <section>
@@ -293,6 +366,12 @@
         <li>Una neurona: <code>y = &phi;(&sum;w<sub>i</sub>x<sub>i</sub> + b)</code></li>
       </ul>
     </ul>
+    <aside class="notes">
+      Definición que usamos en toda la materia: y = f(x; θ). x son las entradas, θ los
+      parámetros que se aprenden.
+      Recorrer los ejemplos de menor a mayor: hasta una neurona es una función paramétrica más.
+      Comprimir un modelo es, en el fondo, cambiar f o θ para que sean más baratos.
+    </aside>
   </section>
 
   <section>
@@ -304,6 +383,10 @@
         <code>&theta;</code> para minimizar la discrepancia (error) entre la predicción y el valor real.
       </li>
     </ul>
+    <aside class="notes">
+      Volver a remarcar: en inferencia θ está fijo; en entrenamiento θ cambia.
+      Para un sistema embebido, casi siempre solo nos importa la inferencia.
+    </aside>
   </section>
 
   <section>
@@ -317,6 +400,12 @@
     </ul>
     <img src="./figures/costo.png"
       style="height: 300px; border-radius: 1rem; margin: 0 auto 4rem auto; background: white;">
+    <aside class="notes">
+      Gradiente descendente: dar pasos en la dirección que más reduce el error.
+      Backpropagation: la forma eficiente de calcular esos gradientes en una red, con la regla de
+      la cadena. No hace falta el detalle matemático para la materia; sí la idea de que entrenar
+      es iterativo y costoso.
+    </aside>
   </section>
 
   <section>
@@ -343,6 +432,12 @@
         Fuente: MathWorks - Overfitting
       </a>
     </p>
+    <aside class="notes">
+      Overfitting: el modelo memoriza el entrenamiento y no generaliza. Underfitting: el modelo
+      no alcanza ni para el entrenamiento.
+      Conexión con la materia: un modelo más chico tiende al underfitting; uno sobredimensionado
+      desperdicia recursos. Comprimir bien es encontrar el punto justo.
+    </aside>
   </section>
 
   <section>
@@ -370,6 +465,11 @@
         <img src="./figures/01-bias_variance.png" style="width: 100%; border-radius: 1rem;">
       </div>
     </div>
+    <aside class="notes">
+      Otra forma de ver lo mismo: sesgo alto ≈ underfitting, varianza alta ≈ overfitting.
+      El ajuste de la complejidad del modelo es un compromiso, igual que el de la materia entre
+      tamaño y accuracy.
+    </aside>
   </section>
 
   <section>
@@ -385,6 +485,10 @@
       <li><strong>Tamaño de lote (Batch size):</strong> cantidad de muestras analizadas en paralelo antes de realizar un
         ajuste.</li>
     </ul>
+    <aside class="notes">
+      Hiperparámetros: lo que se elige antes de entrenar (no se aprende).
+      Learning rate, épocas y batch size son los tres que van a ver en todos los scripts del curso.
+    </aside>
   </section>
 
   <section>
@@ -399,6 +503,11 @@
       <li>Topologias avanzadas: multiples caminos y conexiones residuales</li>
       <li>Ejemplos de redes neuronales para visión artificial</li>
     </ul>
+    <aside class="notes">
+      Agenda de la parte de arquitecturas: de la neurona a las redes de visión completas.
+      Mientras avanzamos, prestar atención a cuántos parámetros y operaciones agrega cada tipo
+      de capa: es lo que después vamos a comprimir.
+    </aside>
   </section>
 
   <!-- Neuronas -->
@@ -420,6 +529,11 @@
         <div data-external-replace="./figures/02-neuron_diagram.html"></div>
       </div>
     </div>
+    <aside class="notes">
+      Una neurona: suma ponderada de las entradas más un sesgo, y una activación no lineal.
+      Para los de embebidos: es una multiplicación-acumulación (MAC) por entrada, más una función.
+      Contar MACs es la forma básica de medir el costo de una red.
+    </aside>
   </section>
 
   <!-- Activaciones -->
@@ -440,6 +554,11 @@
       <img src="./figures/02-activation_swish.png"
         style="width: 100%; border-radius: 0.5rem; background: rgba(255,255,255,0.1); margin: 0;">
     </div>
+    <aside class="notes">
+      Sin activaciones no lineales, apilar capas es equivalente a una sola capa lineal.
+      ReLU es la más usada: barata (un max con cero), ideal para hardware. Sigmoide y tanh
+      requieren exponenciales: más caras en un microcontrolador.
+    </aside>
   </section>
 
   <!-- Capas densas -->
@@ -458,6 +577,11 @@
         <div data-external-replace="./figures/02-dense_layer_diagram.html"></div>
       </div>
     </div>
+    <aside class="notes">
+      Cada salida depende de todas las entradas: parámetros = entradas × salidas (+ sesgos).
+      Ejemplo: 1000 entradas y 1000 salidas son 1 millón de pesos (4 MB en FP32), más que la RAM
+      de la ESP32-CAM.
+    </aside>
   </section>
 
   <section>
@@ -471,11 +595,21 @@
       <li><strong>Compartición de pesos:</strong> reduce drásticamente los parámetros frente a las capas densas.
       </li>
     </ul>
+    <aside class="notes">
+      Un mismo filtro chico se aplica en toda la imagen: compartir pesos reduce muchísimo los
+      parámetros respecto a una densa.
+      Pero el costo en operaciones (MACs) sigue siendo alto, porque el filtro se aplica en cada posición.
+    </aside>
   </section>
   <section>
     <h3>Capas Convolucionales (CNN)</h3>
     <iframe src="./figures/02-conv_animation.html"
       style="width: 100%; height: 620px; border: none; background: transparent;" scrolling="no"></iframe>
+    <aside class="notes">
+      Mostrar la animación: el kernel se desliza y en cada posición hace una suma de productos.
+      Con varios canales de entrada, el filtro tiene profundidad; con varios filtros, hay varios
+      canales de salida. MACs ≈ alto × ancho de salida × canales de salida × (k × k × canales de entrada).
+    </aside>
   </section>
 
   <section>
@@ -502,6 +636,11 @@
           simplificada de LSTM con rendimiento similar y menos cómputo.</p>
       </div>
     </div>
+    <aside class="notes">
+      Para secuencias (audio, texto, series de tiempo). Mantienen un estado entre pasos.
+      LSTM y GRU agregan compuertas para recordar más tiempo.
+      En la materia nos enfocamos en CNN; las mencionamos para que sepan que existen.
+    </aside>
   </section>
 
   <section>
@@ -525,6 +664,10 @@
           style="width: 100%; height: 320px; border: none; background: transparent;" scrolling="no"></iframe>
       </div>
     </div>
+    <aside class="notes">
+      Pooling reduce el tamaño espacial (menos cómputo en las capas siguientes) sin parámetros.
+      Flatten solo reacomoda el tensor para conectarlo a capas densas: no hace cálculos.
+    </aside>
   </section>
 
   <section>
@@ -551,6 +694,12 @@
       </div>
     </div>
     <p style="font-size: 0.85em;">Estas capas tienen comportamiento diferente en entrenamiento y en inferencia.</p>
+    <aside class="notes">
+      BatchNorm y Dropout se comportan distinto en entrenamiento y en inferencia.
+      Importante para embebidos: en inferencia BatchNorm es una operación lineal fija que se puede
+      fusionar con la convolución anterior (BN folding, lo vemos en optimización algorítmica), y
+      Dropout directamente desaparece.
+    </aside>
   </section>
 
   <!-- Perceptrón multicapa -->
@@ -570,6 +719,10 @@
         <div data-external-replace="./figures/02-mlp_diagram.html"></div>
       </div>
     </div>
+    <aside class="notes">
+      Varias capas densas apiladas. Con suficientes neuronas puede aproximar cualquier función
+      continua (teorema de aproximación universal), pero eso no dice nada sobre su tamaño ni costo.
+    </aside>
   </section>
 
   <!-- Estructura típica para redes de visión artificial: backbone -->
@@ -590,6 +743,10 @@
         <div data-external-replace="./figures/02-architecture_backbone.html"></div>
       </div>
     </div>
+    <aside class="notes">
+      Las redes de visión tienen dos partes. El backbone extrae características con convoluciones
+      y pooling; es donde está la mayor parte de las operaciones.
+    </aside>
   </section>
 
   <!-- Estructura típica para redes de visión artificial: head -->
@@ -617,6 +774,10 @@
         <div data-external-replace="./figures/02-architecture_head.html"></div>
       </div>
     </div>
+    <aside class="notes">
+      La cabeza interpreta esas características y da la salida: lineal para regresión, softmax
+      para clasificación. Suele concentrar muchos parámetros (capas densas) aunque pocas operaciones.
+    </aside>
   </section>
 
   <!-- Topologías avanzadas -->
@@ -640,6 +801,12 @@
         <div data-external-replace="./figures/02-topology_branching.html"></div>
       </div>
     </div>
+    <aside class="notes">
+      Las redes modernas no son una cadena simple: tienen conexiones residuales (ResNet) y
+      caminos en paralelo (Inception).
+      Para embebidos importa porque hay que guardar activaciones de varios caminos a la vez:
+      más memoria intermedia.
+    </aside>
   </section>
 
   <!-- Ejemplos CNN (Cronológico) -->
@@ -647,6 +814,10 @@
     <h3>Ejemplos de redes</h3>
     <p style="font-size: 0.8em;">Breve recorrido histórico de arquitecturas exitosas y su influencia en visión
       artificial.</p>
+    <aside class="notes">
+      Recorrido rápido por redes clásicas de visión, en orden cronológico. Mirar cómo evolucionan
+      parámetros y eficiencia.
+    </aside>
   </section>
 
   <section>
@@ -667,6 +838,10 @@
         <div data-external-replace="./figures/02-lenet5_diagram.html"></div>
       </div>
     </div>
+    <aside class="notes">
+      La red pionera (1998): reconocer dígitos manuscritos. Es chica (~60 mil parámetros) y es
+      la que se ve en la visualización interactiva del final.
+    </aside>
   </section>
 
   <section>
@@ -686,6 +861,10 @@
         <div data-external-replace="./figures/02-alexnet_diagram.html"></div>
       </div>
     </div>
+    <aside class="notes">
+      2012: el punto de inflexión. Ganó ImageNet por mucho gracias a una red grande entrenada en
+      GPUs, con ReLU y Dropout.
+    </aside>
   </section>
 
   <section>
@@ -705,6 +884,10 @@
         <div data-external-replace="./figures/02-vgg_diagram.html"></div>
       </div>
     </div>
+    <aside class="notes">
+      Mucha profundidad con filtros 3x3. Muy precisa para su época, pero enorme: ~138 millones
+      de parámetros. Es el ejemplo típico de red que no entra en un embebido.
+    </aside>
   </section>
 
   <section>
@@ -724,6 +907,10 @@
         <div data-external-replace="./figures/02-inception_diagram.html"></div>
       </div>
     </div>
+    <aside class="notes">
+      Varios filtros en paralelo y convoluciones 1x1 para reducir canales antes de las convoluciones grandes.
+      Mejor que VGG con muchos menos parámetros: primer ejemplo de diseño pensando en eficiencia.
+    </aside>
   </section>
 
   <section>
@@ -745,6 +932,10 @@
         <div data-external-replace="./figures/02-resnet_diagram.html"></div>
       </div>
     </div>
+    <aside class="notes">
+      Las conexiones residuales permiten entrenar redes de cientos de capas. Hoy casi toda
+      arquitectura las usa.
+    </aside>
   </section>
 
   <section>
@@ -763,6 +954,10 @@
         <div data-external-replace="./figures/02-mobilenet_diagram.html"></div>
       </div>
     </div>
+    <aside class="notes">
+      Diseñada para móviles: reemplaza la convolución estándar por depthwise separable, que hace
+      muchas menos operaciones. Es la idea que usa el modelo chico de la demo.
+    </aside>
   </section>
 
   <section>
@@ -822,6 +1017,11 @@
         </tr>
       </tbody>
     </table>
+    <aside class="notes">
+      Hacer notar la tendencia: de VGG (138 M) a MobileNet (4.2 M) con accuracy parecida.
+      Mejorar la arquitectura es una de las formas más efectivas de "comprimir".
+      Las cifras de accuracy son aproximadas y dependen de la variante y del protocolo de evaluación.
+    </aside>
   </section>
 
   <!-- Ejemplos intuitivos: presentación -->
@@ -845,6 +1045,10 @@
         </span>
       </li>
     </ul>
+    <aside class="notes">
+      Dos ejemplos para desarrollar intuición antes de cerrar la sección: ajustar una función
+      1D con modelos de complejidad creciente, y ver por dentro una LeNet.
+    </aside>
   </section>
 
   <!-- Ejemplos intuitivos: datos + modelos -->
@@ -868,6 +1072,11 @@
         </ol>
       </div>
     </div>
+    <aside class="notes">
+      Los datos siguen una recta más una senoide con ruido. Se prueban modelos de menor a mayor
+      complejidad, desde regresión lineal hasta MLPs de dos capas.
+      Pregunta para el grupo: ¿cuál creen que va a ajustar mejor?
+    </aside>
   </section>
 
   <!-- Ejemplos intuitivos: imagen de salida (sin título) -->
@@ -875,6 +1084,11 @@
     <h3>Ejemplo 1 - Ajustes</h3>
     <img src="./figures/02-fit_models_1d.png"
       style="width: 100%; max-height: 155vh; object-fit: contain; margin: 0; padding: 0; display: block;">
+    <aside class="notes">
+      Comparar: los modelos simples no alcanzan (underfitting); el modelo con la forma correcta
+      (lineal + senoide) ajusta con muy pocos parámetros; los MLP grandes ajustan pero con muchos
+      más parámetros. Conocer el problema permite modelos mucho más chicos.
+    </aside>
   </section>
 
   <!-- Ejemplos intuitivos: visualización LeNet 2D -->
@@ -887,6 +1101,10 @@
       <img src="./figures/02-2d_lenet_visualization.png"
         style="width: 90%; max-height: 78vh; object-fit: contain; border-radius: 0.5rem;">
     </div>
+    <aside class="notes">
+      Abrir el link y dibujar un dígito: se ven las activaciones de cada capa en tiempo real.
+      Sirve para ver que cada capa es una transformación concreta, con un costo concreto.
+    </aside>
   </section>
 
   <!-- Cierre sección CESE -->
@@ -902,6 +1120,12 @@
       <li style="margin-bottom: 0.4rem;">La <strong>intuición práctica</strong> es vital: ver cómo ajusta una regresión
         1D y cómo activan los mapas visuales en una CNN nos ayuda a entender "qué ve" y cómo procesa la red.</li>
     </ul>
+    <aside class="notes">
+      Resumen de la nivelación. Lo importante para el resto de la materia: un modelo es una
+      función con parámetros; entrenar es caro pero se hace una vez; la inferencia es lo que corre
+      en el dispositivo; y cada capa tiene un costo en parámetros y en operaciones que podemos medir
+      y reducir.
+    </aside>
   </section>
 
 </section>
