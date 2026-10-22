@@ -12,6 +12,7 @@ clases/deploy_despliegue.html
 clases/deploy_frameworks.html
 clases/deploy_ia_embebida.html
 clases/deploy_plataformas.html
+clases/figures/00_intro-binary_classification.svg
 clases/figures/00_intro-ia_ml_ann_dl.png
 clases/figures/00_intro-logistic_regression.png
 clases/figures/00_intro-metrics1.png
