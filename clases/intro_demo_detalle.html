@@ -1,8 +1,8 @@
-<!-- 5. La demo, en detalle -->
+<!-- 6. La demo, en detalle -->
 <section>
 
     <section>
-        <h2 class="gradient-text">5. La demo, en detalle</h2>
+        <h2 class="gradient-text">6. La demo, en detalle</h2>
         <p>Volvemos al ejemplo del principio, con lo que vimos en las introducciones</p>
         <ul style="font-size: 0.8em; text-align: left; max-width: 700px; margin: 1.5rem auto;">
             <li style="margin-bottom: 0.5rem;">Los modelos</li>
@@ -144,7 +144,7 @@
             <div
                 style="flex: 1; background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 1.2rem; text-align: center;">
                 <p style="margin: 0;">Tiempo (misma placa)</p>
-                <p style="font-size: 1.6em; margin: 0.4rem 0; color: #50fa7b;"><strong>~85–97×</strong> menos</p>
+                <p style="font-size: 1.6em; margin: 0.4rem 0; color: #50fa7b;"><strong>~100–125×</strong> menos</p>
                 <p style="margin: 0; color: #6272a4;">ESP32-CAM y ESP32-S3</p>
             </div>
         </div>
@@ -182,9 +182,9 @@
                 </tr>
                 <tr>
                     <td style="padding: 8px;">Chico</td>
-                    <td style="padding: 8px;">111 ms</td>
+                    <td style="padding: 8px;">75 ms</td>
                     <td style="padding: 8px;">6.4 ms</td>
-                    <td style="padding: 8px; color: #50fa7b;"><strong>~17×</strong></td>
+                    <td style="padding: 8px; color: #50fa7b;"><strong>~12×</strong></td>
                 </tr>
             </tbody>
         </table>
@@ -193,7 +193,8 @@
             hacen varias multiplicaciones-acumulaciones por ciclo.
         </p>
         <aside class="notes">
-            Misma frecuencia de reloj, 15 veces más rápido: la diferencia está en la arquitectura.
+            Misma frecuencia de reloj, 12 a 15 veces más rápido: la diferencia está en la arquitectura.
+            (ESP32-CAM medida en la demo; ESP32-S3 en un devkit, ver benchmarks.json.)
             Conectar con la intro para CEIA: arquitecturas iterativas vs. con más paralelismo, y
             con INT8: las instrucciones vectoriales del S3 están pensadas para enteros de 8 y 16 bits.
             Por eso elegir la plataforma es parte del diseño, no un detalle del final.
@@ -244,7 +245,7 @@
             se ejecuta. Los runtimes que usan las instrucciones vectoriales del S3 (ESP-DL y
             TFLite Micro con ESP-NN) son los rápidos; los genéricos no las aprovechan.
             Es tan importante como comprimir el modelo, y lo vemos en la parte de despliegue.
-            Medido con examples/esp32-pipelines (firmware_rt/).
+            Medido con examples/esp32-pipelines (firmware_rt/) en un ESP32-S3 devkit.
         </aside>
     </section>
 

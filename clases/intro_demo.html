@@ -1,13 +1,14 @@
-<!-- 2. Demo: IA en un microcontrolador -->
+<!-- 3. Demo: IA en un microcontrolador -->
 <section>
 
     <section>
-        <h2 class="gradient-text">2. Demo: IA en un microcontrolador</h2>
+        <h2 class="gradient-text">3. Demo: IA en un microcontrolador</h2>
         <p>Un adelanto de lo que vamos a hacer en la materia</p>
         <aside class="notes">
             Arrancamos la parte 1 con un adelanto, no con teoría. La idea es que vean a
             dónde queremos llegar antes de pasar por las dos introducciones.
-            Son 5 minutos: no explicar nada todavía, solo mostrar el problema y el resultado.
+            No explicar nada todavía: mostrar el problema, correr los dos modelos y ver la diferencia.
+            Todo lo necesario para correr la demo está en estas diapositivas.
         </aside>
     </section>
 
@@ -16,10 +17,10 @@
         <div style="display: flex; gap: 2rem; align-items: stretch; font-size: 0.7em;">
             <div
                 style="flex: 1; background: rgba(139,233,253,0.1); border-radius: 0.5rem; padding: 1.2rem; border: 1px solid rgba(139,233,253,0.3); text-align: left;">
-                <h4 style="color: #8be9fd; margin: 0 0 0.8rem;">🔌 La placa</h4>
+                <h4 style="color: #8be9fd; margin: 0 0 0.8rem;">🔌 La placa: ESP32-CAM</h4>
                 <ul style="font-size: 0.9em;">
-                    <li style="margin-bottom: 0.4rem;">ESP32-CAM: microcontrolador de pocos dólares con cámara.</li>
-                    <li style="margin-bottom: 0.4rem;">CPU de 240 MHz, ~520 KB de RAM interna.</li>
+                    <li style="margin-bottom: 0.4rem;">Microcontrolador de pocos dólares con cámara.</li>
+                    <li style="margin-bottom: 0.4rem;">CPU de 240 MHz, ~520 KB de RAM interna (+4 MB externa).</li>
                     <li>Sin GPU, sin sistema operativo, sin Python.</li>
                 </ul>
             </div>
@@ -27,8 +28,8 @@
                 style="flex: 1; background: rgba(189,147,249,0.1); border-radius: 0.5rem; padding: 1.2rem; border: 1px solid rgba(189,147,249,0.3); text-align: left;">
                 <h4 style="color: #bd93f9; margin: 0 0 0.8rem;">🧠 La tarea</h4>
                 <ul style="font-size: 0.9em;">
-                    <li style="margin-bottom: 0.4rem;">Clasificar imágenes en 10 clases (avión, pájaro, auto, gato,
-                        perro, barco...).</li>
+                    <li style="margin-bottom: 0.4rem;">Clasificar imágenes en 10 clases (avión, pájaro, auto, ciervo,
+                        perro, rana, caballo, mono, barco, camión).</li>
                     <li style="margin-bottom: 0.4rem;">Con una red neuronal convolucional (CNN).</li>
                     <li>Todo dentro de la placa: sin nube, sin conexión.</li>
                 </ul>
@@ -37,27 +38,166 @@
         <aside class="notes">
             Presentar la placa como algo que cuesta lo mismo que un café y que tiene menos
             memoria que una sola foto de un celular.
-            Dataset: STL-10, imágenes de 10 clases.
+            Dataset: STL-10 (imágenes de 96×96 de 10 clases).
             Pregunta para el grupo: ¿les parece que una red neuronal entra acá?
             Dejar que respondan; no corregir todavía.
         </aside>
     </section>
 
     <section>
-        <h3>La placa clasificando</h3>
+        <h3>Las imágenes</h3>
         <div
-            style="margin: 1rem auto; max-width: 700px; aspect-ratio: 16 / 9; border: 2px dashed rgba(255,255,255,0.3); border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; color: #6272a4; font-size: 0.7em;">
-            [Video pendiente: la ESP32-CAM clasificando en vivo]
+            style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.8rem; max-width: 760px; margin: 1rem auto; font-size: 0.5em;">
+            <div><img src="./figures/demo/avion.png" style="width: 100%; image-rendering: pixelated; margin: 0;"><br>avion.png</div>
+            <div><img src="./figures/demo/pajaro.png" style="width: 100%; image-rendering: pixelated; margin: 0;"><br>pajaro.png</div>
+            <div><img src="./figures/demo/auto.png" style="width: 100%; image-rendering: pixelated; margin: 0;"><br>auto.png</div>
+            <div><img src="./figures/demo/ciervo.png" style="width: 100%; image-rendering: pixelated; margin: 0;"><br>ciervo.png</div>
+            <div><img src="./figures/demo/perro.png" style="width: 100%; image-rendering: pixelated; margin: 0;"><br>perro.png</div>
+            <div><img src="./figures/demo/rana.png" style="width: 100%; image-rendering: pixelated; margin: 0;"><br>rana.png</div>
+            <div><img src="./figures/demo/caballo.png" style="width: 100%; image-rendering: pixelated; margin: 0;"><br>caballo.png</div>
+            <div><img src="./figures/demo/mono.png" style="width: 100%; image-rendering: pixelated; margin: 0;"><br>mono.png</div>
+            <div><img src="./figures/demo/barco.png" style="width: 100%; image-rendering: pixelated; margin: 0;"><br>barco.png</div>
+            <div><img src="./figures/demo/camion.png" style="width: 100%; image-rendering: pixelated; margin: 0;"><br>camion.png</div>
         </div>
+        <p style="font-size: 0.6em; color: #6272a4;">Una imagen por clase del conjunto de test de STL-10 (96×96 píxeles),
+            en <code>demo/imagenes/</code>.</p>
         <aside class="notes">
-            Mostrar el video (o, si el hardware coopera, un flasheo en vivo de un binario ya
-            compilado; nunca entrenar en vivo).
-            Mostrar la clase predicha, la confianza y el tiempo por inferencia.
+            Son imágenes chicas y difíciles: 96×96 píxeles, fotos reales con fondos variados.
+            Son la primera imagen de cada clase del test set; no están elegidas para que el modelo acierte.
         </aside>
     </section>
 
     <section>
-        <h3>Mismo problema, distintos modelos</h3>
+        <h3>En la PC: clasificar con Python</h3>
+        <p style="font-size: 0.6em; text-align: left; margin-bottom: 0.3rem;">Desde la carpeta del ejemplo
+            (<code>examples/esp32-pipelines/</code>; en el repo de la materia, <code>ejercicios/esp32-pipelines/</code>):</p>
+        <pre style="font-size: 0.42em;"><code class="language-bash" data-trim>
+uv sync                                                              # solo la primera vez (tarda)
+uv run python demo/clasificar.py --modelo grande demo/imagenes/*.png
+uv run python demo/clasificar.py --modelo chico  demo/imagenes/*.png
+        </code></pre>
+        <pre style="font-size: 0.42em;"><code class="language-plaintext" data-trim>
+Modelo grande: entrada 96x96, 60,532 parámetros, 59.63 M MACs, accuracy (test) 59.0%
+
+auto.png       -> car 57%  |  truck 32%  |  ship 3%   (1.6 ms en PC)
+avion.png      -> ship 49%  |  airplane 46%  |  truck 2%   (1.5 ms en PC)
+caballo.png    -> horse 73%  |  dog 13%  |  frog 7%   (1.4 ms en PC)
+...
+Modelo chico: entrada 32x32, 4,206 parámetros, 0.39 M MACs, accuracy (test) 41.6%
+
+auto.png       -> car 41%  |  truck 18%  |  ship 15%   (1.3 ms en PC)
+caballo.png    -> dog 19%  |  horse 19%  |  frog 18%   (1.1 ms en PC)
+...
+        </code></pre>
+        <aside class="notes">
+            Mismo modelo que después va a la placa, pero en PyTorch, en FP32 y en una PC.
+            En la PC los dos tardan ~1 ms: acá no se nota ninguna diferencia de costo.
+            Sobre estas 10 imágenes el grande acierta 6 y el chico 3: hay un costo en accuracy.
+            El script es demo/clasificar.py; se le puede pasar cualquier imagen.
+        </aside>
+    </section>
+
+    <section>
+        <h3>En la placa: preparación</h3>
+        <ul style="font-size: 0.62em; text-align: left;">
+            <li style="margin-bottom: 0.5rem;">Una sola vez: instalar ESP-IDF v5.3 (guía oficial de Espressif,
+                "Get Started" para ESP32).</li>
+            <li style="margin-bottom: 0.5rem;">Conectar la ESP32-CAM, montada sobre la placa <strong>ESP32-CAM-MB</strong>,
+                por USB.</li>
+            <li style="margin-bottom: 0.5rem;">En cada terminal nueva, desde la carpeta del ejemplo:</li>
+        </ul>
+        <pre style="font-size: 0.45em;"><code class="language-bash" data-trim>
+. ~/esp/esp-idf/export.sh      # carga esptool.py y el monitor de ESP-IDF
+ls /dev/ttyUSB*                # puerto de la placa (en general /dev/ttyUSB0)
+        </code></pre>
+        <p style="font-size: 0.55em; color: #6272a4; text-align: left;">Los firmwares ya están compilados en
+            <code>demo/</code>: <code>demo_grande.bin</code> y <code>demo_chico.bin</code>. No hace falta compilar nada.</p>
+        <aside class="notes">
+            Si el puerto no es /dev/ttyUSB0, reemplazarlo en todos los comandos.
+            Si da "permission denied" en el puerto: el usuario tiene que estar en el grupo dialout.
+            La ESP32-CAM-MB no tiene reset automático: para flashear hay que usar los botones.
+        </aside>
+    </section>
+
+    <section>
+        <h3>En la placa: modelo grande</h3>
+        <ol style="font-size: 0.6em; text-align: left;">
+            <li style="margin-bottom: 0.4rem;">Modo de carga: <strong>mantener BOOT</strong>, tocar
+                <strong>RST</strong>, soltar <strong>BOOT</strong>.</li>
+            <li style="margin-bottom: 0.4rem;">Flashear:</li>
+        </ol>
+        <pre style="font-size: 0.42em;"><code class="language-bash" data-trim>
+esptool.py --chip esp32 -p /dev/ttyUSB0 -b 460800 write_flash 0x0 demo/demo_grande.bin
+        </code></pre>
+        <ol start="3" style="font-size: 0.6em; text-align: left;">
+            <li style="margin-bottom: 0.4rem;">Abrir el monitor y después tocar <strong>RST</strong> (solo RST) para arrancar:</li>
+        </ol>
+        <pre style="font-size: 0.42em;"><code class="language-bash" data-trim>
+python -m esp_idf_monitor -p /dev/ttyUSB0
+        </code></pre>
+        <ol start="4" style="font-size: 0.6em; text-align: left;">
+            <li>Tecla <code>t</code>: clasifica 10 imágenes de prueba. Tecla <code>c</code>: una foto con la cámara.
+                Tecla <code>h</code>: ayuda. <strong>Ctrl+]</strong>: salir del monitor.</li>
+        </ol>
+        <aside class="notes">
+            El flasheo tarda ~30 s. Si esptool no conecta, repetir el paso 1 (BOOT+RST) y volver a correr el comando.
+            Abrir el monitor ANTES de tocar RST, así se ve el arranque.
+            Con el grande el self-test tarda ~1.5 minutos (10 imágenes de ~9 s): buen momento para
+            preguntar qué creen que está pasando.
+            La captura con la cámara (c) es opcional: con el modelo grande también tarda ~9 s.
+        </aside>
+    </section>
+
+    <section>
+        <h3>Modelo grande: lo que se ve</h3>
+        <pre style="font-size: 0.4em;"><code class="language-plaintext" data-trim>
+=== SELF-TEST: 10 golden images (STL-10 test set) ===
+  airplane  -> airplane   99.5%  (pc_q: airplane   99.5% | float  99.5%)  dlogits<=0  9364ms  PASS
+  bird      -> bird       97.6%  (pc_q: bird       97.6% | float  97.8%)  dlogits<=0  9358ms  PASS
+  car       -> car        99.8%  (pc_q: car        99.8% | float  99.9%)  dlogits<=0  9363ms  PASS
+  ...
+  truck     -> truck      95.4%  (pc_q: truck      95.4% | float  96.6%)  dlogits<=0  9366ms  PASS
+=== SELF-TEST: 10/10 PASS (vs PC cuantizado) ===
+        </code></pre>
+        <p style="font-size: 0.7em; color: #ff79c6;">~9.4 segundos por imagen.</p>
+        <aside class="notes">
+            Salida real en la ESP32-CAM (respaldo por si la placa no coopera en clase).
+            PASS significa que la placa da exactamente lo mismo que el modelo cuantizado simulado en la PC.
+            Las 10 imágenes del self-test están elegidas entre las que el modelo clasifica bien: sirven
+            para verificar la placa y medir tiempo, no para medir accuracy.
+        </aside>
+    </section>
+
+    <section>
+        <h3>En la placa: modelo chico</h3>
+        <p style="font-size: 0.6em; text-align: left;">Los mismos pasos, con el otro firmware
+            (salir antes del monitor con <strong>Ctrl+]</strong>):</p>
+        <ol style="font-size: 0.6em; text-align: left;">
+            <li style="margin-bottom: 0.4rem;"><strong>Mantener BOOT</strong>, tocar <strong>RST</strong>, soltar
+                <strong>BOOT</strong>.</li>
+        </ol>
+        <pre style="font-size: 0.42em;"><code class="language-bash" data-trim>
+esptool.py --chip esp32 -p /dev/ttyUSB0 -b 460800 write_flash 0x0 demo/demo_chico.bin
+python -m esp_idf_monitor -p /dev/ttyUSB0      # después tocar RST, y tecla t
+        </code></pre>
+        <pre style="font-size: 0.4em;"><code class="language-plaintext" data-trim>
+=== SELF-TEST: 10 golden images (STL-10 test set) ===
+  airplane  -> airplane   81.2%  (pc_q: airplane   81.2% | float  84.7%)  dlogits<=0  75ms  PASS
+  bird      -> bird       65.6%  (pc_q: bird       65.6% | float  74.7%)  dlogits<=0  72ms  PASS
+  ...
+=== SELF-TEST: 10/10 PASS (vs PC cuantizado) ===
+        </code></pre>
+        <p style="font-size: 0.7em; color: #50fa7b;">~75 milisegundos por imagen.</p>
+        <aside class="notes">
+            Ahora el self-test termina antes de que terminemos de leer la pantalla.
+            Probar la cámara con la tecla c (y m para modo continuo): apuntar a una foto en el celular.
+            Va a equivocarse seguido: es el modelo de 42 % de accuracy, y la cámara ve algo muy distinto
+            de las imágenes de entrenamiento.
+        </aside>
+    </section>
+
+    <section>
+        <h3>Mismo problema, misma placa, dos modelos</h3>
         <table style="font-size: 0.6em; width: 100%; border-collapse: collapse; margin-top: 0.5rem;">
             <thead>
                 <tr style="border-bottom: 2px solid #fff;">
@@ -71,14 +211,8 @@
                 <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
                     <td style="padding: 8px;">Tiempo por imagen (ESP32-CAM)</td>
                     <td style="padding: 8px;">9.4 s</td>
-                    <td style="padding: 8px;">0.11 s</td>
-                    <td style="padding: 8px; color: #50fa7b;"><strong>~85× más rápido</strong></td>
-                </tr>
-                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
-                    <td style="padding: 8px;">Tiempo por imagen (ESP32-S3)</td>
-                    <td style="padding: 8px;">619 ms</td>
-                    <td style="padding: 8px;">6.4 ms</td>
-                    <td style="padding: 8px; color: #50fa7b;"><strong>~97× más rápido</strong></td>
+                    <td style="padding: 8px;">75 ms</td>
+                    <td style="padding: 8px; color: #50fa7b;"><strong>~125× más rápido</strong></td>
                 </tr>
                 <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
                     <td style="padding: 8px;">Tamaño del modelo</td>
@@ -95,16 +229,15 @@
             </tbody>
         </table>
         <p style="font-size: 0.7em; margin-top: 1rem; color: #ffb86c;">
-            De 9.4 s a 6.4 ms: unas 1500 veces menos, en la misma familia de placas... pero no es gratis.
+            Más de 100 veces más rápido... pero no es gratis.
         </p>
         <aside class="notes">
-            El número para quedarse: de casi 10 segundos a pocos milisegundos.
+            El número para quedarse: de casi 10 segundos a menos de una décima de segundo, en la misma placa.
             Pero la última fila es igual de importante: perdimos accuracy. Toda la materia
             gira alrededor de este compromiso: cuánto rendimiento ganamos y cuánto estamos
             dispuestos a perder.
             (La accuracy es baja en ambos casos porque los modelos son minúsculos y el dataset
             es difícil; el azar es 10 %. El objetivo es mostrar el compromiso, no un producto.)
-            Medido en las placas con ESP-DL; ver examples/esp32-pipelines/benchmarks.json.
         </aside>
     </section>
 
