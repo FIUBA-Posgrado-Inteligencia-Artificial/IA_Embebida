@@ -142,25 +142,33 @@
     </div>
     <h4>Evaluación: clasificación</h4>
     <div style="display: flex; align-items: center; gap: 1rem;">
-      <div style="flex: 1;">
-        <ul style="font-size: 0.7em;">
-          <li><strong>Precisión:</strong> ¿cuánto de lo que predigo es correcto?</li>
-          <li><strong>Recall / sensibilidad:</strong> ¿cuánto de la realidad detecto?</li>
-          <li><strong>F1-score:</strong> balance entre ambos.</li>
+      <div style="flex: 1.4; text-align: left;">
+        <ul style="font-size: 0.6em;">
+          <li style="margin-bottom: 0.5rem;"><strong>Precisión</strong> = TP / (TP + FP): de lo que el modelo marca
+            como positivo, ¿cuánto lo es? (pocas falsas alarmas)</li>
+          <li style="margin-bottom: 0.5rem;"><strong>Recall / sensibilidad</strong> = TP / (TP + FN): de lo que
+            realmente es positivo, ¿cuánto detecta? (pocos casos perdidos)</li>
+          <li><strong>F1-score</strong> = 2·P·R / (P + R): es alto solo si las dos son altas.</li>
         </ul>
+        <p style="font-size: 0.45em; opacity: 0.8;">En el diagrama: precisión = PPV, recall = TPR.</p>
       </div>
       <div style="flex: 1; text-align: center;">
-        <img src="./figures/00_intro-metrics1.png" style="max-height: 300px; width: auto;">
-        <p style="font-size: 0.4em; opacity: 0.6; margin-top: 0.5rem;">
-          Fuente: <a href="https://en.wikipedia.org/wiki/Evaluation_of_binary_classifiers" target="_blank"
-            style="color: inherit;">Wikipedia - evaluation of binary classifiers</a>
+        <img src="./figures/00_intro-binary_classification.svg"
+          style="max-height: 260px; width: auto; margin: 0; background: white;">
+        <p style="font-size: 0.4em; opacity: 0.6; margin-top: 0.3rem;">
+          Figura: <a href="https://commons.wikimedia.org/wiki/File:Binary-classification-labeled.svg" target="_blank"
+            style="color: inherit;">Wikimedia Commons</a> (dominio público)
         </p>
       </div>
     </div>
     <aside class="notes">
-      <p>Accuracy sola puede engañar con clases desbalanceadas.</p>
-      <p>Precisión: de lo que marqué como positivo, cuánto era positivo. Recall: de los positivos reales, cuántos encontré. F1 combina ambas.</p>
-      <p>La tabla de la derecha es de referencia; no recorrerla entera.</p>
+      <p>En el diagrama: los puntos dentro del óvalo son los que el modelo marca como positivos; los de la izquierda son los realmente positivos. Verde = acierto, rojo = error.</p>
+      <ul>
+        <li>TP: positivos bien detectados. FP: falsas alarmas. FN: positivos que se escaparon. TN: negativos bien descartados.</li>
+      </ul>
+      <p>Ejemplo para fijar ideas, una cámara que detecta personas: precisión baja = muchas falsas alarmas; recall bajo = personas que pasan sin ser detectadas.</p>
+      <p>Las dos compiten: bajar el umbral de decisión sube el recall y baja la precisión, y al revés. Qué conviene depende de la aplicación (en medicina se prioriza el recall; en un filtro de spam, la precisión).</p>
+      <p>Accuracy sola puede engañar con clases desbalanceadas: si el 99 % de los casos son negativos, decir siempre "negativo" da 99 % de accuracy y recall 0.</p>
     </aside>
   </section>
 
