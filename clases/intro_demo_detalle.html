@@ -1,0 +1,311 @@
+<!-- 5. La demo, en detalle -->
+<section>
+
+    <section>
+        <h2 class="gradient-text">5. La demo, en detalle</h2>
+        <p>Volvemos al ejemplo del principio, con lo que vimos en las introducciones</p>
+        <ul style="font-size: 0.8em; text-align: left; max-width: 700px; margin: 1.5rem auto;">
+            <li style="margin-bottom: 0.5rem;">Los modelos</li>
+            <li style="margin-bottom: 0.5rem;">Qué cambió entre el modelo grande y el chico</li>
+            <li style="margin-bottom: 0.5rem;">Operaciones vs. tiempo</li>
+            <li style="margin-bottom: 0.5rem;">La plataforma importa</li>
+            <li style="margin-bottom: 0.5rem;">El runtime importa</li>
+            <li>El costo: accuracy</li>
+        </ul>
+        <aside class="notes">
+            Cierre de la clase 1. Ahora que saben qué es un MAC, qué es INT8 y por qué
+            importan la memoria y el ancho de banda, volvemos a la demo y la desarmamos.
+            Todavía no explicamos cómo se hace cada técnica: eso es el resto de la materia.
+            Acá solo mostramos qué se cambió y cuánto impactó.
+        </aside>
+    </section>
+
+    <section>
+        <h3>Los modelos</h3>
+        <table style="font-size: 0.55em; width: 100%; border-collapse: collapse; margin-top: 0.5rem;">
+            <thead>
+                <tr style="border-bottom: 2px solid #fff;">
+                    <th style="padding: 8px;"></th>
+                    <th style="padding: 8px;">Original</th>
+                    <th style="padding: 8px;">Grande (desplegado)</th>
+                    <th style="padding: 8px;">Chico (desplegado)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 8px;">Entrada</td>
+                    <td style="padding: 8px;">96×96 RGB</td>
+                    <td style="padding: 8px;">96×96 RGB</td>
+                    <td style="padding: 8px;">32×32 RGB</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 8px;">Convoluciones</td>
+                    <td style="padding: 8px;">Estándar</td>
+                    <td style="padding: 8px;">Estándar</td>
+                    <td style="padding: 8px;">Depthwise separable</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 8px;">Poda + reentrenamiento</td>
+                    <td style="padding: 8px;">—</td>
+                    <td style="padding: 8px;">20 %</td>
+                    <td style="padding: 8px;">50 %</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 8px;">Formato numérico</td>
+                    <td style="padding: 8px;">FP32</td>
+                    <td style="padding: 8px;">INT8</td>
+                    <td style="padding: 8px;">INT8</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 8px;">Parámetros</td>
+                    <td style="padding: 8px;">95 k</td>
+                    <td style="padding: 8px;">61 k</td>
+                    <td style="padding: 8px;">4.2 k</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 8px;">MACs por imagen</td>
+                    <td style="padding: 8px;">93 M</td>
+                    <td style="padding: 8px;">60 M</td>
+                    <td style="padding: 8px;">0.39 M</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px;">Tamaño</td>
+                    <td style="padding: 8px;">371 KB</td>
+                    <td style="padding: 8px;">68 KB</td>
+                    <td style="padding: 8px;">15 KB</td>
+                </tr>
+            </tbody>
+        </table>
+        <aside class="notes">
+            El "original" es el modelo tal como sale del entrenamiento en PyTorch, en FP32.
+            No lo desplegamos en la placa.
+            Los dos desplegados ya están cuantizados a INT8: el "grande" de la demo no es un
+            modelo sin comprimir, es el que menos cambios tiene.
+            Pasar de FP32 a INT8 divide el tamaño de los pesos por 4 (32 → 8 bits).
+            Los MACs son las multiplicaciones-acumulaciones que vimos en la intro para CESE.
+        </aside>
+    </section>
+
+    <section>
+        <h3>Qué cambió entre el modelo grande y el chico</h3>
+        <table style="font-size: 0.6em; width: 100%; border-collapse: collapse; margin-top: 0.5rem;">
+            <thead>
+                <tr style="border-bottom: 2px solid #fff;">
+                    <th style="padding: 8px;">Cambio</th>
+                    <th style="padding: 8px;">Qué reduce</th>
+                    <th style="padding: 8px;">Lo vemos en</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 8px;">Entrada de 96×96 a 32×32</td>
+                    <td style="padding: 8px;">9× menos píxeles → menos MACs en cada convolución</td>
+                    <td style="padding: 8px;">Diseño del sistema, NAS</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 8px;">Conv estándar → depthwise separable</td>
+                    <td style="padding: 8px;">Parámetros y MACs por capa</td>
+                    <td style="padding: 8px;">Factorización</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 8px;">Poda estructurada + reentrenamiento</td>
+                    <td style="padding: 8px;">Filtros completos (canales)</td>
+                    <td style="padding: 8px;">Pruning</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 8px;">FP32 → INT8</td>
+                    <td style="padding: 8px;">4× menos memoria, aritmética entera</td>
+                    <td style="padding: 8px;">Cuantización</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px;">Runtime optimizado para la placa</td>
+                    <td style="padding: 8px;">Tiempo de ejecución, sin cambiar el modelo</td>
+                    <td style="padding: 8px;">Frameworks y despliegue</td>
+                </tr>
+            </tbody>
+        </table>
+        <aside class="notes">
+            Cada fila es una técnica que vamos a ver en la materia. Ninguna sola explica la
+            diferencia: es la combinación.
+            Conectar con las intros: la resolución y la depthwise atacan los MACs (intro para
+            CESE: capas convolucionales); INT8 conecta con punto fijo (intro para CEIA).
+        </aside>
+    </section>
+
+    <section>
+        <h3>Operaciones vs. tiempo</h3>
+        <div style="display: flex; gap: 2rem; font-size: 0.75em; margin-top: 1rem;">
+            <div
+                style="flex: 1; background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 1.2rem; text-align: center;">
+                <p style="margin: 0;">MACs</p>
+                <p style="font-size: 1.6em; margin: 0.4rem 0; color: #8be9fd;"><strong>~150×</strong> menos</p>
+                <p style="margin: 0; color: #6272a4;">60 M → 0.39 M</p>
+            </div>
+            <div
+                style="flex: 1; background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 1.2rem; text-align: center;">
+                <p style="margin: 0;">Tiempo (misma placa)</p>
+                <p style="font-size: 1.6em; margin: 0.4rem 0; color: #50fa7b;"><strong>~85–97×</strong> menos</p>
+                <p style="margin: 0; color: #6272a4;">ESP32-CAM y ESP32-S3</p>
+            </div>
+        </div>
+        <p style="font-size: 0.7em; margin-top: 1.2rem; color: #ffb86c;">
+            Contar operaciones es una buena primera aproximación, pero el tiempo real también depende de la
+            memoria, de cómo se mueven los datos y de qué instrucciones usa la plataforma.
+        </p>
+        <aside class="notes">
+            Pregunta para el grupo: si los MACs bajaron 150 veces, ¿por qué el tiempo no bajó 150 veces?
+            Respuestas esperables (intro para CEIA): accesos a memoria y ancho de banda, overhead fijo
+            por capa, capas que no son MACs (activaciones, pooling), qué tan bien aprovecha el
+            hardware cada tipo de capa.
+            Mensaje: los MACs son un proxy útil, pero hay que medir en la placa.
+        </aside>
+    </section>
+
+    <section>
+        <h3>La plataforma importa</h3>
+        <p style="font-size: 0.7em; text-align: left;">El mismo modelo, el mismo runtime (ESP-DL), dos placas:</p>
+        <table style="font-size: 0.6em; width: 100%; border-collapse: collapse; margin-top: 0.5rem;">
+            <thead>
+                <tr style="border-bottom: 2px solid #fff;">
+                    <th style="padding: 8px;">Modelo</th>
+                    <th style="padding: 8px;">ESP32-CAM</th>
+                    <th style="padding: 8px;">ESP32-S3</th>
+                    <th style="padding: 8px;">Diferencia</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 8px;">Grande</td>
+                    <td style="padding: 8px;">9.4 s</td>
+                    <td style="padding: 8px;">619 ms</td>
+                    <td style="padding: 8px; color: #50fa7b;"><strong>~15×</strong></td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px;">Chico</td>
+                    <td style="padding: 8px;">111 ms</td>
+                    <td style="padding: 8px;">6.4 ms</td>
+                    <td style="padding: 8px; color: #50fa7b;"><strong>~17×</strong></td>
+                </tr>
+            </tbody>
+        </table>
+        <p style="font-size: 0.7em; margin-top: 1rem;">
+            Las dos corren a 240 MHz, pero el ESP32-S3 tiene instrucciones vectoriales (SIMD) que
+            hacen varias multiplicaciones-acumulaciones por ciclo.
+        </p>
+        <aside class="notes">
+            Misma frecuencia de reloj, 15 veces más rápido: la diferencia está en la arquitectura.
+            Conectar con la intro para CEIA: arquitecturas iterativas vs. con más paralelismo, y
+            con INT8: las instrucciones vectoriales del S3 están pensadas para enteros de 8 y 16 bits.
+            Por eso elegir la plataforma es parte del diseño, no un detalle del final.
+        </aside>
+    </section>
+
+    <section>
+        <h3>El runtime importa</h3>
+        <p style="font-size: 0.7em; text-align: left;">El mismo modelo grande, la misma placa (ESP32-S3), distintos runtimes:</p>
+        <table style="font-size: 0.6em; width: 100%; border-collapse: collapse; margin-top: 0.5rem;">
+            <thead>
+                <tr style="border-bottom: 2px solid #fff;">
+                    <th style="padding: 8px;">Runtime</th>
+                    <th style="padding: 8px;">Tiempo por imagen</th>
+                    <th style="padding: 8px;">vs. ESP-DL</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 8px;">ExecuTorch</td>
+                    <td style="padding: 8px;">56.6 s</td>
+                    <td style="padding: 8px; color: #ff5555;">~91×</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 8px;">onnx2c</td>
+                    <td style="padding: 8px;">7.0 s</td>
+                    <td style="padding: 8px; color: #ffb86c;">~11×</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 8px;">TFLite Micro</td>
+                    <td style="padding: 8px;">3.5 s</td>
+                    <td style="padding: 8px; color: #ffb86c;">~6×</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 8px;">TFLite Micro + ESP-NN</td>
+                    <td style="padding: 8px;">0.80 s</td>
+                    <td style="padding: 8px; color: #50fa7b;">~1.3×</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px;">ESP-DL</td>
+                    <td style="padding: 8px;">0.62 s</td>
+                    <td style="padding: 8px; color: #50fa7b;">1×</td>
+                </tr>
+            </tbody>
+        </table>
+        <aside class="notes">
+            Mismo modelo, mismos pesos, misma placa: hasta 90 veces de diferencia solo por cómo
+            se ejecuta. Los runtimes que usan las instrucciones vectoriales del S3 (ESP-DL y
+            TFLite Micro con ESP-NN) son los rápidos; los genéricos no las aprovechan.
+            Es tan importante como comprimir el modelo, y lo vemos en la parte de despliegue.
+            Medido con examples/esp32-pipelines (firmware_rt/).
+        </aside>
+    </section>
+
+    <section>
+        <h3>El costo: accuracy</h3>
+        <table style="font-size: 0.6em; width: 100%; border-collapse: collapse; margin-top: 0.5rem;">
+            <thead>
+                <tr style="border-bottom: 2px solid #fff;">
+                    <th style="padding: 8px;">Modelo</th>
+                    <th style="padding: 8px;">Accuracy</th>
+                    <th style="padding: 8px;">Tiempo (ESP32-S3)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 8px;">Original (FP32)</td>
+                    <td style="padding: 8px;">58 %</td>
+                    <td style="padding: 8px;">—</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 8px;">Grande</td>
+                    <td style="padding: 8px;">59 %</td>
+                    <td style="padding: 8px;">619 ms</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px;">Chico</td>
+                    <td style="padding: 8px; color: #ffb86c;">42 %</td>
+                    <td style="padding: 8px;">6.4 ms</td>
+                </tr>
+            </tbody>
+        </table>
+        <ul style="font-size: 0.65em; margin-top: 1rem;">
+            <li style="margin-bottom: 0.4rem;">Algunas técnicas casi no cuestan accuracy (la poda del 20 % con
+                reentrenamiento, en este caso).</li>
+            <li style="margin-bottom: 0.4rem;">Otras cuestan mucho (bajar la resolución a 32×32).</li>
+            <li>La pregunta de la materia: <strong>¿cuánto estamos dispuestos a perder, y a cambio de qué?</strong></li>
+        </ul>
+        <aside class="notes">
+            La accuracy de los modelos desplegados es la medida antes de cuantizar (en PC); la
+            cuantización puede sumar alguna pérdida extra.
+            Los valores son bajos en general (el azar es 10 %): modelos minúsculos y un dataset
+            difícil. No es un producto, es un ejemplo para ver los compromisos.
+            Para el TP: definir primero la restricción (por ejemplo, tiempo máximo o caída
+            máxima de accuracy) y después elegir las técnicas.
+        </aside>
+    </section>
+
+    <section>
+        <h3>Lo que viene</h3>
+        <ul style="font-size: 0.75em; text-align: left; max-width: 800px; margin: 1rem auto;">
+            <li style="margin-bottom: 0.6rem;"><strong>Próxima clase:</strong> introducción a IA embebida y las
+                herramientas principales de compresión.</li>
+            <li style="margin-bottom: 0.6rem;">Cada fila de "qué cambió" es una sección de la materia.</li>
+            <li style="margin-bottom: 0.6rem;">El código de esta demo está en el repo
+                (<code>esp32-pipelines</code>): entrenar → podar → cuantizar → compilar → flashear → medir.</li>
+            <li>En el TP van a recorrer este mismo camino con su propio problema.</li>
+        </ul>
+        <aside class="notes">
+            Cerrar la clase dejando claro el arco: hoy vimos el qué, desde la próxima clase vemos el cómo.
+            Recordar la encuesta y que pueden escribir por mail si algo no quedó claro.
+        </aside>
+    </section>
+
+</section>

@@ -1,0 +1,141 @@
+<!-- 2. Demo: IA en un microcontrolador -->
+<section>
+
+    <section>
+        <h2 class="gradient-text">2. Demo: IA en un microcontrolador</h2>
+        <p>Un adelanto de lo que vamos a hacer en la materia</p>
+        <aside class="notes">
+            Arrancamos la parte 1 con un adelanto, no con teoría. La idea es que vean a
+            dónde queremos llegar antes de pasar por las dos introducciones.
+            Son 5 minutos: no explicar nada todavía, solo mostrar el problema y el resultado.
+        </aside>
+    </section>
+
+    <section>
+        <h3>El desafío</h3>
+        <div style="display: flex; gap: 2rem; align-items: stretch; font-size: 0.7em;">
+            <div
+                style="flex: 1; background: rgba(139,233,253,0.1); border-radius: 0.5rem; padding: 1.2rem; border: 1px solid rgba(139,233,253,0.3); text-align: left;">
+                <h4 style="color: #8be9fd; margin: 0 0 0.8rem;">🔌 La placa</h4>
+                <ul style="font-size: 0.9em;">
+                    <li style="margin-bottom: 0.4rem;">ESP32-CAM: microcontrolador de pocos dólares con cámara.</li>
+                    <li style="margin-bottom: 0.4rem;">CPU de 240 MHz, ~520 KB de RAM interna.</li>
+                    <li>Sin GPU, sin sistema operativo, sin Python.</li>
+                </ul>
+            </div>
+            <div
+                style="flex: 1; background: rgba(189,147,249,0.1); border-radius: 0.5rem; padding: 1.2rem; border: 1px solid rgba(189,147,249,0.3); text-align: left;">
+                <h4 style="color: #bd93f9; margin: 0 0 0.8rem;">🧠 La tarea</h4>
+                <ul style="font-size: 0.9em;">
+                    <li style="margin-bottom: 0.4rem;">Clasificar imágenes en 10 clases (avión, pájaro, auto, gato,
+                        perro, barco...).</li>
+                    <li style="margin-bottom: 0.4rem;">Con una red neuronal convolucional (CNN).</li>
+                    <li>Todo dentro de la placa: sin nube, sin conexión.</li>
+                </ul>
+            </div>
+        </div>
+        <aside class="notes">
+            Presentar la placa como algo que cuesta lo mismo que un café y que tiene menos
+            memoria que una sola foto de un celular.
+            Dataset: STL-10, imágenes de 10 clases.
+            Pregunta para el grupo: ¿les parece que una red neuronal entra acá?
+            Dejar que respondan; no corregir todavía.
+        </aside>
+    </section>
+
+    <section>
+        <h3>La placa clasificando</h3>
+        <div
+            style="margin: 1rem auto; max-width: 700px; aspect-ratio: 16 / 9; border: 2px dashed rgba(255,255,255,0.3); border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; color: #6272a4; font-size: 0.7em;">
+            [Video pendiente: la ESP32-CAM clasificando en vivo]
+        </div>
+        <aside class="notes">
+            Mostrar el video (o, si el hardware coopera, un flasheo en vivo de un binario ya
+            compilado; nunca entrenar en vivo).
+            Mostrar la clase predicha, la confianza y el tiempo por inferencia.
+        </aside>
+    </section>
+
+    <section>
+        <h3>Mismo problema, distintos modelos</h3>
+        <table style="font-size: 0.6em; width: 100%; border-collapse: collapse; margin-top: 0.5rem;">
+            <thead>
+                <tr style="border-bottom: 2px solid #fff;">
+                    <th style="padding: 8px;"></th>
+                    <th style="padding: 8px;">Modelo grande</th>
+                    <th style="padding: 8px;">Modelo chico</th>
+                    <th style="padding: 8px;">Diferencia</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 8px;">Tiempo por imagen (ESP32-CAM)</td>
+                    <td style="padding: 8px;">9.4 s</td>
+                    <td style="padding: 8px;">0.11 s</td>
+                    <td style="padding: 8px; color: #50fa7b;"><strong>~85× más rápido</strong></td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 8px;">Tiempo por imagen (ESP32-S3)</td>
+                    <td style="padding: 8px;">619 ms</td>
+                    <td style="padding: 8px;">6.4 ms</td>
+                    <td style="padding: 8px; color: #50fa7b;"><strong>~97× más rápido</strong></td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 8px;">Tamaño del modelo</td>
+                    <td style="padding: 8px;">68 KB</td>
+                    <td style="padding: 8px;">15 KB</td>
+                    <td style="padding: 8px; color: #50fa7b;"><strong>~4.5× más chico</strong></td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px;">Accuracy</td>
+                    <td style="padding: 8px;">59 %</td>
+                    <td style="padding: 8px;">42 %</td>
+                    <td style="padding: 8px; color: #ffb86c;"><strong>−17 puntos</strong></td>
+                </tr>
+            </tbody>
+        </table>
+        <p style="font-size: 0.7em; margin-top: 1rem; color: #ffb86c;">
+            De 9.4 s a 6.4 ms: unas 1500 veces menos, en la misma familia de placas... pero no es gratis.
+        </p>
+        <aside class="notes">
+            El número para quedarse: de casi 10 segundos a pocos milisegundos.
+            Pero la última fila es igual de importante: perdimos accuracy. Toda la materia
+            gira alrededor de este compromiso: cuánto rendimiento ganamos y cuánto estamos
+            dispuestos a perder.
+            (La accuracy es baja en ambos casos porque los modelos son minúsculos y el dataset
+            es difícil; el azar es 10 %. El objetivo es mostrar el compromiso, no un producto.)
+            Medido en las placas con ESP-DL; ver examples/esp32-pipelines/benchmarks.json.
+        </aside>
+    </section>
+
+    <section>
+        <h3>¿Cómo se logra esto?</h3>
+        <p style="font-size: 0.75em;">Para entender cómo llevar un modelo de IA a un dispositivo tan limitado,
+            necesitamos dos bases:</p>
+        <div style="display: flex; gap: 2rem; font-size: 0.7em; margin-top: 1rem;">
+            <div
+                style="flex: 1; background: rgba(139,233,253,0.1); border-radius: 0.5rem; padding: 1.2rem; border: 1px solid rgba(139,233,253,0.3); text-align: left;">
+                <h4 style="color: #8be9fd; margin: 0 0 0.8rem;">🔌 Cómo funciona el hardware</h4>
+                <p style="margin: 0;">Memoria, cómputo, energía y formatos numéricos.</p>
+                <p style="margin: 0.8rem 0 0; color: #6272a4;">→ Introducción para CEIA</p>
+            </div>
+            <div
+                style="flex: 1; background: rgba(189,147,249,0.1); border-radius: 0.5rem; padding: 1.2rem; border: 1px solid rgba(189,147,249,0.3); text-align: left;">
+                <h4 style="color: #bd93f9; margin: 0 0 0.8rem;">🧠 Cómo funciona un modelo</h4>
+                <p style="margin: 0;">Qué calcula, cuántas operaciones hace y por qué pesa lo que pesa.</p>
+                <p style="margin: 0.8rem 0 0; color: #6272a4;">→ Introducción para CESE</p>
+            </div>
+        </div>
+        <p style="font-size: 0.65em; margin-top: 1.2rem; font-style: italic; color: #6272a4;">
+            Al final de la clase volvemos a esta demo, con más detalle.
+        </p>
+        <aside class="notes">
+            Este es el puente a las introducciones. Cada perfil ya sabe una de las dos mitades:
+            los de CESE el hardware, los de CEIA los modelos. Pedir que, en la intro que para
+            ellos es repaso, aporten ejemplos y preguntas.
+            Prometer que al final de la clase volvemos a la demo y la explicamos con lo que
+            hayamos visto.
+        </aside>
+    </section>
+
+</section>
