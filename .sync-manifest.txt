@@ -68,10 +68,10 @@ clases/figures/demo/barco.png
 clases/figures/demo/caballo.png
 clases/figures/demo/camion.png
 clases/figures/demo/ciervo.png
+clases/figures/demo/gato.png
 clases/figures/demo/mono.png
 clases/figures/demo/pajaro.png
 clases/figures/demo/perro.png
-clases/figures/demo/rana.png
 clases/figures/fit_datos_reales.png
 clases/figures/fit_models_1d.png
 clases/figures/general_bigo.png
@@ -429,10 +429,10 @@ ejercicios/esp32-pipelines/demo/imagenes/barco.png
 ejercicios/esp32-pipelines/demo/imagenes/caballo.png
 ejercicios/esp32-pipelines/demo/imagenes/camion.png
 ejercicios/esp32-pipelines/demo/imagenes/ciervo.png
+ejercicios/esp32-pipelines/demo/imagenes/gato.png
 ejercicios/esp32-pipelines/demo/imagenes/mono.png
 ejercicios/esp32-pipelines/demo/imagenes/pajaro.png
 ejercicios/esp32-pipelines/demo/imagenes/perro.png
-ejercicios/esp32-pipelines/demo/imagenes/rana.png
 ejercicios/esp32-pipelines/docs/superpowers/plans/2026-08-07-pipeline-stages-inference-webserver.md
 ejercicios/esp32-pipelines/docs/superpowers/plans/2026-08-13-firmware-multiboard-config.md
 ejercicios/esp32-pipelines/docs/superpowers/plans/2026-08-14-runtimes-alternativos-esp32s3.md

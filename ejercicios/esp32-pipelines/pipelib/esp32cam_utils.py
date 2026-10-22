@@ -38,9 +38,12 @@ MODELS_DIR.mkdir(parents=True, exist_ok=True)
 OUTPUTS_DIR = _EXAMPLE_ROOT / "outputs"
 OUTPUTS_DIR.mkdir(parents=True, exist_ok=True)
 
+# Orden oficial de STL-10 (= torchvision.datasets.STL10(...).classes y
+# stl10_binary/class_names.txt). Ojo: STL-10 tiene "cat" y no "frog" (eso es
+# CIFAR-10); un error acá no rompe el entrenamiento, pero rotula mal las clases.
 STL10_CLASSES = [
-    "airplane", "bird", "car", "deer", "dog",
-    "frog", "horse", "monkey", "ship", "truck",
+    "airplane", "bird", "car", "cat", "deer",
+    "dog", "horse", "monkey", "ship", "truck",
 ]
 
 # Estadísticas de normalización de STL-10 (calculadas sobre el train set)

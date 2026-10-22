@@ -30,8 +30,8 @@
                 style="flex: 1; background: rgba(189,147,249,0.1); border-radius: 0.5rem; padding: 1.2rem; border: 1px solid rgba(189,147,249,0.3); text-align: left;">
                 <h4 style="color: #bd93f9; margin: 0 0 0.8rem;">🧠 La tarea</h4>
                 <ul style="font-size: 0.9em;">
-                    <li style="margin-bottom: 0.4rem;">Clasificar imágenes en 10 clases (avión, pájaro, auto, ciervo,
-                        perro, rana, caballo, mono, barco, camión).</li>
+                    <li style="margin-bottom: 0.4rem;">Clasificar imágenes en 10 clases (avión, pájaro, auto, gato,
+                        ciervo, perro, caballo, mono, barco, camión).</li>
                     <li style="margin-bottom: 0.4rem;">Con una red neuronal convolucional (CNN).</li>
                     <li>Todo dentro de la placa: sin nube, sin conexión.</li>
                 </ul>
@@ -39,7 +39,7 @@
         </div>
         <aside class="notes">
           <p>Presentar la placa como algo que cuesta lo mismo que un café y que tiene menos memoria que una sola foto de un celular.</p>
-          <p>Dataset: STL-10 (imágenes de 96×96 de 10 clases).</p>
+          <p>Dataset: STL-10 (imágenes de 96×96 de 10 clases; ojo, tiene gato y no rana, a diferencia de CIFAR-10).</p>
           <p>Pregunta para el grupo: ¿les parece que una red neuronal entra acá?</p>
           <p>Dejar que respondan; no corregir todavía.</p>
         </aside>
@@ -52,9 +52,9 @@
             <div><img src="./figures/demo/avion.png" style="width: 100%; image-rendering: pixelated; margin: 0;"><br>avion.png</div>
             <div><img src="./figures/demo/pajaro.png" style="width: 100%; image-rendering: pixelated; margin: 0;"><br>pajaro.png</div>
             <div><img src="./figures/demo/auto.png" style="width: 100%; image-rendering: pixelated; margin: 0;"><br>auto.png</div>
+            <div><img src="./figures/demo/gato.png" style="width: 100%; image-rendering: pixelated; margin: 0;"><br>gato.png</div>
             <div><img src="./figures/demo/ciervo.png" style="width: 100%; image-rendering: pixelated; margin: 0;"><br>ciervo.png</div>
             <div><img src="./figures/demo/perro.png" style="width: 100%; image-rendering: pixelated; margin: 0;"><br>perro.png</div>
-            <div><img src="./figures/demo/rana.png" style="width: 100%; image-rendering: pixelated; margin: 0;"><br>rana.png</div>
             <div><img src="./figures/demo/caballo.png" style="width: 100%; image-rendering: pixelated; margin: 0;"><br>caballo.png</div>
             <div><img src="./figures/demo/mono.png" style="width: 100%; image-rendering: pixelated; margin: 0;"><br>mono.png</div>
             <div><img src="./figures/demo/barco.png" style="width: 100%; image-rendering: pixelated; margin: 0;"><br>barco.png</div>
@@ -82,18 +82,18 @@ Modelo grande: entrada 96x96, 60,532 parámetros, 59.63 M MACs, accuracy (test) 
 
 auto.png       -> car 57%  |  truck 32%  |  ship 3%   (1.6 ms en PC)
 avion.png      -> ship 49%  |  airplane 46%  |  truck 2%   (1.5 ms en PC)
-caballo.png    -> horse 73%  |  dog 13%  |  frog 7%   (1.4 ms en PC)
+caballo.png    -> horse 73%  |  deer 13%  |  dog 7%   (1.5 ms en PC)
 ...
 Modelo chico: entrada 32x32, 4,206 parámetros, 0.39 M MACs, accuracy (test) 41.6%
 
-auto.png       -> car 41%  |  truck 18%  |  ship 15%   (1.3 ms en PC)
-caballo.png    -> dog 19%  |  horse 19%  |  frog 18%   (1.1 ms en PC)
+auto.png       -> car 41%  |  truck 18%  |  ship 15%   (0.6 ms en PC)
+caballo.png    -> deer 19%  |  horse 19%  |  dog 18%   (0.5 ms en PC)
 ...
         </code></pre>
         <aside class="notes">
           <p>Mismo modelo que después va a la placa, pero en PyTorch, en FP32 y en una PC.</p>
           <p>En la PC los dos tardan ~1 ms: acá no se nota ninguna diferencia de costo.</p>
-          <p>Sobre estas 10 imágenes el grande acierta 6 y el chico 3: hay un costo en accuracy.</p>
+          <p>Sobre estas 10 imágenes el grande acierta 6 y el chico 2: hay un costo en accuracy.</p>
           <p>El script es demo/clasificar.py; se le puede pasar cualquier imagen.</p>
         </aside>
     </section>
@@ -102,7 +102,8 @@ caballo.png    -> dog 19%  |  horse 19%  |  frog 18%   (1.1 ms en PC)
         <h3>En la placa: preparación</h3>
         <ul style="font-size: 0.62em; text-align: left;">
             <li style="margin-bottom: 0.5rem;">Una sola vez: instalar ESP-IDF v5.3 (guía oficial de Espressif,
-                "Get Started" para ESP32).</li>
+                <a href="https://docs.espressif.com/projects/esp-idf/en/v5.3.2/esp32/get-started/index.html"
+                    target="_blank">"Get Started" para ESP32</a>).</li>
             <li style="margin-bottom: 0.5rem;">Conectar la ESP32-CAM, montada sobre la placa <strong>ESP32-CAM-MB</strong>,
                 por USB.</li>
             <li style="margin-bottom: 0.5rem;">En cada terminal nueva, desde la carpeta del ejemplo:</li>
@@ -131,7 +132,8 @@ ls /dev/ttyUSB*                # puerto de la placa (en general /dev/ttyUSB0)
 esptool.py --chip esp32 -p /dev/ttyUSB0 -b 460800 write_flash 0x0 demo/demo_grande.bin
         </code></pre>
         <ol start="3" style="font-size: 0.6em; text-align: left;">
-            <li style="margin-bottom: 0.4rem;">Abrir el monitor y después tocar <strong>RST</strong> (solo RST) para arrancar:</li>
+            <li style="margin-bottom: 0.4rem;">Cuando esptool termine (<code>Hash of data verified</code>), abrir el monitor
+                y después tocar <strong>RST</strong> (solo RST) para arrancar:</li>
         </ol>
         <pre style="font-size: 0.42em;"><code class="language-bash" data-trim>
 python -m esp_idf_monitor -p /dev/ttyUSB0
@@ -141,7 +143,7 @@ python -m esp_idf_monitor -p /dev/ttyUSB0
                 Tecla <code>h</code>: ayuda. <strong>Ctrl+]</strong>: salir del monitor.</li>
         </ol>
         <aside class="notes">
-          <p>El flasheo tarda ~30 s. Si esptool no conecta, repetir el paso 1 (BOOT+RST) y volver a correr el comando.</p>
+          <p>El flasheo tarda ~30 s: no tocar RST hasta que esptool termine (si no, la placa queda con un firmware a medias y hay que repetir). Si esptool no conecta, repetir el paso 1 (BOOT+RST) y volver a correr el comando.</p>
           <p>Abrir el monitor ANTES de tocar RST, así se ve el arranque.</p>
           <p>Con el grande el self-test tarda ~1.5 minutos (10 imágenes de ~9 s): buen momento para preguntar qué creen que está pasando.</p>
           <p>La captura con la cámara (c) es opcional: con el modelo grande también tarda ~9 s.</p>
@@ -177,12 +179,12 @@ python -m esp_idf_monitor -p /dev/ttyUSB0
         </ol>
         <pre style="font-size: 0.42em;"><code class="language-bash" data-trim>
 esptool.py --chip esp32 -p /dev/ttyUSB0 -b 460800 write_flash 0x0 demo/demo_chico.bin
-python -m esp_idf_monitor -p /dev/ttyUSB0      # después tocar RST, y tecla t
+python -m esp_idf_monitor -p /dev/ttyUSB0      # cuando esptool termine; después RST y tecla t
         </code></pre>
         <pre style="font-size: 0.4em;"><code class="language-plaintext" data-trim>
 === SELF-TEST: 10 golden images (STL-10 test set) ===
-  airplane  -> airplane   81.2%  (pc_q: airplane   81.2% | float  84.7%)  dlogits<=0  75ms  PASS
-  bird      -> bird       65.6%  (pc_q: bird       65.6% | float  74.7%)  dlogits<=0  72ms  PASS
+  airplane  -> airplane   82.3%  (pc_q: airplane   82.3% | float  84.7%)  dlogits<=0  73ms  PASS
+  bird      -> bird       60.6%  (pc_q: bird       60.6% | float  74.7%)  dlogits<=0  81ms  PASS
   ...
 === SELF-TEST: 10/10 PASS (vs PC cuantizado) ===
         </code></pre>

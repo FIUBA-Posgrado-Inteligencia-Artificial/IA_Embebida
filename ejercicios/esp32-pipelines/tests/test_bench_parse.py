@@ -13,14 +13,14 @@ def _load_module():
     return mod
 
 
-SAMPLE = "  frog      -> monkey    24.0%  (pc_q: monkey    24.0% | float  23.8%)  dlogits<=0  39ms  PASS"
+SAMPLE = "  cat       -> monkey    24.0%  (pc_q: monkey    24.0% | float  23.8%)  dlogits<=0  39ms  PASS"
 
 
 def test_selftest_line_regex():
     mod = _load_module()
     m = mod._SELFTEST_LINE.match(SAMPLE)
     assert m
-    assert m.group(1) == "frog"
+    assert m.group(1) == "cat"
     assert m.group(2) == "monkey"
     assert m.group(4) == "0"
     assert m.group(5) == "39"
