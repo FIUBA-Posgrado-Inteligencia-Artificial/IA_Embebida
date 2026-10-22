@@ -69,6 +69,46 @@
     </section>
 
     <section>
+        <h3>Los modelos: archivos <code>.pth</code></h3>
+        <ul style="font-size: 0.65em; text-align: left;">
+            <li style="margin-bottom: 0.5rem;">Un <code>.pth</code> es el archivo donde PyTorch guarda un modelo entrenado.</li>
+            <li style="margin-bottom: 0.5rem;">Contiene los <strong>parámetros</strong> aprendidos (el θ de
+                <em>y = f(x; θ)</em>): los pesos y sesgos de cada capa, en FP32 (32 bits por número).</li>
+            <li style="margin-bottom: 0.5rem;">Y metadatos: arquitectura, resolución de entrada, normalización, nombres de
+                las clases y la accuracy medida.</li>
+            <li>No contiene el código del modelo: la arquitectura se define en Python y el <code>.pth</code> solo carga
+                sus valores.</li>
+        </ul>
+        <table style="width: 80%; margin: 0.8rem auto 0; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 2px solid #fff;">
+                    <th style="padding: 6px;">Archivo</th>
+                    <th style="padding: 6px;">Parámetros</th>
+                    <th style="padding: 6px;">Tamaño</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 6px;"><code>demo/demo_grande.pth</code></td>
+                    <td style="padding: 6px;">60 532</td>
+                    <td style="padding: 6px;">247 KB</td>
+                </tr>
+                <tr>
+                    <td style="padding: 6px;"><code>demo/demo_chico.pth</code></td>
+                    <td style="padding: 6px;">4 206</td>
+                    <td style="padding: 6px;">34 KB</td>
+                </tr>
+            </tbody>
+        </table>
+        <aside class="notes">
+          <p>El .pth es, literalmente, el θ: los números que se aprendieron durante el entrenamiento.</p>
+          <p>Cuenta rápida: 60 532 parámetros × 4 bytes (FP32) ≈ 237 KB; el resto del archivo son metadatos (y algunos valores extra de BatchNorm).</p>
+          <p>Estos dos modelos los generó el pipeline del ejemplo (entrenar → podar → reentrenar); en la materia vamos a ver cada paso.</p>
+          <p>El .pth sirve para la PC. Para la placa hace falta otro formato: el modelo cuantizado a INT8 y compilado dentro del firmware (lo vemos en "En la placa").</p>
+        </aside>
+    </section>
+
+    <section>
         <h3>En la PC: clasificar con Python</h3>
         <p style="font-size: 0.6em; text-align: left; margin-bottom: 0.3rem;">Desde la carpeta del ejemplo <code>esp32-pipelines</code>:</p>
         <!-- Resaltado por pasos (data-line-numbers) sin mostrar los números de línea -->
@@ -130,12 +170,15 @@ perro.png      -> airplane 24%  |  deer 20%  |  bird 18%   (0.5 ms en PC)
 . ~/esp/esp-idf/export.sh      # carga esptool.py y el monitor de ESP-IDF
 ls /dev/ttyUSB*                # puerto de la placa (en general /dev/ttyUSB0)
         </code></pre>
-        <p style="font-size: 0.55em; color: #6272a4; text-align: left;">Los firmwares ya están compilados en
-            <code>demo/</code>: <code>demo_grande.bin</code> y <code>demo_chico.bin</code>. No hace falta compilar nada.</p>
+        <p style="font-size: 0.55em; text-align: left;">Los firmwares ya están compilados en <code>demo/</code>:
+            <code>demo_grande.bin</code> y <code>demo_chico.bin</code>. Cada <code>.bin</code> es la imagen completa que se
+            graba en la memoria flash de la placa: el programa (cámara, preprocesamiento, self-test), el motor de
+            inferencia (ESP-DL) y el modelo ya cuantizado a INT8. No hace falta compilar nada.</p>
         <aside class="notes">
           <p>Si el puerto no es /dev/ttyUSB0, reemplazarlo en todos los comandos.</p>
           <p>Si da "permission denied" en el puerto: el usuario tiene que estar en el grupo dialout.</p>
           <p>La ESP32-CAM-MB no tiene reset automático: para flashear hay que usar los botones.</p>
+          <p>Sobre los .bin: pesan ~1.8 MB (grande) y ~1.5 MB (chico), pero el modelo es solo una parte chica (68 KB y 15 KB); el resto es el programa, el motor de inferencia y las bibliotecas de la cámara y el WiFi. Se generan con ESP-IDF a partir del modelo cuantizado; acá los damos hechos para no tener que compilar.</p>
         </aside>
     </section>
 
