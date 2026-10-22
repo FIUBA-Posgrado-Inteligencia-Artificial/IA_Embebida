@@ -13,10 +13,9 @@
             <li>El costo: accuracy</li>
         </ul>
         <aside class="notes">
-            Cierre de la clase 1. Ahora que saben qué es un MAC, qué es INT8 y por qué
-            importan la memoria y el ancho de banda, volvemos a la demo y la desarmamos.
-            Todavía no explicamos cómo se hace cada técnica: eso es el resto de la materia.
-            Acá solo mostramos qué se cambió y cuánto impactó.
+          <p>Cierre de la clase 1. Ahora que saben qué es un MAC, qué es INT8 y por qué importan la memoria y el ancho de banda, volvemos a la demo y la desarmamos.</p>
+          <p>Todavía no explicamos cómo se hace cada técnica: eso es el resto de la materia.</p>
+          <p>Acá solo mostramos qué se cambió y cuánto impactó.</p>
         </aside>
     </section>
 
@@ -77,12 +76,11 @@
             </tbody>
         </table>
         <aside class="notes">
-            El "original" es el modelo tal como sale del entrenamiento en PyTorch, en FP32.
-            No lo desplegamos en la placa.
-            Los dos desplegados ya están cuantizados a INT8: el "grande" de la demo no es un
-            modelo sin comprimir, es el que menos cambios tiene.
-            Pasar de FP32 a INT8 divide el tamaño de los pesos por 4 (32 → 8 bits).
-            Los MACs son las multiplicaciones-acumulaciones que vimos en la intro para CESE.
+          <p>El "original" es el modelo tal como sale del entrenamiento en PyTorch, en FP32.</p>
+          <p>No lo desplegamos en la placa.</p>
+          <p>Los dos desplegados ya están cuantizados a INT8: el "grande" de la demo no es un modelo sin comprimir, es el que menos cambios tiene.</p>
+          <p>Pasar de FP32 a INT8 divide el tamaño de los pesos por 4 (32 → 8 bits).</p>
+          <p>Los MACs son las multiplicaciones-acumulaciones que vimos en la intro para CESE.</p>
         </aside>
     </section>
 
@@ -125,10 +123,8 @@
             </tbody>
         </table>
         <aside class="notes">
-            Cada fila es una técnica que vamos a ver en la materia. Ninguna sola explica la
-            diferencia: es la combinación.
-            Conectar con las intros: la resolución y la depthwise atacan los MACs (intro para
-            CESE: capas convolucionales); INT8 conecta con punto fijo (intro para CEIA).
+          <p>Cada fila es una técnica que vamos a ver en la materia. Ninguna sola explica la diferencia: es la combinación.</p>
+          <p>Conectar con las intros: la resolución y la depthwise atacan los MACs (intro para CESE: capas convolucionales); INT8 conecta con punto fijo (intro para CEIA).</p>
         </aside>
     </section>
 
@@ -153,11 +149,9 @@
             memoria, de cómo se mueven los datos y de qué instrucciones usa la plataforma.
         </p>
         <aside class="notes">
-            Pregunta para el grupo: si los MACs bajaron 150 veces, ¿por qué el tiempo no bajó 150 veces?
-            Respuestas esperables (intro para CEIA): accesos a memoria y ancho de banda, overhead fijo
-            por capa, capas que no son MACs (activaciones, pooling), qué tan bien aprovecha el
-            hardware cada tipo de capa.
-            Mensaje: los MACs son un proxy útil, pero hay que medir en la placa.
+          <p>Pregunta para el grupo: si los MACs bajaron 150 veces, ¿por qué el tiempo no bajó 150 veces?</p>
+          <p>Respuestas esperables (intro para CEIA): accesos a memoria y ancho de banda, overhead fijo por capa, capas que no son MACs (activaciones, pooling), qué tan bien aprovecha el hardware cada tipo de capa.</p>
+          <p>Mensaje: los MACs son un proxy útil, pero hay que medir en la placa.</p>
         </aside>
     </section>
 
@@ -193,11 +187,9 @@
             hacen varias multiplicaciones-acumulaciones por ciclo.
         </p>
         <aside class="notes">
-            Misma frecuencia de reloj, 12 a 15 veces más rápido: la diferencia está en la arquitectura.
-            (ESP32-CAM medida en la demo; ESP32-S3 en un devkit, ver benchmarks.json.)
-            Conectar con la intro para CEIA: arquitecturas iterativas vs. con más paralelismo, y
-            con INT8: las instrucciones vectoriales del S3 están pensadas para enteros de 8 y 16 bits.
-            Por eso elegir la plataforma es parte del diseño, no un detalle del final.
+          <p>Misma frecuencia de reloj, 12 a 15 veces más rápido: la diferencia está en la arquitectura.</p>
+          <p>(ESP32-CAM medida en la demo; ESP32-S3 en un devkit, ver benchmarks.json.) Conectar con la intro para CEIA: arquitecturas iterativas vs. con más paralelismo, y con INT8: las instrucciones vectoriales del S3 están pensadas para enteros de 8 y 16 bits.</p>
+          <p>Por eso elegir la plataforma es parte del diseño, no un detalle del final.</p>
         </aside>
     </section>
 
@@ -241,11 +233,9 @@
             </tbody>
         </table>
         <aside class="notes">
-            Mismo modelo, mismos pesos, misma placa: hasta 90 veces de diferencia solo por cómo
-            se ejecuta. Los runtimes que usan las instrucciones vectoriales del S3 (ESP-DL y
-            TFLite Micro con ESP-NN) son los rápidos; los genéricos no las aprovechan.
-            Es tan importante como comprimir el modelo, y lo vemos en la parte de despliegue.
-            Medido con examples/esp32-pipelines (firmware_rt/) en un ESP32-S3 devkit.
+          <p>Mismo modelo, mismos pesos, misma placa: hasta 90 veces de diferencia solo por cómo se ejecuta. Los runtimes que usan las instrucciones vectoriales del S3 (ESP-DL y TFLite Micro con ESP-NN) son los rápidos; los genéricos no las aprovechan.</p>
+          <p>Es tan importante como comprimir el modelo, y lo vemos en la parte de despliegue.</p>
+          <p>Medido con examples/esp32-pipelines (firmware_rt/) en un ESP32-S3 devkit.</p>
         </aside>
     </section>
 
@@ -284,12 +274,9 @@
             <li>La pregunta de la materia: <strong>¿cuánto estamos dispuestos a perder, y a cambio de qué?</strong></li>
         </ul>
         <aside class="notes">
-            La accuracy de los modelos desplegados es la medida antes de cuantizar (en PC); la
-            cuantización puede sumar alguna pérdida extra.
-            Los valores son bajos en general (el azar es 10 %): modelos minúsculos y un dataset
-            difícil. No es un producto, es un ejemplo para ver los compromisos.
-            Para el TP: definir primero la restricción (por ejemplo, tiempo máximo o caída
-            máxima de accuracy) y después elegir las técnicas.
+          <p>La accuracy de los modelos desplegados es la medida antes de cuantizar (en PC); la cuantización puede sumar alguna pérdida extra.</p>
+          <p>Los valores son bajos en general (el azar es 10 %): modelos minúsculos y un dataset difícil. No es un producto, es un ejemplo para ver los compromisos.</p>
+          <p>Para el TP: definir primero la restricción (por ejemplo, tiempo máximo o caída máxima de accuracy) y después elegir las técnicas.</p>
         </aside>
     </section>
 
@@ -304,8 +291,8 @@
             <li>En el TP van a recorrer este mismo camino con su propio problema.</li>
         </ul>
         <aside class="notes">
-            Cerrar la clase dejando claro el arco: hoy vimos el qué, desde la próxima clase vemos el cómo.
-            Recordar la encuesta y que pueden escribir por mail si algo no quedó claro.
+          <p>Cerrar la clase dejando claro el arco: hoy vimos el qué, desde la próxima clase vemos el cómo.</p>
+          <p>Recordar la encuesta y que pueden escribir por mail si algo no quedó claro.</p>
         </aside>
     </section>
 

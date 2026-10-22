@@ -5,10 +5,9 @@
         <h2 class="gradient-text">3. Demo: IA en un microcontrolador</h2>
         <p>Un adelanto de lo que vamos a hacer en la materia</p>
         <aside class="notes">
-            Arrancamos la parte 1 con un adelanto, no con teoría. La idea es que vean a
-            dónde queremos llegar antes de pasar por las dos introducciones.
-            No explicar nada todavía: mostrar el problema, correr los dos modelos y ver la diferencia.
-            Todo lo necesario para correr la demo está en estas diapositivas.
+          <p>Arrancamos la parte 1 con un adelanto, no con teoría. La idea es que vean a dónde queremos llegar antes de pasar por las dos introducciones.</p>
+          <p>No explicar nada todavía: mostrar el problema, correr los dos modelos y ver la diferencia.</p>
+          <p>Todo lo necesario para correr la demo está en estas diapositivas.</p>
         </aside>
     </section>
 
@@ -36,11 +35,10 @@
             </div>
         </div>
         <aside class="notes">
-            Presentar la placa como algo que cuesta lo mismo que un café y que tiene menos
-            memoria que una sola foto de un celular.
-            Dataset: STL-10 (imágenes de 96×96 de 10 clases).
-            Pregunta para el grupo: ¿les parece que una red neuronal entra acá?
-            Dejar que respondan; no corregir todavía.
+          <p>Presentar la placa como algo que cuesta lo mismo que un café y que tiene menos memoria que una sola foto de un celular.</p>
+          <p>Dataset: STL-10 (imágenes de 96×96 de 10 clases).</p>
+          <p>Pregunta para el grupo: ¿les parece que una red neuronal entra acá?</p>
+          <p>Dejar que respondan; no corregir todavía.</p>
         </aside>
     </section>
 
@@ -62,8 +60,8 @@
         <p style="font-size: 0.6em; color: #6272a4;">Una imagen por clase del conjunto de test de STL-10 (96×96 píxeles),
             en <code>demo/imagenes/</code>.</p>
         <aside class="notes">
-            Son imágenes chicas y difíciles: 96×96 píxeles, fotos reales con fondos variados.
-            Son la primera imagen de cada clase del test set; no están elegidas para que el modelo acierte.
+          <p>Son imágenes chicas y difíciles: 96×96 píxeles, fotos reales con fondos variados.</p>
+          <p>Son la primera imagen de cada clase del test set; no están elegidas para que el modelo acierte.</p>
         </aside>
     </section>
 
@@ -90,10 +88,10 @@ caballo.png    -> dog 19%  |  horse 19%  |  frog 18%   (1.1 ms en PC)
 ...
         </code></pre>
         <aside class="notes">
-            Mismo modelo que después va a la placa, pero en PyTorch, en FP32 y en una PC.
-            En la PC los dos tardan ~1 ms: acá no se nota ninguna diferencia de costo.
-            Sobre estas 10 imágenes el grande acierta 6 y el chico 3: hay un costo en accuracy.
-            El script es demo/clasificar.py; se le puede pasar cualquier imagen.
+          <p>Mismo modelo que después va a la placa, pero en PyTorch, en FP32 y en una PC.</p>
+          <p>En la PC los dos tardan ~1 ms: acá no se nota ninguna diferencia de costo.</p>
+          <p>Sobre estas 10 imágenes el grande acierta 6 y el chico 3: hay un costo en accuracy.</p>
+          <p>El script es demo/clasificar.py; se le puede pasar cualquier imagen.</p>
         </aside>
     </section>
 
@@ -113,9 +111,9 @@ ls /dev/ttyUSB*                # puerto de la placa (en general /dev/ttyUSB0)
         <p style="font-size: 0.55em; color: #6272a4; text-align: left;">Los firmwares ya están compilados en
             <code>demo/</code>: <code>demo_grande.bin</code> y <code>demo_chico.bin</code>. No hace falta compilar nada.</p>
         <aside class="notes">
-            Si el puerto no es /dev/ttyUSB0, reemplazarlo en todos los comandos.
-            Si da "permission denied" en el puerto: el usuario tiene que estar en el grupo dialout.
-            La ESP32-CAM-MB no tiene reset automático: para flashear hay que usar los botones.
+          <p>Si el puerto no es /dev/ttyUSB0, reemplazarlo en todos los comandos.</p>
+          <p>Si da "permission denied" en el puerto: el usuario tiene que estar en el grupo dialout.</p>
+          <p>La ESP32-CAM-MB no tiene reset automático: para flashear hay que usar los botones.</p>
         </aside>
     </section>
 
@@ -140,11 +138,10 @@ python -m esp_idf_monitor -p /dev/ttyUSB0
                 Tecla <code>h</code>: ayuda. <strong>Ctrl+]</strong>: salir del monitor.</li>
         </ol>
         <aside class="notes">
-            El flasheo tarda ~30 s. Si esptool no conecta, repetir el paso 1 (BOOT+RST) y volver a correr el comando.
-            Abrir el monitor ANTES de tocar RST, así se ve el arranque.
-            Con el grande el self-test tarda ~1.5 minutos (10 imágenes de ~9 s): buen momento para
-            preguntar qué creen que está pasando.
-            La captura con la cámara (c) es opcional: con el modelo grande también tarda ~9 s.
+          <p>El flasheo tarda ~30 s. Si esptool no conecta, repetir el paso 1 (BOOT+RST) y volver a correr el comando.</p>
+          <p>Abrir el monitor ANTES de tocar RST, así se ve el arranque.</p>
+          <p>Con el grande el self-test tarda ~1.5 minutos (10 imágenes de ~9 s): buen momento para preguntar qué creen que está pasando.</p>
+          <p>La captura con la cámara (c) es opcional: con el modelo grande también tarda ~9 s.</p>
         </aside>
     </section>
 
@@ -161,10 +158,9 @@ python -m esp_idf_monitor -p /dev/ttyUSB0
         </code></pre>
         <p style="font-size: 0.7em; color: #ff79c6;">~9.4 segundos por imagen.</p>
         <aside class="notes">
-            Salida real en la ESP32-CAM (respaldo por si la placa no coopera en clase).
-            PASS significa que la placa da exactamente lo mismo que el modelo cuantizado simulado en la PC.
-            Las 10 imágenes del self-test están elegidas entre las que el modelo clasifica bien: sirven
-            para verificar la placa y medir tiempo, no para medir accuracy.
+          <p>Salida real en la ESP32-CAM (respaldo por si la placa no coopera en clase).</p>
+          <p>PASS significa que la placa da exactamente lo mismo que el modelo cuantizado simulado en la PC.</p>
+          <p>Las 10 imágenes del self-test están elegidas entre las que el modelo clasifica bien: sirven para verificar la placa y medir tiempo, no para medir accuracy.</p>
         </aside>
     </section>
 
@@ -189,10 +185,9 @@ python -m esp_idf_monitor -p /dev/ttyUSB0      # después tocar RST, y tecla t
         </code></pre>
         <p style="font-size: 0.7em; color: #50fa7b;">~75 milisegundos por imagen.</p>
         <aside class="notes">
-            Ahora el self-test termina antes de que terminemos de leer la pantalla.
-            Probar la cámara con la tecla c (y m para modo continuo): apuntar a una foto en el celular.
-            Va a equivocarse seguido: es el modelo de 42 % de accuracy, y la cámara ve algo muy distinto
-            de las imágenes de entrenamiento.
+          <p>Ahora el self-test termina antes de que terminemos de leer la pantalla.</p>
+          <p>Probar la cámara con la tecla c (y m para modo continuo): apuntar a una foto en el celular.</p>
+          <p>Va a equivocarse seguido: es el modelo de 42 % de accuracy, y la cámara ve algo muy distinto de las imágenes de entrenamiento.</p>
         </aside>
     </section>
 
@@ -232,12 +227,9 @@ python -m esp_idf_monitor -p /dev/ttyUSB0      # después tocar RST, y tecla t
             Más de 100 veces más rápido... pero no es gratis.
         </p>
         <aside class="notes">
-            El número para quedarse: de casi 10 segundos a menos de una décima de segundo, en la misma placa.
-            Pero la última fila es igual de importante: perdimos accuracy. Toda la materia
-            gira alrededor de este compromiso: cuánto rendimiento ganamos y cuánto estamos
-            dispuestos a perder.
-            (La accuracy es baja en ambos casos porque los modelos son minúsculos y el dataset
-            es difícil; el azar es 10 %. El objetivo es mostrar el compromiso, no un producto.)
+          <p>El número para quedarse: de casi 10 segundos a menos de una décima de segundo, en la misma placa.</p>
+          <p>Pero la última fila es igual de importante: perdimos accuracy. Toda la materia gira alrededor de este compromiso: cuánto rendimiento ganamos y cuánto estamos dispuestos a perder.</p>
+          <p>(La accuracy es baja en ambos casos porque los modelos son minúsculos y el dataset es difícil; el azar es 10 %. El objetivo es mostrar el compromiso, no un producto.)</p>
         </aside>
     </section>
 
@@ -263,11 +255,9 @@ python -m esp_idf_monitor -p /dev/ttyUSB0      # después tocar RST, y tecla t
             Al final de la clase volvemos a esta demo, con más detalle.
         </p>
         <aside class="notes">
-            Este es el puente a las introducciones. Cada perfil ya sabe una de las dos mitades:
-            los de CESE el hardware, los de CEIA los modelos. Pedir que, en la intro que para
-            ellos es repaso, aporten ejemplos y preguntas.
-            Prometer que al final de la clase volvemos a la demo y la explicamos con lo que
-            hayamos visto.
+          <p>Este es el puente a las introducciones. Cada perfil ya sabe una de las dos mitades:</p>
+          <p>los de CESE el hardware, los de CEIA los modelos. Pedir que, en la intro que para ellos es repaso, aporten ejemplos y preguntas.</p>
+          <p>Prometer que al final de la clase volvemos a la demo y la explicamos con lo que hayamos visto.</p>
         </aside>
     </section>
 
