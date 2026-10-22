@@ -1,0 +1,13 @@
+# Defaults específicos del chip ESP32-S3 (se aplican encima de sdkconfig.defaults
+# al hacer set-target esp32s3 — convención de ESP-IDF).
+#
+# SPIRAM habilitado con IGNORE_NOTFOUND: las placas S3 con PSRAM sana (ej.
+# devkit N8R8) la usan; las que no la tienen (o la tienen rota, como la
+# S3-CAM relevada) bootean igual sin heap SPIRAM. Quién la USA lo deciden
+# BOARD_HAS_PSRAM / FEATURE_PSRAM (board.h), no este archivo.
+CONFIG_SPIRAM=y
+CONFIG_SPIRAM_MODE_OCT=y
+CONFIG_SPIRAM_SPEED_80M=y
+CONFIG_SPIRAM_USE_MALLOC=y
+CONFIG_SPIRAM_MALLOC_RESERVE_INTERNAL=32768
+CONFIG_SPIRAM_IGNORE_NOTFOUND=y

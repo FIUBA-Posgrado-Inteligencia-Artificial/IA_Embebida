@@ -1,0 +1,6 @@
+# Variante build_ref/: apaga las optimizaciones SIMD de esp-nn — los kernels
+# esp_nn_* resuelven a las implementaciones *_ansi (C portable).
+# Usar junto con sdkconfig.defaults:
+#   idf.py -B build_ref -DSDKCONFIG=build_ref/sdkconfig \
+#          -DSDKCONFIG_DEFAULTS="sdkconfig.defaults;sdkconfig.ref" build
+CONFIG_NN_ANSI_C=y

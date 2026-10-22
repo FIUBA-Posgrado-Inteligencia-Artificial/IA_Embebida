@@ -1,0 +1,25 @@
+# firmware_rt/executorch — devkit ESP32-S3 N16R8 (16MB flash, 8MB PSRAM octal)
+CONFIG_IDF_TARGET="esp32s3"
+
+# Flash 16MB + tabla de particiones propia (app factory 8MB)
+CONFIG_ESPTOOLPY_FLASHSIZE_16MB=y
+CONFIG_ESPTOOLPY_FLASHSIZE="16MB"
+CONFIG_PARTITION_TABLE_CUSTOM=y
+CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions.csv"
+
+# PSRAM octal (mismo approach que firmware/sdkconfig.defaults.esp32s3)
+CONFIG_SPIRAM=y
+CONFIG_SPIRAM_MODE_OCT=y
+CONFIG_SPIRAM_SPEED_80M=y
+CONFIG_SPIRAM_USE_MALLOC=y
+CONFIG_SPIRAM_MALLOC_RESERVE_INTERNAL=32768
+CONFIG_SPIRAM_IGNORE_NOTFOUND=y
+
+# main task con stack holgado (el runtime ET corre en app_main)
+CONFIG_ESP_MAIN_TASK_STACK_SIZE=16384
+
+# 240 MHz para el bench
+CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ_240=y
+
+# Optimización de tamaño en el resto del firmware
+CONFIG_COMPILER_OPTIMIZATION_SIZE=y

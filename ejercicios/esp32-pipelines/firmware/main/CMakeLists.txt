@@ -1,0 +1,28 @@
+idf_component_register(
+    SRCS
+        "app_main.c"
+        "camera.c"
+        "preprocess.c"
+        "inference.cpp"
+        "capture_state.c"
+        "result_format.c"
+        "serial_trigger.c"
+        "wifi_manager.c"
+        "esp32cam_mqtt.c"
+        "http_stream_server.c"
+    INCLUDE_DIRS
+        "."
+        "../.."     # wifi_creds.h compartido (examples/esp32-cam/)
+    REQUIRES
+        esp_timer
+        nvs_flash
+        espressif__esp32-camera
+        espressif__esp-dl
+        json
+        driver
+        esp_wifi
+        esp_event
+        esp_netif
+        esp_http_server
+        mqtt
+)

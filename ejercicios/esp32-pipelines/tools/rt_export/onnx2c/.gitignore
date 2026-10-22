@@ -1,0 +1,4 @@
+onnx2c-src/
+protobuf-src/
+protobuf-install/
+out/

@@ -1,0 +1,21 @@
+#pragma once
+#define BOARD_NAME        "esp32cam"
+#define BOARD_HAS_CAMERA  1
+#define BOARD_HAS_PSRAM   1
+#define BOARD_CAM_XCLK_FREQ_HZ 20000000
+#define BOARD_CAM_PIN_PWDN  32
+#define BOARD_CAM_PIN_RESET -1
+#define BOARD_CAM_PIN_XCLK   0
+#define BOARD_CAM_PIN_SIOD  26
+#define BOARD_CAM_PIN_SIOC  27
+#define BOARD_CAM_PIN_D7    35
+#define BOARD_CAM_PIN_D6    34
+#define BOARD_CAM_PIN_D5    39
+#define BOARD_CAM_PIN_D4    36
+#define BOARD_CAM_PIN_D3    21
+#define BOARD_CAM_PIN_D2    19
+#define BOARD_CAM_PIN_D1    18
+#define BOARD_CAM_PIN_D0     5
+#define BOARD_CAM_PIN_VSYNC 25
+#define BOARD_CAM_PIN_HREF  23
+#define BOARD_CAM_PIN_PCLK  22

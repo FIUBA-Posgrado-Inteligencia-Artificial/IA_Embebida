@@ -1,0 +1,13 @@
+[project]
+name = "rt-export-executorch"
+version = "0.1.0"
+description = "Export de modelos .pth (esp32-cam) a ExecuTorch .pte (portable, float) para firmware_rt/executorch"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "executorch>=0.4",
+    "numpy",
+    "torchvision",
+]
+
+[tool.uv]
+environments = ["sys_platform == 'linux'"]

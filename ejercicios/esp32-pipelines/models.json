@@ -1,0 +1,2429 @@
+{
+  "models": [
+    {
+      "name": "dw_rgb32",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32.pth",
+      "stage": "baseline",
+      "size_bytes": 73135,
+      "modified": "2026-08-19T02:06:20",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 63677,
+      "modified": "2026-08-20T08:08:16",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra10_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra10_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 63991,
+      "modified": "2026-08-20T08:09:08",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra10_ft10_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra10_ft10_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 55677,
+      "modified": "2026-08-20T08:09:20",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra10_ft10_pra10_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra10_ft10_pra10_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 56119,
+      "modified": "2026-08-20T08:10:11",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra10_ft10_pra10_ft10_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra10_ft10_pra10_ft10_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 48317,
+      "modified": "2026-08-20T08:10:23",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 49399,
+      "modified": "2026-08-20T08:11:12",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 43005,
+      "modified": "2026-08-20T08:11:25",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 43319,
+      "modified": "2026-08-20T08:12:14",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 38461,
+      "modified": "2026-08-20T08:12:26",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 38775,
+      "modified": "2026-08-20T08:13:13",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 34941,
+      "modified": "2026-08-20T08:13:25",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 35255,
+      "modified": "2026-08-20T08:14:14",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 32125,
+      "modified": "2026-08-20T08:14:25",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 32503,
+      "modified": "2026-08-20T08:15:13",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 29629,
+      "modified": "2026-08-20T08:15:25",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 29943,
+      "modified": "2026-08-20T08:16:11",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 27069,
+      "modified": "2026-08-20T08:16:22",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 28151,
+      "modified": "2026-08-20T08:17:08",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 25789,
+      "modified": "2026-08-20T08:17:20",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 26103,
+      "modified": "2026-08-20T08:18:07",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 24253,
+      "modified": "2026-08-20T08:18:19",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 24567,
+      "modified": "2026-08-20T08:19:05",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra10_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra10_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 63891,
+      "modified": "2026-08-20T08:01:11",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra10_ft5_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra10_ft5_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 55627,
+      "modified": "2026-08-20T08:01:24",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra10_ft5_pra10_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra10_ft5_pra10_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 55955,
+      "modified": "2026-08-20T08:01:55",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra10_ft5_pra10_ft5_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra10_ft5_pra10_ft5_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 48267,
+      "modified": "2026-08-20T08:02:08",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 49235,
+      "modified": "2026-08-20T08:02:38",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 42955,
+      "modified": "2026-08-20T08:02:50",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 43219,
+      "modified": "2026-08-20T08:03:18",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 38411,
+      "modified": "2026-08-20T08:03:30",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 38675,
+      "modified": "2026-08-20T08:04:00",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 34891,
+      "modified": "2026-08-20T08:04:12",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 35155,
+      "modified": "2026-08-20T08:04:42",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 32075,
+      "modified": "2026-08-20T08:04:54",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 32339,
+      "modified": "2026-08-20T08:05:22",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 29579,
+      "modified": "2026-08-20T08:05:34",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 29843,
+      "modified": "2026-08-20T08:06:02",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 27019,
+      "modified": "2026-08-20T08:06:14",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 28051,
+      "modified": "2026-08-20T08:06:42",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 25739,
+      "modified": "2026-08-20T08:06:54",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 26003,
+      "modified": "2026-08-20T08:07:21",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 24203,
+      "modified": "2026-08-20T08:07:33",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 24467,
+      "modified": "2026-08-20T08:08:02",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra20",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra20.pth",
+      "stage": "pruned",
+      "size_bytes": 54665,
+      "modified": "2026-08-20T06:23:01",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra20_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra20_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 54979,
+      "modified": "2026-08-20T07:48:15",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra20_ft10_pra20",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra20_ft10_pra20.pth",
+      "stage": "pruned",
+      "size_bytes": 44957,
+      "modified": "2026-08-20T07:48:27",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra20_ft10_pra20_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra20_ft10_pra20_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 46167,
+      "modified": "2026-08-20T07:49:16",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra20_ft10_pra20_ft10_pra20",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra20_ft10_pra20_ft10_pra20.pth",
+      "stage": "pruned",
+      "size_bytes": 40049,
+      "modified": "2026-08-20T07:49:29",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra20_ft10_pra20_ft10_pra20_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra20_ft10_pra20_ft10_pra20_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 40491,
+      "modified": "2026-08-20T07:50:18",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra20_ft10_pra20_ft10_pra20_ft10_pra20",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra20_ft10_pra20_ft10_pra20_ft10_pra20.pth",
+      "stage": "pruned",
+      "size_bytes": 36357,
+      "modified": "2026-08-20T07:50:31",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra20_ft10_pra20_ft10_pra20_ft10_pra20_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra20_ft10_pra20_ft10_pra20_ft10_pra20_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 36735,
+      "modified": "2026-08-20T07:51:18",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra20_ft10_pra20_ft10_pra20_ft10_pra20_ft10_pra20",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra20_ft10_pra20_ft10_pra20_ft10_pra20_ft10_pra20.pth",
+      "stage": "pruned",
+      "size_bytes": 35801,
+      "modified": "2026-08-20T07:51:30",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra20_ft10_pra20_ft10_pra20_ft10_pra20_ft10_pra20_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra20_ft10_pra20_ft10_pra20_ft10_pra20_ft10_pra20_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 36115,
+      "modified": "2026-08-20T07:52:17",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra20_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra20_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 54929,
+      "modified": "2026-08-20T06:23:33",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra20_ft5_pra20",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra20_ft5_pra20.pth",
+      "stage": "pruned",
+      "size_bytes": 44907,
+      "modified": "2026-08-20T06:23:46",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra20_ft5_pra20_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra20_ft5_pra20_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 45619,
+      "modified": "2026-08-20T06:24:18",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra20_ft5_pra20_ft5_pra20",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra20_ft5_pra20_ft5_pra20.pth",
+      "stage": "pruned",
+      "size_bytes": 39949,
+      "modified": "2026-08-20T06:24:30",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra20_ft5_pra20_ft5_pra20_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra20_ft5_pra20_ft5_pra20_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 40277,
+      "modified": "2026-08-20T06:25:00",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra20_ft5_pra20_ft5_pra20_ft5_pra20",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra20_ft5_pra20_ft5_pra20_ft5_pra20.pth",
+      "stage": "pruned",
+      "size_bytes": 36207,
+      "modified": "2026-08-20T06:25:12",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra20_ft5_pra20_ft5_pra20_ft5_pra20_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra20_ft5_pra20_ft5_pra20_ft5_pra20_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 36471,
+      "modified": "2026-08-20T06:25:42",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra20_ft5_pra20_ft5_pra20_ft5_pra20_ft5_pra20",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra20_ft5_pra20_ft5_pra20_ft5_pra20_ft5_pra20.pth",
+      "stage": "pruned",
+      "size_bytes": 35601,
+      "modified": "2026-08-20T06:25:54",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra20_ft5_pra20_ft5_pra20_ft5_pra20_ft5_pra20_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra20_ft5_pra20_ft5_pra20_ft5_pra20_ft5_pra20_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 35865,
+      "modified": "2026-08-20T06:26:24",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra30",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra30.pth",
+      "stage": "pruned",
+      "size_bytes": 46665,
+      "modified": "2026-08-19T02:07:55",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra30_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra30_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 47043,
+      "modified": "2026-08-20T07:45:18",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra30_ft10_pra30",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra30_ft10_pra30.pth",
+      "stage": "pruned",
+      "size_bytes": 35037,
+      "modified": "2026-08-20T07:45:30",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra30_ft10_pra30_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra30_ft10_pra30_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 35991,
+      "modified": "2026-08-20T07:46:19",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra30_ft10_pra30_ft10_pra30",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra30_ft10_pra30_ft10_pra30.pth",
+      "stage": "pruned",
+      "size_bytes": 30769,
+      "modified": "2026-08-20T07:46:32",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra30_ft10_pra30_ft10_pra30_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra30_ft10_pra30_ft10_pra30_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 31531,
+      "modified": "2026-08-20T07:47:19",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra30_ft2",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra30_ft2.pth",
+      "stage": "finetuned",
+      "size_bytes": 46993,
+      "modified": "2026-08-19T02:08:14",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra30_ft2_qptq.espdl",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra30_ft2_qptq.espdl",
+      "stage": "espdl",
+      "size_bytes": 18320,
+      "modified": "2026-08-20T02:24:14",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra30_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra30_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 46993,
+      "modified": "2026-08-20T06:21:22",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra30_ft5_pra30",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra30_ft5_pra30.pth",
+      "stage": "pruned",
+      "size_bytes": 34987,
+      "modified": "2026-08-20T06:21:34",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra30_ft5_pra30_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra30_ft5_pra30_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 35763,
+      "modified": "2026-08-20T06:22:04",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra30_ft5_pra30_ft5_pra30",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra30_ft5_pra30_ft5_pra30.pth",
+      "stage": "pruned",
+      "size_bytes": 30669,
+      "modified": "2026-08-20T06:22:17",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra30_ft5_pra30_ft5_pra30_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra30_ft5_pra30_ft5_pra30_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 30933,
+      "modified": "2026-08-20T06:22:47",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra50",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra50.pth",
+      "stage": "pruned",
+      "size_bytes": 34377,
+      "modified": "2026-08-19T02:06:33",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra50_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra50_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 34691,
+      "modified": "2026-08-19T02:07:19",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb32_pra50_ft10_qptq.espdl",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb32_pra50_ft10_qptq.espdl",
+      "stage": "espdl",
+      "size_bytes": 15168,
+      "modified": "2026-08-20T02:26:13",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96.pth",
+      "stage": "baseline",
+      "size_bytes": 73135,
+      "modified": "2026-08-20T06:04:06",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 63677,
+      "modified": "2026-08-20T09:42:43",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra10_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra10_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 63991,
+      "modified": "2026-08-20T09:48:57",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra10_ft10_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra10_ft10_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 55677,
+      "modified": "2026-08-20T09:49:18",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra10_ft10_pra10_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra10_ft10_pra10_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 56119,
+      "modified": "2026-08-20T09:54:21",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra10_ft10_pra10_ft10_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra10_ft10_pra10_ft10_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 48317,
+      "modified": "2026-08-20T09:54:43",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 49399,
+      "modified": "2026-08-20T09:58:59",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 43005,
+      "modified": "2026-08-20T09:59:19",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 43319,
+      "modified": "2026-08-20T10:02:54",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 38461,
+      "modified": "2026-08-20T10:03:14",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 38775,
+      "modified": "2026-08-20T10:06:54",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 34941,
+      "modified": "2026-08-20T10:07:13",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 35255,
+      "modified": "2026-08-20T10:10:20",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 32125,
+      "modified": "2026-08-20T10:10:36",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 32503,
+      "modified": "2026-08-20T10:13:05",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 29629,
+      "modified": "2026-08-20T10:13:20",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 29943,
+      "modified": "2026-08-20T10:15:41",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 27069,
+      "modified": "2026-08-20T10:15:57",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 28151,
+      "modified": "2026-08-20T10:18:03",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 25789,
+      "modified": "2026-08-20T10:18:18",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 26103,
+      "modified": "2026-08-20T10:20:00",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 24253,
+      "modified": "2026-08-20T10:20:15",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 24567,
+      "modified": "2026-08-20T10:21:52",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra10_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra10_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 63891,
+      "modified": "2026-08-20T09:21:37",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra10_ft5_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra10_ft5_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 55627,
+      "modified": "2026-08-20T09:22:01",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra10_ft5_pra10_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra10_ft5_pra10_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 55955,
+      "modified": "2026-08-20T09:24:44",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra10_ft5_pra10_ft5_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra10_ft5_pra10_ft5_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 48267,
+      "modified": "2026-08-20T09:25:07",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 49235,
+      "modified": "2026-08-20T09:27:31",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 42955,
+      "modified": "2026-08-20T09:27:54",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 43219,
+      "modified": "2026-08-20T09:30:07",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 38411,
+      "modified": "2026-08-20T09:30:28",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 38675,
+      "modified": "2026-08-20T09:32:34",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 34891,
+      "modified": "2026-08-20T09:32:55",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 35155,
+      "modified": "2026-08-20T09:34:49",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 32075,
+      "modified": "2026-08-20T09:35:08",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 32339,
+      "modified": "2026-08-20T09:36:38",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 29579,
+      "modified": "2026-08-20T09:36:55",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 29843,
+      "modified": "2026-08-20T09:38:18",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 27019,
+      "modified": "2026-08-20T09:38:35",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 28051,
+      "modified": "2026-08-20T09:39:47",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 25739,
+      "modified": "2026-08-20T09:40:02",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 26003,
+      "modified": "2026-08-20T09:41:03",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 24203,
+      "modified": "2026-08-20T09:41:18",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 24467,
+      "modified": "2026-08-20T09:42:14",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra20",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra20.pth",
+      "stage": "pruned",
+      "size_bytes": 54665,
+      "modified": "2026-08-20T06:10:39",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra20_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra20_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 54979,
+      "modified": "2026-08-20T09:03:35",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra20_ft10_pra20",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra20_ft10_pra20.pth",
+      "stage": "pruned",
+      "size_bytes": 44957,
+      "modified": "2026-08-20T09:03:57",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra20_ft10_pra20_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra20_ft10_pra20_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 46167,
+      "modified": "2026-08-20T09:08:20",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra20_ft10_pra20_ft10_pra20",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra20_ft10_pra20_ft10_pra20.pth",
+      "stage": "pruned",
+      "size_bytes": 40049,
+      "modified": "2026-08-20T09:08:40",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra20_ft10_pra20_ft10_pra20_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra20_ft10_pra20_ft10_pra20_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 40491,
+      "modified": "2026-08-20T09:12:28",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra20_ft10_pra20_ft10_pra20_ft10_pra20",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra20_ft10_pra20_ft10_pra20_ft10_pra20.pth",
+      "stage": "pruned",
+      "size_bytes": 36357,
+      "modified": "2026-08-20T09:12:47",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra20_ft10_pra20_ft10_pra20_ft10_pra20_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra20_ft10_pra20_ft10_pra20_ft10_pra20_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 36735,
+      "modified": "2026-08-20T09:15:17",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra20_ft10_pra20_ft10_pra20_ft10_pra20_ft10_pra20",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra20_ft10_pra20_ft10_pra20_ft10_pra20_ft10_pra20.pth",
+      "stage": "pruned",
+      "size_bytes": 35801,
+      "modified": "2026-08-20T09:15:32",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra20_ft10_pra20_ft10_pra20_ft10_pra20_ft10_pra20_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra20_ft10_pra20_ft10_pra20_ft10_pra20_ft10_pra20_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 36115,
+      "modified": "2026-08-20T09:17:44",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra20_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra20_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 54929,
+      "modified": "2026-08-20T06:13:16",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra20_ft5_pra20",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra20_ft5_pra20.pth",
+      "stage": "pruned",
+      "size_bytes": 44907,
+      "modified": "2026-08-20T06:13:35",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra20_ft5_pra20_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra20_ft5_pra20_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 45619,
+      "modified": "2026-08-20T06:15:51",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra20_ft5_pra20_ft5_pra20",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra20_ft5_pra20_ft5_pra20.pth",
+      "stage": "pruned",
+      "size_bytes": 39949,
+      "modified": "2026-08-20T06:16:09",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra20_ft5_pra20_ft5_pra20_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra20_ft5_pra20_ft5_pra20_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 40277,
+      "modified": "2026-08-20T06:17:46",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra20_ft5_pra20_ft5_pra20_ft5_pra20",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra20_ft5_pra20_ft5_pra20_ft5_pra20.pth",
+      "stage": "pruned",
+      "size_bytes": 36207,
+      "modified": "2026-08-20T06:18:04",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra20_ft5_pra20_ft5_pra20_ft5_pra20_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra20_ft5_pra20_ft5_pra20_ft5_pra20_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 36471,
+      "modified": "2026-08-20T06:19:22",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra20_ft5_pra20_ft5_pra20_ft5_pra20_ft5_pra20",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra20_ft5_pra20_ft5_pra20_ft5_pra20_ft5_pra20.pth",
+      "stage": "pruned",
+      "size_bytes": 35601,
+      "modified": "2026-08-20T06:19:38",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra20_ft5_pra20_ft5_pra20_ft5_pra20_ft5_pra20_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra20_ft5_pra20_ft5_pra20_ft5_pra20_ft5_pra20_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 35865,
+      "modified": "2026-08-20T06:20:47",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra30",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra30.pth",
+      "stage": "pruned",
+      "size_bytes": 46665,
+      "modified": "2026-08-20T06:04:28",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra30_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra30_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 47043,
+      "modified": "2026-08-20T08:52:05",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra30_ft10_pra30",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra30_ft10_pra30.pth",
+      "stage": "pruned",
+      "size_bytes": 35037,
+      "modified": "2026-08-20T08:52:25",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra30_ft10_pra30_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra30_ft10_pra30_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 35991,
+      "modified": "2026-08-20T08:55:48",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra30_ft10_pra30_ft10_pra30",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra30_ft10_pra30_ft10_pra30.pth",
+      "stage": "pruned",
+      "size_bytes": 30769,
+      "modified": "2026-08-20T08:56:05",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra30_ft10_pra30_ft10_pra30_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra30_ft10_pra30_ft10_pra30_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 31531,
+      "modified": "2026-08-20T08:58:32",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra30_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra30_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 46993,
+      "modified": "2026-08-20T06:06:52",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra30_ft5_pra30",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra30_ft5_pra30.pth",
+      "stage": "pruned",
+      "size_bytes": 34987,
+      "modified": "2026-08-20T06:07:09",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra30_ft5_pra30_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra30_ft5_pra30_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 35763,
+      "modified": "2026-08-20T06:08:44",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra30_ft5_pra30_ft5_pra30",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra30_ft5_pra30_ft5_pra30.pth",
+      "stage": "pruned",
+      "size_bytes": 30669,
+      "modified": "2026-08-20T06:09:00",
+      "notes": ""
+    },
+    {
+      "name": "dw_rgb96_pra30_ft5_pra30_ft5_pra30_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/dw_rgb96_pra30_ft5_pra30_ft5_pra30_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 30933,
+      "modified": "2026-08-20T06:10:12",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32.pth",
+      "stage": "baseline",
+      "size_bytes": 392169,
+      "modified": "2026-08-19T02:08:43",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 314796,
+      "modified": "2026-08-20T08:35:11",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra10_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra10_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 315069,
+      "modified": "2026-08-20T08:36:14",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra10_ft10_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra10_ft10_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 255276,
+      "modified": "2026-08-20T08:36:28",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra10_ft10_pra10_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra10_ft10_pra10_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 255549,
+      "modified": "2026-08-20T08:37:30",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra10_ft10_pra10_ft10_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra10_ft10_pra10_ft10_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 203628,
+      "modified": "2026-08-20T08:37:43",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 204157,
+      "modified": "2026-08-20T08:38:39",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 163308,
+      "modified": "2026-08-20T08:38:53",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 163517,
+      "modified": "2026-08-20T08:39:49",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 133612,
+      "modified": "2026-08-20T08:40:02",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 133821,
+      "modified": "2026-08-20T08:40:57",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 108268,
+      "modified": "2026-08-20T08:41:10",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 108477,
+      "modified": "2026-08-20T08:42:04",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 87212,
+      "modified": "2026-08-20T08:42:17",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 87421,
+      "modified": "2026-08-20T08:43:12",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 71596,
+      "modified": "2026-08-20T08:43:25",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 71805,
+      "modified": "2026-08-20T08:44:18",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 57580,
+      "modified": "2026-08-20T08:44:32",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 58173,
+      "modified": "2026-08-20T08:45:23",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 47340,
+      "modified": "2026-08-20T08:45:36",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 47549,
+      "modified": "2026-08-20T08:46:25",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 39468,
+      "modified": "2026-08-20T08:46:39",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 39677,
+      "modified": "2026-08-20T08:47:26",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra10_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra10_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 315011,
+      "modified": "2026-08-20T08:27:26",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra10_ft5_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra10_ft5_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 255247,
+      "modified": "2026-08-20T08:27:39",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra10_ft5_pra10_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra10_ft5_pra10_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 255491,
+      "modified": "2026-08-20T08:28:13",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra10_ft5_pra10_ft5_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra10_ft5_pra10_ft5_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 203599,
+      "modified": "2026-08-20T08:28:27",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 204099,
+      "modified": "2026-08-20T08:28:58",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 163279,
+      "modified": "2026-08-20T08:29:12",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 163459,
+      "modified": "2026-08-20T08:29:45",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 133583,
+      "modified": "2026-08-20T08:29:57",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 133763,
+      "modified": "2026-08-20T08:30:28",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 108239,
+      "modified": "2026-08-20T08:30:41",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 108419,
+      "modified": "2026-08-20T08:31:13",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 87183,
+      "modified": "2026-08-20T08:31:27",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 87363,
+      "modified": "2026-08-20T08:31:58",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 71567,
+      "modified": "2026-08-20T08:32:11",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 71747,
+      "modified": "2026-08-20T08:32:44",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 57551,
+      "modified": "2026-08-20T08:32:57",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 58115,
+      "modified": "2026-08-20T08:33:28",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 47311,
+      "modified": "2026-08-20T08:33:42",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 47491,
+      "modified": "2026-08-20T08:34:12",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 39439,
+      "modified": "2026-08-20T08:34:25",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 39619,
+      "modified": "2026-08-20T08:34:56",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra20",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra20.pth",
+      "stage": "pruned",
+      "size_bytes": 252426,
+      "modified": "2026-08-20T05:36:57",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra20_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra20_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 252955,
+      "modified": "2026-08-20T08:22:14",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra20_ft10_pra20",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra20_ft10_pra20.pth",
+      "stage": "pruned",
+      "size_bytes": 164348,
+      "modified": "2026-08-20T08:22:27",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra20_ft10_pra20_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra20_ft10_pra20_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 164813,
+      "modified": "2026-08-20T08:23:23",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra20_ft10_pra20_ft10_pra20",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra20_ft10_pra20_ft10_pra20.pth",
+      "stage": "pruned",
+      "size_bytes": 111342,
+      "modified": "2026-08-20T08:23:36",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra20_ft10_pra20_ft10_pra20_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra20_ft10_pra20_ft10_pra20_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 111551,
+      "modified": "2026-08-20T08:24:28",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra20_ft10_pra20_ft10_pra20_ft10_pra20",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra20_ft10_pra20_ft10_pra20_ft10_pra20.pth",
+      "stage": "pruned",
+      "size_bytes": 75488,
+      "modified": "2026-08-20T08:24:41",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra20_ft10_pra20_ft10_pra20_ft10_pra20_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra20_ft10_pra20_ft10_pra20_ft10_pra20_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 75761,
+      "modified": "2026-08-20T08:25:30",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra20_ft10_pra20_ft10_pra20_ft10_pra20_ft10_pra20",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra20_ft10_pra20_ft10_pra20_ft10_pra20_ft10_pra20.pth",
+      "stage": "pruned",
+      "size_bytes": 54738,
+      "modified": "2026-08-20T08:25:43",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra20_ft10_pra20_ft10_pra20_ft10_pra20_ft10_pra20_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra20_ft10_pra20_ft10_pra20_ft10_pra20_ft10_pra20_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 55011,
+      "modified": "2026-08-20T08:26:35",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra20_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra20_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 252926,
+      "modified": "2026-08-20T05:37:31",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra20_ft5_pra20",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra20_ft5_pra20.pth",
+      "stage": "pruned",
+      "size_bytes": 164319,
+      "modified": "2026-08-20T05:37:44",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra20_ft5_pra20_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra20_ft5_pra20_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 164691,
+      "modified": "2026-08-20T05:38:17",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra20_ft5_pra20_ft5_pra20",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra20_ft5_pra20_ft5_pra20.pth",
+      "stage": "pruned",
+      "size_bytes": 111220,
+      "modified": "2026-08-20T05:38:30",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra20_ft5_pra20_ft5_pra20_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra20_ft5_pra20_ft5_pra20_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 111464,
+      "modified": "2026-08-20T05:39:01",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra20_ft5_pra20_ft5_pra20_ft5_pra20",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra20_ft5_pra20_ft5_pra20_ft5_pra20.pth",
+      "stage": "pruned",
+      "size_bytes": 75337,
+      "modified": "2026-08-20T05:39:14",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra20_ft5_pra20_ft5_pra20_ft5_pra20_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra20_ft5_pra20_ft5_pra20_ft5_pra20_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 75581,
+      "modified": "2026-08-20T05:39:44",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra20_ft5_pra20_ft5_pra20_ft5_pra20_ft5_pra20",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra20_ft5_pra20_ft5_pra20_ft5_pra20_ft5_pra20.pth",
+      "stage": "pruned",
+      "size_bytes": 54622,
+      "modified": "2026-08-20T05:39:56",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra20_ft5_pra20_ft5_pra20_ft5_pra20_ft5_pra20_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra20_ft5_pra20_ft5_pra20_ft5_pra20_ft5_pra20_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 54802,
+      "modified": "2026-08-20T05:40:27",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra30",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra30.pth",
+      "stage": "pruned",
+      "size_bytes": 194570,
+      "modified": "2026-08-19T02:08:43",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra30_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra30_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 194843,
+      "modified": "2026-08-19T02:08:43",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra30_ft10_pra30",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra30_ft10_pra30.pth",
+      "stage": "pruned",
+      "size_bytes": 99836,
+      "modified": "2026-08-20T08:19:23",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra30_ft10_pra30_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra30_ft10_pra30_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 100365,
+      "modified": "2026-08-20T08:20:14",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra30_ft10_pra30_ft10_pra30",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra30_ft10_pra30_ft10_pra30.pth",
+      "stage": "pruned",
+      "size_bytes": 56494,
+      "modified": "2026-08-20T08:20:26",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra30_ft10_pra30_ft10_pra30_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra30_ft10_pra30_ft10_pra30_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 57023,
+      "modified": "2026-08-20T08:21:13",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra30_ft10_qptq.espdl",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra30_ft10_qptq.espdl",
+      "stage": "espdl",
+      "size_bytes": 53872,
+      "modified": "2026-08-20T02:27:17",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra30_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra30_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 194430,
+      "modified": "2026-08-20T05:35:20",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra30_ft5_pra30",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra30_ft5_pra30.pth",
+      "stage": "pruned",
+      "size_bytes": 99807,
+      "modified": "2026-08-20T05:35:32",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra30_ft5_pra30_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra30_ft5_pra30_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 100243,
+      "modified": "2026-08-20T05:36:01",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra30_ft5_pra30_ft5_pra30",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra30_ft5_pra30_ft5_pra30.pth",
+      "stage": "pruned",
+      "size_bytes": 56372,
+      "modified": "2026-08-20T05:36:13",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb32_pra30_ft5_pra30_ft5_pra30_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb32_pra30_ft5_pra30_ft5_pra30_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 56616,
+      "modified": "2026-08-20T05:36:42",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96.pth",
+      "stage": "baseline",
+      "size_bytes": 392169,
+      "modified": "2026-08-19T02:08:43",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 314796,
+      "modified": "2026-08-20T11:09:53",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra10_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra10_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 315069,
+      "modified": "2026-08-20T11:17:05",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra10_ft10_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra10_ft10_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 255276,
+      "modified": "2026-08-20T11:17:29",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra10_ft10_pra10_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra10_ft10_pra10_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 255549,
+      "modified": "2026-08-20T11:23:26",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra10_ft10_pra10_ft10_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra10_ft10_pra10_ft10_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 203628,
+      "modified": "2026-08-20T11:23:48",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 204157,
+      "modified": "2026-08-20T11:28:41",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 163308,
+      "modified": "2026-08-20T11:29:02",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 163517,
+      "modified": "2026-08-20T11:32:58",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 133612,
+      "modified": "2026-08-20T11:33:19",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 133821,
+      "modified": "2026-08-20T11:37:18",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 108268,
+      "modified": "2026-08-20T11:37:37",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 108477,
+      "modified": "2026-08-20T11:40:55",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 87212,
+      "modified": "2026-08-20T11:41:12",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 87421,
+      "modified": "2026-08-20T11:43:56",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 71596,
+      "modified": "2026-08-20T11:44:11",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 71805,
+      "modified": "2026-08-20T11:46:30",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 57580,
+      "modified": "2026-08-20T11:46:45",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 58173,
+      "modified": "2026-08-20T11:48:41",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 47340,
+      "modified": "2026-08-20T11:48:55",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 47549,
+      "modified": "2026-08-20T11:50:24",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 39468,
+      "modified": "2026-08-20T11:50:37",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 39677,
+      "modified": "2026-08-20T11:52:00",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra10_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra10_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 315011,
+      "modified": "2026-08-20T10:49:18",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra10_ft5_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra10_ft5_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 255247,
+      "modified": "2026-08-20T10:49:44",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra10_ft5_pra10_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra10_ft5_pra10_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 255491,
+      "modified": "2026-08-20T10:52:41",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra10_ft5_pra10_ft5_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra10_ft5_pra10_ft5_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 203599,
+      "modified": "2026-08-20T10:53:03",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 204099,
+      "modified": "2026-08-20T10:55:36",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 163279,
+      "modified": "2026-08-20T10:55:57",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 163459,
+      "modified": "2026-08-20T10:58:19",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 133583,
+      "modified": "2026-08-20T10:58:40",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 133763,
+      "modified": "2026-08-20T11:00:50",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 108239,
+      "modified": "2026-08-20T11:01:08",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 108419,
+      "modified": "2026-08-20T11:02:54",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 87183,
+      "modified": "2026-08-20T11:03:10",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 87363,
+      "modified": "2026-08-20T11:04:26",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 71567,
+      "modified": "2026-08-20T11:04:43",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 71747,
+      "modified": "2026-08-20T11:06:05",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 57551,
+      "modified": "2026-08-20T11:06:19",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 58115,
+      "modified": "2026-08-20T11:07:19",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 47311,
+      "modified": "2026-08-20T11:07:33",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 47491,
+      "modified": "2026-08-20T11:08:22",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10.pth",
+      "stage": "pruned",
+      "size_bytes": 39439,
+      "modified": "2026-08-20T11:08:36",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 39619,
+      "modified": "2026-08-20T11:09:23",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra20",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra20.pth",
+      "stage": "pruned",
+      "size_bytes": 252746,
+      "modified": "2026-08-19T02:08:43",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra20_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra20_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 253275,
+      "modified": "2026-08-19T02:08:43",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra20_ft10_pra20",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra20_ft10_pra20.pth",
+      "stage": "pruned",
+      "size_bytes": 164348,
+      "modified": "2026-08-20T10:32:21",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra20_ft10_pra20_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra20_ft10_pra20_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 164813,
+      "modified": "2026-08-20T10:36:52",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra20_ft10_pra20_ft10_pra20",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra20_ft10_pra20_ft10_pra20.pth",
+      "stage": "pruned",
+      "size_bytes": 111342,
+      "modified": "2026-08-20T10:37:11",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra20_ft10_pra20_ft10_pra20_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra20_ft10_pra20_ft10_pra20_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 111551,
+      "modified": "2026-08-20T10:40:28",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra20_ft10_pra20_ft10_pra20_ft10_pra20",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra20_ft10_pra20_ft10_pra20_ft10_pra20.pth",
+      "stage": "pruned",
+      "size_bytes": 75488,
+      "modified": "2026-08-20T10:40:44",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra20_ft10_pra20_ft10_pra20_ft10_pra20_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra20_ft10_pra20_ft10_pra20_ft10_pra20_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 75761,
+      "modified": "2026-08-20T10:42:55",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra20_ft10_pra20_ft10_pra20_ft10_pra20_ft10_pra20",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra20_ft10_pra20_ft10_pra20_ft10_pra20_ft10_pra20.pth",
+      "stage": "pruned",
+      "size_bytes": 54738,
+      "modified": "2026-08-20T10:43:09",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra20_ft10_pra20_ft10_pra20_ft10_pra20_ft10_pra20_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra20_ft10_pra20_ft10_pra20_ft10_pra20_ft10_pra20_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 55011,
+      "modified": "2026-08-20T10:44:52",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra20_ft10_qptq.espdl",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra20_ft10_qptq.espdl",
+      "stage": "espdl",
+      "size_bytes": 68512,
+      "modified": "2026-08-20T02:28:29",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra20_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra20_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 252926,
+      "modified": "2026-08-20T05:26:26",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra20_ft5_pra20",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra20_ft5_pra20.pth",
+      "stage": "pruned",
+      "size_bytes": 164319,
+      "modified": "2026-08-20T05:26:46",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra20_ft5_pra20_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra20_ft5_pra20_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 164691,
+      "modified": "2026-08-20T05:29:16",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra20_ft5_pra20_ft5_pra20",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra20_ft5_pra20_ft5_pra20.pth",
+      "stage": "pruned",
+      "size_bytes": 111220,
+      "modified": "2026-08-20T05:29:35",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra20_ft5_pra20_ft5_pra20_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra20_ft5_pra20_ft5_pra20_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 111464,
+      "modified": "2026-08-20T05:31:32",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra20_ft5_pra20_ft5_pra20_ft5_pra20",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra20_ft5_pra20_ft5_pra20_ft5_pra20.pth",
+      "stage": "pruned",
+      "size_bytes": 75337,
+      "modified": "2026-08-20T05:31:48",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra20_ft5_pra20_ft5_pra20_ft5_pra20_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra20_ft5_pra20_ft5_pra20_ft5_pra20_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 75581,
+      "modified": "2026-08-20T05:33:18",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra20_ft5_pra20_ft5_pra20_ft5_pra20_ft5_pra20",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra20_ft5_pra20_ft5_pra20_ft5_pra20_ft5_pra20.pth",
+      "stage": "pruned",
+      "size_bytes": 54622,
+      "modified": "2026-08-20T05:33:34",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra20_ft5_pra20_ft5_pra20_ft5_pra20_ft5_pra20_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra20_ft5_pra20_ft5_pra20_ft5_pra20_ft5_pra20_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 54802,
+      "modified": "2026-08-20T05:34:46",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra30",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra30.pth",
+      "stage": "pruned",
+      "size_bytes": 194250,
+      "modified": "2026-08-20T05:16:48",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra30_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra30_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 194523,
+      "modified": "2026-08-20T10:26:45",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra30_ft10_pra30",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra30_ft10_pra30.pth",
+      "stage": "pruned",
+      "size_bytes": 99836,
+      "modified": "2026-08-20T10:27:02",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra30_ft10_pra30_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra30_ft10_pra30_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 100365,
+      "modified": "2026-08-20T10:29:39",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra30_ft10_pra30_ft10_pra30",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra30_ft10_pra30_ft10_pra30.pth",
+      "stage": "pruned",
+      "size_bytes": 56494,
+      "modified": "2026-08-20T10:29:54",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra30_ft10_pra30_ft10_pra30_ft10",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra30_ft10_pra30_ft10_pra30_ft10.pth",
+      "stage": "finetuned",
+      "size_bytes": 57023,
+      "modified": "2026-08-20T10:31:54",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra30_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra30_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 194430,
+      "modified": "2026-08-20T05:19:24",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra30_ft5_pra30",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra30_ft5_pra30.pth",
+      "stage": "pruned",
+      "size_bytes": 99807,
+      "modified": "2026-08-20T05:19:42",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra30_ft5_pra30_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra30_ft5_pra30_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 100243,
+      "modified": "2026-08-20T05:21:31",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra30_ft5_pra30_ft5_pra30",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra30_ft5_pra30_ft5_pra30.pth",
+      "stage": "pruned",
+      "size_bytes": 56372,
+      "modified": "2026-08-20T05:21:48",
+      "notes": ""
+    },
+    {
+      "name": "std_rgb96_pra30_ft5_pra30_ft5_pra30_ft5",
+      "path": "/home/fzacchigna/projects/ia_compression/examples/esp32-pipelines/models/std_rgb96_pra30_ft5_pra30_ft5_pra30_ft5.pth",
+      "stage": "finetuned",
+      "size_bytes": 56616,
+      "modified": "2026-08-20T05:23:05",
+      "notes": ""
+    }
+  ],
+  "updated_at": "2026-08-20T11:56:57"
+}

@@ -1,0 +1,2281 @@
+# ESP32-CAM pipeline flows.
+# Usage:
+#   uv run python main.py run <flow_name>
+#   uv run python main.py run <flow_name> --dry-run
+#   uv run python main.py flows
+#
+# Un flow puede heredar de otro con `extends` + `stages`: la lista efectiva
+# es la del padre seguida de los stages propios. Como los scripts cachean sus
+# outputs (train/prune/finetune/quantize saltean si el checkpoint ya existe),
+# re-ejecutar los stages heredados cuesta segundos. Eso permite definir capas:
+#   <modelo>_base   → train → prune → finetune        (agnóstico del chip)
+#   <modelo>        → extends base + quantize          (ESP32 clásico)
+#   <modelo>_esp32  → extends <modelo> + build/flash/monitor
+#   <modelo>_esp32s3 → extends base + quantize/build del ESP32-S3
+
+# Puerto serie del ESP32-CAM. Se inyecta automáticamente en los stages
+# `flash` y `monitor` que no definan su propio `port`. Cambialo si tu board
+# está en otra ruta (ej: /dev/ttyUSB0). Dejalo en `auto` para que se
+# autodetecte por (VID, PID) — solo confiable si hay una única placa ESP
+# conectada.
+port: /dev/ttyUSB0
+
+flows:
+
+  # -----------------------------------------------------------------------
+  # GENÉRICOS
+  # No dependen de ningún modelo: operan sobre lo último buildeado / lo que
+  # ya esté corriendo en la placa.
+  # -----------------------------------------------------------------------
+
+  # Flashea lo que haya en firmware/build (correr antes un flow con build).
+  flash:
+    - stage: flash
+      params:
+        board: esp32cam
+
+  # Sólo abre el monitor serie; no toca el firmware que ya está en la placa.
+  monitor:
+    - stage: monitor
+      params:
+        board: esp32cam
+
+  # -----------------------------------------------------------------------
+  # DESARROLLO RÁPIDO
+  # Ciclo corto (minutos) para verificar que el pipeline corre de punta
+  # a punta antes de gastar tiempo en un modelo de producción.
+  # -----------------------------------------------------------------------
+
+  # Capa compartida: depthwise rgb 32x32, 5 epochs. La reutilizan el flow
+  # del ESP32 clásico y el del S3.
+  fast_debug_base:
+    - stage: train
+      params:
+        arch: depthwise
+        input_mode: rgb
+        resolution: 32
+        epochs: 5
+        lr: 1.0e-3
+        batch_size: 512
+
+    - stage: prune
+      source: dw_rgb32
+      params:
+        method: activation
+        ratio: 0.3
+
+    - stage: finetune
+      source: dw_rgb32_pra30
+      params:
+        epochs: 2
+        lr: 2.0e-4
+
+  # Hasta quantize (ESP32 clásico) — para iterar sin placa.
+  fast_debug:
+    extends: fast_debug_base
+    stages:
+      - stage: quantize
+        source: dw_rgb32_pra30_ft2
+        variant: a
+        params:
+          mode: ptq
+          calib_batches: 32
+
+  # Pipeline completo en el ESP32-CAM: quantize → build → flash → monitor.
+  fast_debug_esp32:
+    extends: fast_debug
+    stages:
+      - stage: build
+        source: dw_rgb32_pra30_ft2_qptq
+        params:
+          preflight: true
+          board: esp32cam
+
+      - stage: flash
+        params:
+          board: esp32cam
+
+      - stage: monitor
+        params:
+          board: esp32cam
+
+  # Benchmark en placa ESP32 clásica (sin cámara, sin PSRAM/módulo cam):
+  # mide preprocess+inferencia sobre una imagen fija embebida.
+  benchmark_esp32:
+    extends: fast_debug
+    stages:
+      - stage: build
+        source: dw_rgb32_pra30_ft2_qptq
+        params:
+          preflight: true
+          board: esp32
+
+      - stage: flash
+        params:
+          board: esp32
+
+      - stage: monitor
+        params:
+          board: esp32
+
+  # Benchmark build-only para ESP32-S3 (sin cámara). Sin placa para flashear
+  # acá; el .espdl necesita el target esp32s3, por eso NO extiende fast_debug
+  # (que cuantiza target c) sino fast_debug_base + su propio quantize.
+  benchmark_esp32s3:
+    extends: fast_debug_base
+    stages:
+      - stage: quantize
+        source: dw_rgb32_pra30_ft2
+        variant: a
+        params:
+          mode: ptq
+          calib_batches: 32
+          target: esp32s3
+
+      - stage: build
+        source: dw_rgb32_pra30_ft2_qptq
+        params:
+          preflight: true
+          board: esp32s3
+
+  # ESP32-S3-CAM (proyecto unificado firmware/, --board deriva chip/target):
+  # quantize deja el header en models/ como siempre (sin firmware_dir); el
+  # build lo instala validando el target derivado del board. Build-only:
+  # sin placa S3-CAM para flashear en este flow.
+  # OJO: el .espdl/.h no llevan el target en el nombre — correr este quantize
+  # sobrescribe en models/ los artefactos target=c de fast_debug. El build-side
+  # valida el sidecar y rechaza el mismatch, pero no evita el overwrite.
+  fast_debug_esp32s3cam:
+    extends: fast_debug_base
+    stages:
+      - stage: quantize
+        source: dw_rgb32_pra30_ft2
+        variant: a
+        params:
+          mode: ptq
+          calib_batches: 32
+          target: esp32s3
+
+      - stage: build
+        source: dw_rgb32_pra30_ft2_qptq
+        params:
+          preflight: true
+          board: esp32s3cam
+
+  # -----------------------------------------------------------------------
+  # MODELOS DE PRODUCCIÓN
+  # Capas por modelo:
+  #   <nombre>_base   → hasta finetune (comparte entre targets)
+  #   <nombre>        → hasta quantize ESP32 — para iterar sin placa
+  #   <nombre>_esp32  → deploy completo en ESP32-CAM
+  # -----------------------------------------------------------------------
+
+  # -- good_model: alta calidad, poca compresión, standard rgb 96x96.
+  # Mayor accuracy; más pesado y más lento en el ESP32.
+
+  good_model_base:
+    - stage: train
+      params:
+        arch: standard
+        input_mode: rgb
+        resolution: 96
+        epochs: 30
+        lr: 1.0e-3
+        batch_size: 128
+
+    - stage: prune
+      source: std_rgb96
+      params:
+        method: activation
+        ratio: 0.2
+
+    - stage: finetune
+      source: std_rgb96_pra20
+      params:
+        epochs: 10
+        lr: 2.0e-4
+
+  # Hasta quantize (ESP32 clásico) — entrenar una vez y comparar métricas
+  # (main.py models) sin necesitar placa.
+  good_model:
+    extends: good_model_base
+    stages:
+      - stage: quantize
+        source: std_rgb96_pra20_ft10
+        variant: a
+        params:
+          mode: ptq
+          calib_batches: 32
+
+  # Deploy completo en el ESP32-CAM reutilizando todo lo anterior.
+  good_model_esp32:
+    extends: good_model
+    stages:
+      - stage: build
+        source: std_rgb96_pra20_ft10_qptq
+        params:
+          preflight: true
+          board: esp32cam
+
+      - stage: flash
+        params:
+          board: esp32cam
+
+      - stage: monitor
+        params:
+          board: esp32cam
+
+  # LEGACY: apuntaba a ../esp32-s3-cam/ (proyecto externo, otra sesión) usando
+  # el viejo --target de script05-build.py, que ya no existe (reemplazado por
+  # --board). Este flow ya no corre — se eliminó en vez de migrarlo porque
+  # --board/-DBOARD no tiene sentido en el CMake standalone de ese proyecto.
+  # Migrar cuando se valide good_model_esp32s3cam sobre el firmware unificado
+  # (ver fast_debug_esp32s3cam más abajo como referencia del patrón).
+
+  # -- standard32: CNN estándar a 32x32 — aísla el efecto de la arquitectura
+  # (standard vs depthwise) a igual resolución que small_model.
+  standard32_base:
+    - stage: train
+      params:
+        arch: standard
+        input_mode: rgb
+        resolution: 32
+        epochs: 30
+        lr: 1.0e-3
+        batch_size: 512
+
+    - stage: prune
+      source: std_rgb32
+      params:
+        method: activation
+        ratio: 0.3
+
+    - stage: finetune
+      source: std_rgb32_pra30
+      params:
+        epochs: 10
+        lr: 2.0e-4
+
+  # Hasta quantize — para iterar sin placa.
+  standard32:
+    extends: standard32_base
+    stages:
+      - stage: quantize
+        source: std_rgb32_pra30_ft10
+        variant: a
+        params:
+          mode: ptq
+          calib_batches: 32
+
+  # -- small_model: compacto, mucha compresión, depthwise rgb 32x32.
+  # Menor tamaño y más veloz en el ESP32; posible caída de accuracy.
+
+  small_model_base:
+    - stage: train
+      params:
+        arch: depthwise
+        input_mode: rgb
+        resolution: 32
+        epochs: 30
+        lr: 1.0e-3
+        batch_size: 512
+
+    - stage: prune
+      source: dw_rgb32
+      params:
+        method: activation
+        ratio: 0.5
+
+    - stage: finetune
+      source: dw_rgb32_pra50
+      params:
+        epochs: 10
+        lr: 2.0e-4
+
+  # Hasta quantize — para iterar sin placa.
+  small_model:
+    extends: small_model_base
+    stages:
+      - stage: quantize
+        source: dw_rgb32_pra50_ft10
+        variant: a
+        params:
+          mode: ptq
+          calib_batches: 32
+
+  # Deploy completo en el ESP32-CAM.
+  small_model_esp32:
+    extends: small_model
+    stages:
+      - stage: build
+        source: dw_rgb32_pra50_ft10_qptq
+        params:
+          preflight: true
+          board: esp32cam
+
+      - stage: flash
+        params:
+          board: esp32cam
+
+      - stage: monitor
+        params:
+          board: esp32cam
+
+  # -----------------------------------------------------------------------
+  # ESP32-S3-CAM
+  # LEGACY: fast_debug_esp32s3 apuntaba a ../esp32-s3-cam/ (proyecto externo,
+  # otra sesión) usando el viejo --target de script05-build.py, que ya no
+  # existe (reemplazado por --board). Se eliminó en vez de migrarlo porque
+  # --board/-DBOARD no tiene sentido en el CMake standalone de ese proyecto.
+  # El reemplazo sobre el firmware unificado es fast_debug_esp32s3cam
+  # (ver arriba, sección DESARROLLO RÁPIDO) — migrar good_model cuando se
+  # valide en HW.
+  # -----------------------------------------------------------------------
+
+  # -----------------------------------------------------------------------
+  # PRUNING ITERATIVO
+  # (prune -> finetune) x N sobre cada baseline, con ft5 o ft10 por etapa:
+  #   _iter30[_ft10] -> 3 etapas de 30%  (~66% acumulado)
+  #   _iter20[_ft10] -> 5 etapas de 20%  (~67% acumulado)
+  #   _iter10[_ft10] -> 11 etapas de 10% (~69% acumulado)
+  # OJO: el ratio de cada prune es relativo a los canales ACTUALES, no al
+  # modelo original. Los checkpoints intermedios quedan en models/ y se
+  # comparan con `main.py models`. Capa _train compartida entre esquemas.
+  # Nombres cortos (_praNN, _ftN): la cadena de 11 etapas mide ~120 chars,
+  # dentro del límite de 255 bytes por nombre del filesystem.
+  # -----------------------------------------------------------------------
+  std_rgb96_train:
+    - stage: train
+      params:
+        arch: standard
+        input_mode: rgb
+        resolution: 96
+        epochs: 30
+        lr: 1.0e-3
+        batch_size: 128
+
+  std_rgb96_iter30:
+    extends: std_rgb96_train
+    stages:
+      - stage: prune
+        source: std_rgb96
+        params:
+          method: activation
+          ratio: 0.30
+
+      - stage: finetune
+        source: std_rgb96_pra30
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb96_pra30_ft5
+        params:
+          method: activation
+          ratio: 0.30
+
+      - stage: finetune
+        source: std_rgb96_pra30_ft5_pra30
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb96_pra30_ft5_pra30_ft5
+        params:
+          method: activation
+          ratio: 0.30
+
+      - stage: finetune
+        source: std_rgb96_pra30_ft5_pra30_ft5_pra30
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+  std_rgb96_iter30_ft10:
+    extends: std_rgb96_train
+    stages:
+      - stage: prune
+        source: std_rgb96
+        params:
+          method: activation
+          ratio: 0.30
+
+      - stage: finetune
+        source: std_rgb96_pra30
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb96_pra30_ft10
+        params:
+          method: activation
+          ratio: 0.30
+
+      - stage: finetune
+        source: std_rgb96_pra30_ft10_pra30
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb96_pra30_ft10_pra30_ft10
+        params:
+          method: activation
+          ratio: 0.30
+
+      - stage: finetune
+        source: std_rgb96_pra30_ft10_pra30_ft10_pra30
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+  std_rgb96_iter20:
+    extends: std_rgb96_train
+    stages:
+      - stage: prune
+        source: std_rgb96
+        params:
+          method: activation
+          ratio: 0.20
+
+      - stage: finetune
+        source: std_rgb96_pra20
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb96_pra20_ft5
+        params:
+          method: activation
+          ratio: 0.20
+
+      - stage: finetune
+        source: std_rgb96_pra20_ft5_pra20
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb96_pra20_ft5_pra20_ft5
+        params:
+          method: activation
+          ratio: 0.20
+
+      - stage: finetune
+        source: std_rgb96_pra20_ft5_pra20_ft5_pra20
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb96_pra20_ft5_pra20_ft5_pra20_ft5
+        params:
+          method: activation
+          ratio: 0.20
+
+      - stage: finetune
+        source: std_rgb96_pra20_ft5_pra20_ft5_pra20_ft5_pra20
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb96_pra20_ft5_pra20_ft5_pra20_ft5_pra20_ft5
+        params:
+          method: activation
+          ratio: 0.20
+
+      - stage: finetune
+        source: std_rgb96_pra20_ft5_pra20_ft5_pra20_ft5_pra20_ft5_pra20
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+  std_rgb96_iter20_ft10:
+    extends: std_rgb96_train
+    stages:
+      - stage: prune
+        source: std_rgb96
+        params:
+          method: activation
+          ratio: 0.20
+
+      - stage: finetune
+        source: std_rgb96_pra20
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb96_pra20_ft10
+        params:
+          method: activation
+          ratio: 0.20
+
+      - stage: finetune
+        source: std_rgb96_pra20_ft10_pra20
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb96_pra20_ft10_pra20_ft10
+        params:
+          method: activation
+          ratio: 0.20
+
+      - stage: finetune
+        source: std_rgb96_pra20_ft10_pra20_ft10_pra20
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb96_pra20_ft10_pra20_ft10_pra20_ft10
+        params:
+          method: activation
+          ratio: 0.20
+
+      - stage: finetune
+        source: std_rgb96_pra20_ft10_pra20_ft10_pra20_ft10_pra20
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb96_pra20_ft10_pra20_ft10_pra20_ft10_pra20_ft10
+        params:
+          method: activation
+          ratio: 0.20
+
+      - stage: finetune
+        source: std_rgb96_pra20_ft10_pra20_ft10_pra20_ft10_pra20_ft10_pra20
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+  std_rgb96_iter10:
+    extends: std_rgb96_train
+    stages:
+      - stage: prune
+        source: std_rgb96
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: std_rgb96_pra10
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb96_pra10_ft5
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: std_rgb96_pra10_ft5_pra10
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb96_pra10_ft5_pra10_ft5
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: std_rgb96_pra10_ft5_pra10_ft5_pra10
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: std_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+  std_rgb96_iter10_ft10:
+    extends: std_rgb96_train
+    stages:
+      - stage: prune
+        source: std_rgb96
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: std_rgb96_pra10
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb96_pra10_ft10
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: std_rgb96_pra10_ft10_pra10
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb96_pra10_ft10_pra10_ft10
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: std_rgb96_pra10_ft10_pra10_ft10_pra10
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: std_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+  std_rgb32_train:
+    - stage: train
+      params:
+        arch: standard
+        input_mode: rgb
+        resolution: 32
+        epochs: 30
+        lr: 1.0e-3
+        batch_size: 512
+
+  std_rgb32_iter30:
+    extends: std_rgb32_train
+    stages:
+      - stage: prune
+        source: std_rgb32
+        params:
+          method: activation
+          ratio: 0.30
+
+      - stage: finetune
+        source: std_rgb32_pra30
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb32_pra30_ft5
+        params:
+          method: activation
+          ratio: 0.30
+
+      - stage: finetune
+        source: std_rgb32_pra30_ft5_pra30
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb32_pra30_ft5_pra30_ft5
+        params:
+          method: activation
+          ratio: 0.30
+
+      - stage: finetune
+        source: std_rgb32_pra30_ft5_pra30_ft5_pra30
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+  std_rgb32_iter30_ft10:
+    extends: std_rgb32_train
+    stages:
+      - stage: prune
+        source: std_rgb32
+        params:
+          method: activation
+          ratio: 0.30
+
+      - stage: finetune
+        source: std_rgb32_pra30
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb32_pra30_ft10
+        params:
+          method: activation
+          ratio: 0.30
+
+      - stage: finetune
+        source: std_rgb32_pra30_ft10_pra30
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb32_pra30_ft10_pra30_ft10
+        params:
+          method: activation
+          ratio: 0.30
+
+      - stage: finetune
+        source: std_rgb32_pra30_ft10_pra30_ft10_pra30
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+  std_rgb32_iter20:
+    extends: std_rgb32_train
+    stages:
+      - stage: prune
+        source: std_rgb32
+        params:
+          method: activation
+          ratio: 0.20
+
+      - stage: finetune
+        source: std_rgb32_pra20
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb32_pra20_ft5
+        params:
+          method: activation
+          ratio: 0.20
+
+      - stage: finetune
+        source: std_rgb32_pra20_ft5_pra20
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb32_pra20_ft5_pra20_ft5
+        params:
+          method: activation
+          ratio: 0.20
+
+      - stage: finetune
+        source: std_rgb32_pra20_ft5_pra20_ft5_pra20
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb32_pra20_ft5_pra20_ft5_pra20_ft5
+        params:
+          method: activation
+          ratio: 0.20
+
+      - stage: finetune
+        source: std_rgb32_pra20_ft5_pra20_ft5_pra20_ft5_pra20
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb32_pra20_ft5_pra20_ft5_pra20_ft5_pra20_ft5
+        params:
+          method: activation
+          ratio: 0.20
+
+      - stage: finetune
+        source: std_rgb32_pra20_ft5_pra20_ft5_pra20_ft5_pra20_ft5_pra20
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+  std_rgb32_iter20_ft10:
+    extends: std_rgb32_train
+    stages:
+      - stage: prune
+        source: std_rgb32
+        params:
+          method: activation
+          ratio: 0.20
+
+      - stage: finetune
+        source: std_rgb32_pra20
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb32_pra20_ft10
+        params:
+          method: activation
+          ratio: 0.20
+
+      - stage: finetune
+        source: std_rgb32_pra20_ft10_pra20
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb32_pra20_ft10_pra20_ft10
+        params:
+          method: activation
+          ratio: 0.20
+
+      - stage: finetune
+        source: std_rgb32_pra20_ft10_pra20_ft10_pra20
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb32_pra20_ft10_pra20_ft10_pra20_ft10
+        params:
+          method: activation
+          ratio: 0.20
+
+      - stage: finetune
+        source: std_rgb32_pra20_ft10_pra20_ft10_pra20_ft10_pra20
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb32_pra20_ft10_pra20_ft10_pra20_ft10_pra20_ft10
+        params:
+          method: activation
+          ratio: 0.20
+
+      - stage: finetune
+        source: std_rgb32_pra20_ft10_pra20_ft10_pra20_ft10_pra20_ft10_pra20
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+  std_rgb32_iter10:
+    extends: std_rgb32_train
+    stages:
+      - stage: prune
+        source: std_rgb32
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: std_rgb32_pra10
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb32_pra10_ft5
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: std_rgb32_pra10_ft5_pra10
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb32_pra10_ft5_pra10_ft5
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: std_rgb32_pra10_ft5_pra10_ft5_pra10
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: std_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+  std_rgb32_iter10_ft10:
+    extends: std_rgb32_train
+    stages:
+      - stage: prune
+        source: std_rgb32
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: std_rgb32_pra10
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb32_pra10_ft10
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: std_rgb32_pra10_ft10_pra10
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb32_pra10_ft10_pra10_ft10
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: std_rgb32_pra10_ft10_pra10_ft10_pra10
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: std_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+  dw_rgb96_train:
+    - stage: train
+      params:
+        arch: depthwise
+        input_mode: rgb
+        resolution: 96
+        epochs: 30
+        lr: 1.0e-3
+        batch_size: 128
+
+  dw_rgb96_iter30:
+    extends: dw_rgb96_train
+    stages:
+      - stage: prune
+        source: dw_rgb96
+        params:
+          method: activation
+          ratio: 0.30
+
+      - stage: finetune
+        source: dw_rgb96_pra30
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb96_pra30_ft5
+        params:
+          method: activation
+          ratio: 0.30
+
+      - stage: finetune
+        source: dw_rgb96_pra30_ft5_pra30
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb96_pra30_ft5_pra30_ft5
+        params:
+          method: activation
+          ratio: 0.30
+
+      - stage: finetune
+        source: dw_rgb96_pra30_ft5_pra30_ft5_pra30
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+  dw_rgb96_iter30_ft10:
+    extends: dw_rgb96_train
+    stages:
+      - stage: prune
+        source: dw_rgb96
+        params:
+          method: activation
+          ratio: 0.30
+
+      - stage: finetune
+        source: dw_rgb96_pra30
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb96_pra30_ft10
+        params:
+          method: activation
+          ratio: 0.30
+
+      - stage: finetune
+        source: dw_rgb96_pra30_ft10_pra30
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb96_pra30_ft10_pra30_ft10
+        params:
+          method: activation
+          ratio: 0.30
+
+      - stage: finetune
+        source: dw_rgb96_pra30_ft10_pra30_ft10_pra30
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+  dw_rgb96_iter20:
+    extends: dw_rgb96_train
+    stages:
+      - stage: prune
+        source: dw_rgb96
+        params:
+          method: activation
+          ratio: 0.20
+
+      - stage: finetune
+        source: dw_rgb96_pra20
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb96_pra20_ft5
+        params:
+          method: activation
+          ratio: 0.20
+
+      - stage: finetune
+        source: dw_rgb96_pra20_ft5_pra20
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb96_pra20_ft5_pra20_ft5
+        params:
+          method: activation
+          ratio: 0.20
+
+      - stage: finetune
+        source: dw_rgb96_pra20_ft5_pra20_ft5_pra20
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb96_pra20_ft5_pra20_ft5_pra20_ft5
+        params:
+          method: activation
+          ratio: 0.20
+
+      - stage: finetune
+        source: dw_rgb96_pra20_ft5_pra20_ft5_pra20_ft5_pra20
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb96_pra20_ft5_pra20_ft5_pra20_ft5_pra20_ft5
+        params:
+          method: activation
+          ratio: 0.20
+
+      - stage: finetune
+        source: dw_rgb96_pra20_ft5_pra20_ft5_pra20_ft5_pra20_ft5_pra20
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+  dw_rgb96_iter20_ft10:
+    extends: dw_rgb96_train
+    stages:
+      - stage: prune
+        source: dw_rgb96
+        params:
+          method: activation
+          ratio: 0.20
+
+      - stage: finetune
+        source: dw_rgb96_pra20
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb96_pra20_ft10
+        params:
+          method: activation
+          ratio: 0.20
+
+      - stage: finetune
+        source: dw_rgb96_pra20_ft10_pra20
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb96_pra20_ft10_pra20_ft10
+        params:
+          method: activation
+          ratio: 0.20
+
+      - stage: finetune
+        source: dw_rgb96_pra20_ft10_pra20_ft10_pra20
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb96_pra20_ft10_pra20_ft10_pra20_ft10
+        params:
+          method: activation
+          ratio: 0.20
+
+      - stage: finetune
+        source: dw_rgb96_pra20_ft10_pra20_ft10_pra20_ft10_pra20
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb96_pra20_ft10_pra20_ft10_pra20_ft10_pra20_ft10
+        params:
+          method: activation
+          ratio: 0.20
+
+      - stage: finetune
+        source: dw_rgb96_pra20_ft10_pra20_ft10_pra20_ft10_pra20_ft10_pra20
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+  dw_rgb96_iter10:
+    extends: dw_rgb96_train
+    stages:
+      - stage: prune
+        source: dw_rgb96
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: dw_rgb96_pra10
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb96_pra10_ft5
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: dw_rgb96_pra10_ft5_pra10
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb96_pra10_ft5_pra10_ft5
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: dw_rgb96_pra10_ft5_pra10_ft5_pra10
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: dw_rgb96_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+  dw_rgb96_iter10_ft10:
+    extends: dw_rgb96_train
+    stages:
+      - stage: prune
+        source: dw_rgb96
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: dw_rgb96_pra10
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb96_pra10_ft10
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: dw_rgb96_pra10_ft10_pra10
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb96_pra10_ft10_pra10_ft10
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: dw_rgb96_pra10_ft10_pra10_ft10_pra10
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: dw_rgb96_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+  dw_rgb32_train:
+    - stage: train
+      params:
+        arch: depthwise
+        input_mode: rgb
+        resolution: 32
+        epochs: 30
+        lr: 1.0e-3
+        batch_size: 512
+
+  dw_rgb32_iter30:
+    extends: dw_rgb32_train
+    stages:
+      - stage: prune
+        source: dw_rgb32
+        params:
+          method: activation
+          ratio: 0.30
+
+      - stage: finetune
+        source: dw_rgb32_pra30
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb32_pra30_ft5
+        params:
+          method: activation
+          ratio: 0.30
+
+      - stage: finetune
+        source: dw_rgb32_pra30_ft5_pra30
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb32_pra30_ft5_pra30_ft5
+        params:
+          method: activation
+          ratio: 0.30
+
+      - stage: finetune
+        source: dw_rgb32_pra30_ft5_pra30_ft5_pra30
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+  dw_rgb32_iter30_ft10:
+    extends: dw_rgb32_train
+    stages:
+      - stage: prune
+        source: dw_rgb32
+        params:
+          method: activation
+          ratio: 0.30
+
+      - stage: finetune
+        source: dw_rgb32_pra30
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb32_pra30_ft10
+        params:
+          method: activation
+          ratio: 0.30
+
+      - stage: finetune
+        source: dw_rgb32_pra30_ft10_pra30
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb32_pra30_ft10_pra30_ft10
+        params:
+          method: activation
+          ratio: 0.30
+
+      - stage: finetune
+        source: dw_rgb32_pra30_ft10_pra30_ft10_pra30
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+  dw_rgb32_iter20:
+    extends: dw_rgb32_train
+    stages:
+      - stage: prune
+        source: dw_rgb32
+        params:
+          method: activation
+          ratio: 0.20
+
+      - stage: finetune
+        source: dw_rgb32_pra20
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb32_pra20_ft5
+        params:
+          method: activation
+          ratio: 0.20
+
+      - stage: finetune
+        source: dw_rgb32_pra20_ft5_pra20
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb32_pra20_ft5_pra20_ft5
+        params:
+          method: activation
+          ratio: 0.20
+
+      - stage: finetune
+        source: dw_rgb32_pra20_ft5_pra20_ft5_pra20
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb32_pra20_ft5_pra20_ft5_pra20_ft5
+        params:
+          method: activation
+          ratio: 0.20
+
+      - stage: finetune
+        source: dw_rgb32_pra20_ft5_pra20_ft5_pra20_ft5_pra20
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb32_pra20_ft5_pra20_ft5_pra20_ft5_pra20_ft5
+        params:
+          method: activation
+          ratio: 0.20
+
+      - stage: finetune
+        source: dw_rgb32_pra20_ft5_pra20_ft5_pra20_ft5_pra20_ft5_pra20
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+  dw_rgb32_iter20_ft10:
+    extends: dw_rgb32_train
+    stages:
+      - stage: prune
+        source: dw_rgb32
+        params:
+          method: activation
+          ratio: 0.20
+
+      - stage: finetune
+        source: dw_rgb32_pra20
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb32_pra20_ft10
+        params:
+          method: activation
+          ratio: 0.20
+
+      - stage: finetune
+        source: dw_rgb32_pra20_ft10_pra20
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb32_pra20_ft10_pra20_ft10
+        params:
+          method: activation
+          ratio: 0.20
+
+      - stage: finetune
+        source: dw_rgb32_pra20_ft10_pra20_ft10_pra20
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb32_pra20_ft10_pra20_ft10_pra20_ft10
+        params:
+          method: activation
+          ratio: 0.20
+
+      - stage: finetune
+        source: dw_rgb32_pra20_ft10_pra20_ft10_pra20_ft10_pra20
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb32_pra20_ft10_pra20_ft10_pra20_ft10_pra20_ft10
+        params:
+          method: activation
+          ratio: 0.20
+
+      - stage: finetune
+        source: dw_rgb32_pra20_ft10_pra20_ft10_pra20_ft10_pra20_ft10_pra20
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+  dw_rgb32_iter10:
+    extends: dw_rgb32_train
+    stages:
+      - stage: prune
+        source: dw_rgb32
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: dw_rgb32_pra10
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb32_pra10_ft5
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: dw_rgb32_pra10_ft5_pra10
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb32_pra10_ft5_pra10_ft5
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: dw_rgb32_pra10_ft5_pra10_ft5_pra10
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: dw_rgb32_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10_ft5_pra10
+        params:
+          epochs: 5
+          lr: 2.0e-4
+
+  dw_rgb32_iter10_ft10:
+    extends: dw_rgb32_train
+    stages:
+      - stage: prune
+        source: dw_rgb32
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: dw_rgb32_pra10
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb32_pra10_ft10
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: dw_rgb32_pra10_ft10_pra10
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb32_pra10_ft10_pra10_ft10
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: dw_rgb32_pra10_ft10_pra10_ft10_pra10
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10
+        params:
+          epochs: 10
+          lr: 2.0e-4
+
+      - stage: prune
+        source: dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10
+        params:
+          method: activation
+          ratio: 0.10
+
+      - stage: finetune
+        source: dw_rgb32_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10_ft10_pra10
+        params:
+          epochs: 10
+          lr: 2.0e-4

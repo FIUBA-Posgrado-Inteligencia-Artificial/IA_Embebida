@@ -1,0 +1,41 @@
+# Config tuned for the AI-Thinker ESP32-CAM board.
+#
+# The upstream espressif/esp32-camera/examples/camera_example defaults
+# (240 MHz CPU, 1 kHz FreeRTOS tick, 80 MHz PSRAM) trigger a PHY init
+# boot loop on this board: the 3.3V rail can't sustain camera + WiFi
+# PA power-up simultaneously at those frequencies, and phy_init crashes
+# during RF calibration with rst:0x3 (SW_RESET) and no backtrace.
+#
+# The settings below are copied from sibling firmware_test_ota/, which
+# is the proven-working baseline for WiFi + HTTP on this exact board.
+
+# Target: ESP32-D0WD rev 3.0. Disables SPIRAM_CACHE_WORKAROUND which is
+# unnecessary on rev 3.0 (silicon fix) and breaks PHY init timing.
+CONFIG_ESP32_REV_MIN_3=y
+
+# 4MB flash.
+CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y
+CONFIG_ESPTOOLPY_FLASHSIZE="4MB"
+
+# PSRAM: camera needs ~120KB for frame buffers. The PSRAM init also
+# charges the 3.3V decoupling caps before PA activation, stabilizing
+# the rail. RESERVE_INTERNAL=32KB keeps enough internal RAM for WiFi
+# DMA (WiFi cannot use PSRAM directly).
+CONFIG_ESP32_SPIRAM_SUPPORT=y
+CONFIG_SPIRAM_USE_MALLOC=y
+CONFIG_SPIRAM_MALLOC_RESERVE_INTERNAL=32768
+
+# WiFi TX power: cap at 15 dBm (~30 mW) to reduce PA peak current.
+# Default 20 dBm (100 mW) is the main driver of the 3.3V dip.
+CONFIG_ESP_PHY_MAX_WIFI_TX_POWER=15
+
+# Custom partitions: single factory, bumped to 3M (up from singleapp_large's 1500K).
+CONFIG_PARTITION_TABLE_CUSTOM=y
+CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions.csv"
+
+# Main task stack: 8K is what camera + WiFi setup needs comfortably.
+CONFIG_ESP_MAIN_TASK_STACK_SIZE=8192
+
+# UART0 @ 115200 for logs.
+CONFIG_ESP_CONSOLE_UART_DEFAULT=y
+CONFIG_ESP_CONSOLE_UART_BAUDRATE=115200

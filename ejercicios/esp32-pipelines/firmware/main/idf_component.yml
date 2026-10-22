@@ -1,0 +1,13 @@
+dependencies:
+  idf:
+    version: ">=5.3.0"
+  espressif/esp32-camera:
+    version: "^2.0.11"
+  espressif/esp-dl:
+    version: "^3.3.0"
+    # Copia local parcheada de esp-dl 3.3.9 (vendorizada desde el proyecto
+    # esp32-s3-cam legacy): el repaqueteo de bias específico del ESP32-S3
+    # aloca con caps de PSRAM detrás de un assert compilado como no-op — en
+    # placas sin PSRAM (o FEATURE_PSRAM 0) desreferencia NULL. El parche cae
+    # a memoria interna y chequea el NULL. Ver firmware/components/README.md.
+    override_path: "../components/esp-dl"

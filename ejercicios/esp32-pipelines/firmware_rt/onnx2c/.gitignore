@@ -1,0 +1,6 @@
+build*/
+sdkconfig
+sdkconfig.old
+main/model.c
+main/golden_data.h
+main/model_meta.json
