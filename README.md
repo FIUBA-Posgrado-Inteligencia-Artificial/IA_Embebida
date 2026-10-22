@@ -8,32 +8,32 @@ recursos limitados.
 
 ## Ejercicios
 
-Cada tema vive bajo `ejercicios/<tema>/` con su propio `pyproject.toml` y entorno
+Cada tema vive bajo `ejemplos/<tema>/` con su propio `pyproject.toml` y entorno
 virtual.
 El proyecto usa [uv](https://docs.astral.sh/uv/) como gestor de dependencias.
 Al ejecutar `uv sync` se crea automáticamente el `.venv`.
 
 | Carpeta | Framework |
 |---------|-----------|
-| `ejercicios/quantization/` | TensorFlow / QKeras |
-| `ejercicios/pruning/` | PyTorch |
-| `ejercicios/factorization/` | PyTorch |
-| `ejercicios/optimization/` | PyTorch |
-| `ejercicios/nas/` | PyTorch |
-| `ejercicios/knowledge_distillation/` | PyTorch |
-| `ejercicios/esp32-pipelines/` | PyTorch + esp-ppq + torchao + brevitas |
+| `ejemplos/quantization/` | TensorFlow / QKeras |
+| `ejemplos/pruning/` | PyTorch |
+| `ejemplos/factorization/` | PyTorch |
+| `ejemplos/optimization/` | PyTorch |
+| `ejemplos/nas/` | PyTorch |
+| `ejemplos/knowledge_distillation/` | PyTorch |
+| `ejemplos/esp32-pipelines/` | PyTorch + esp-ppq + torchao + brevitas |
 
 Instalar dependencias y correr un script:
 
 ```bash
-cd ejercicios/pruning
+cd ejemplos/pruning
 uv sync
 uv run python script01.py
 ```
 
 Los scripts se numeran `script01.py`, `script02.py`,... dentro de cada carpeta,
 ordenados de menor a mayor complejidad.
-La carpeta `ejercicios/datasets/` es un caché compartido de datasets que se
+La carpeta `ejemplos/datasets/` es un caché compartido de datasets que se
 descargan automáticamente la primera vez.
 
 ## Presentación
