@@ -184,22 +184,20 @@ ls /dev/ttyUSB*                # puerto de la placa (en general /dev/ttyUSB0)
 
     <section>
         <h3>En la placa: modelo grande</h3>
-        <ol style="font-size: 0.6em; text-align: left;">
+        <ol style="font-size: 0.6em; text-align: left; display: block; width: 100%;">
             <li style="margin-bottom: 0.4rem;">Modo de carga: <strong>mantener BOOT</strong>, tocar
                 <strong>RST</strong>, soltar <strong>BOOT</strong>.</li>
-            <li style="margin-bottom: 0.4rem;">Flashear:</li>
-        </ol>
-        <pre><code class="language-bash" data-trim>
+            <li style="margin-bottom: 0.4rem;">Flashear:
+                <pre><code class="language-bash" data-trim>
 esptool.py --chip esp32 -p /dev/ttyUSB0 -b 460800 write_flash 0x0 demo/demo_grande.bin
-        </code></pre>
-        <ol start="3" style="font-size: 0.6em; text-align: left;">
+                </code></pre>
+            </li>
             <li style="margin-bottom: 0.4rem;">Cuando esptool termine (<code>Hash of data verified</code>), abrir el monitor
-                y después tocar <strong>RST</strong> (solo RST) para arrancar:</li>
-        </ol>
-        <pre><code class="language-bash" data-trim>
+                y después tocar <strong>RST</strong> (solo RST) para arrancar:
+                <pre><code class="language-bash" data-trim>
 python -m esp_idf_monitor -p /dev/ttyUSB0
-        </code></pre>
-        <ol start="4" style="font-size: 0.6em; text-align: left;">
+                </code></pre>
+            </li>
             <li>Tecla <code>t</code>: clasifica 10 imágenes de prueba. Tecla <code>c</code>: una foto con la cámara.
                 Tecla <code>h</code>: ayuda. <strong>Ctrl+]</strong>: salir del monitor.</li>
         </ol>
@@ -289,22 +287,20 @@ python -m esp_idf_monitor -p /dev/ttyUSB0
 
     <section>
         <h3>En la placa: modelo chico</h3>
-        <ol style="font-size: 0.6em; text-align: left;">
+        <ol style="font-size: 0.6em; text-align: left; display: block; width: 100%;">
             <li style="margin-bottom: 0.4rem;">Modo de carga: <strong>mantener BOOT</strong>, tocar
                 <strong>RST</strong>, soltar <strong>BOOT</strong>.</li>
-            <li style="margin-bottom: 0.4rem;">Flashear:</li>
-        </ol>
-        <pre><code class="language-bash" data-trim>
+            <li style="margin-bottom: 0.4rem;">Flashear:
+                <pre><code class="language-bash" data-trim>
 esptool.py --chip esp32 -p /dev/ttyUSB0 -b 460800 write_flash 0x0 demo/demo_chico.bin
-        </code></pre>
-        <ol start="3" style="font-size: 0.6em; text-align: left;">
+                </code></pre>
+            </li>
             <li style="margin-bottom: 0.4rem;">Cuando esptool termine (<code>Hash of data verified</code>), abrir el monitor
-                y después tocar <strong>RST</strong> (solo RST) para arrancar:</li>
-        </ol>
-        <pre><code class="language-bash" data-trim>
+                y después tocar <strong>RST</strong> (solo RST) para arrancar:
+                <pre><code class="language-bash" data-trim>
 python -m esp_idf_monitor -p /dev/ttyUSB0
-        </code></pre>
-        <ol start="4" style="font-size: 0.6em; text-align: left;">
+                </code></pre>
+            </li>
             <li>Tecla <code>t</code>: clasifica 10 imágenes de prueba. Tecla <code>c</code>: una foto con la cámara.
                 Tecla <code>h</code>: ayuda. <strong>Ctrl+]</strong>: salir del monitor.</li>
         </ol>
