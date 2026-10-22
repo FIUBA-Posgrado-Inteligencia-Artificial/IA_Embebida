@@ -305,11 +305,15 @@
         <p style="margin-top: 0.6rem; font-size: 0.9em; color: #ffb86c;">
             ⚡ Compensación: mayor paralelismo reduce tiempo, a expensas de recursos.
         </p>
+        <p style="margin-top: 0.3rem; font-size: 0.55em;">🔗 Caso extremo: un chip diseñado para correr un único
+            modelo (<a href="https://taalas.com/products/" target="_blank">Taalas</a>), con una eficiencia muy superior
+            a la de un chip genérico.</p>
         <aside class="notes">
           <p>Dos formas de implementar el mismo cálculo en hardware.</p>
           <p>Iterativa: un solo multiplicador reutilizado en muchos ciclos → poca área, más tiempo.</p>
           <p>Desenrollada: un multiplicador por operación → mucha área, un resultado por ciclo (con pipelining).</p>
           <p>Es el compromiso clásico área vs. tiempo; en FPGAs y ASICs se elige el punto intermedio según el requerimiento.</p>
+          <p>Caso extremo (link de Taalas): un chip completo diseñado para un único modelo, con los pesos y la arquitectura "fijos" en el hardware. Mostrar el gráfico de eficiencia contra chips genéricos: es el extremo de "arquitectura específica", con la máxima eficiencia y cero flexibilidad (si cambia el modelo, hay que fabricar otro chip).</p>
         </aside>
     </section>
 
