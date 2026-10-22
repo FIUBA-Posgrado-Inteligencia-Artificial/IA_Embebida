@@ -38,6 +38,24 @@
 			margin-bottom: 1rem;
 		}
 
+		/* Legibilidad al proyectar: tamaños mínimos para tablas y código
+		   (muchas diapos fijan 0.4–0.55em inline, ilegible en un proyector). */
+		.reveal table {
+			font-size: max(18px, 0.55em) !important;
+		}
+
+		.reveal pre {
+			width: 100%;
+			font-size: max(17px, 0.5em) !important;
+			box-shadow: none;
+		}
+
+		.reveal pre code {
+			padding: 0.6em 0.9em;
+			border-radius: 8px;
+			line-height: 1.35;
+		}
+
 		.diagram-header img {
 			height: 150px !important;
 			background: transparent !important;
