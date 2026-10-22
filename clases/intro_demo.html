@@ -128,14 +128,14 @@ ls /dev/ttyUSB*                # puerto de la placa (en general /dev/ttyUSB0)
                 <strong>RST</strong>, soltar <strong>BOOT</strong>.</li>
             <li style="margin-bottom: 0.4rem;">Flashear:</li>
         </ol>
-        <pre style="font-size: 0.42em;"><code class="language-bash" data-trim>
+        <pre><code class="language-bash" data-trim>
 esptool.py --chip esp32 -p /dev/ttyUSB0 -b 460800 write_flash 0x0 demo/demo_grande.bin
         </code></pre>
         <ol start="3" style="font-size: 0.6em; text-align: left;">
             <li style="margin-bottom: 0.4rem;">Cuando esptool termine (<code>Hash of data verified</code>), abrir el monitor
                 y después tocar <strong>RST</strong> (solo RST) para arrancar:</li>
         </ol>
-        <pre style="font-size: 0.42em;"><code class="language-bash" data-trim>
+        <pre><code class="language-bash" data-trim>
 python -m esp_idf_monitor -p /dev/ttyUSB0
         </code></pre>
         <ol start="4" style="font-size: 0.6em; text-align: left;">
@@ -143,56 +143,143 @@ python -m esp_idf_monitor -p /dev/ttyUSB0
                 Tecla <code>h</code>: ayuda. <strong>Ctrl+]</strong>: salir del monitor.</li>
         </ol>
         <aside class="notes">
-          <p>El flasheo tarda ~30 s: no tocar RST hasta que esptool termine (si no, la placa queda con un firmware a medias y hay que repetir). Si esptool no conecta, repetir el paso 1 (BOOT+RST) y volver a correr el comando.</p>
-          <p>Abrir el monitor ANTES de tocar RST, así se ve el arranque.</p>
-          <p>Con el grande el self-test tarda ~1.5 minutos (10 imágenes de ~9 s): buen momento para preguntar qué creen que está pasando.</p>
-          <p>La captura con la cámara (c) es opcional: con el modelo grande también tarda ~9 s.</p>
+          <p>El flasheo tarda ~30 s. No tocar RST hasta que esptool termine: si no, la placa queda con un firmware a medias y hay que repetir desde el paso 1.</p>
+          <p>Si esptool no conecta ("Failed to connect"), la placa no está en modo de carga: repetir el paso 1 y volver a correr el comando.</p>
+          <p>Abrir el monitor antes de tocar RST, así se ve el arranque. Al arrancar imprime "ready" y la ayuda; recién ahí apretar t.</p>
+          <p>Con el grande el self-test tarda ~1.5 minutos (10 imágenes de ~9 s cada una): buen momento para preguntar al grupo qué creen que está haciendo la placa todo ese tiempo.</p>
+          <p>La captura con la cámara (c) es opcional; con el modelo grande también tarda ~9 s.</p>
         </aside>
     </section>
 
     <section>
-        <h3>Modelo grande: lo que se ve</h3>
-        <pre style="font-size: 0.4em;"><code class="language-plaintext" data-trim>
+        <h3>Modelo grande: la salida</h3>
+        <pre style="font-size: 13.5px !important;"><code class="language-plaintext" data-trim>
 === SELF-TEST: 10 golden images (STL-10 test set) ===
-  airplane  -> airplane   99.5%  (pc_q: airplane   99.5% | float  99.5%)  dlogits<=0  9364ms  PASS
-  bird      -> bird       97.6%  (pc_q: bird       97.6% | float  97.8%)  dlogits<=0  9358ms  PASS
-  car       -> car        99.8%  (pc_q: car        99.8% | float  99.9%)  dlogits<=0  9363ms  PASS
-  ...
-  truck     -> truck      95.4%  (pc_q: truck      95.4% | float  96.6%)  dlogits<=0  9366ms  PASS
+  PASS = coincide con el modelo CUANTIZADO simulado en PC (esperable 10/10 exacto)
+  airplane  -> airplane   99.5%  (pc_q: airplane   99.5% | float  99.5%)  dlogits<=0  9356ms  PASS
+  bird      -> bird       97.6%  (pc_q: bird       97.6% | float  97.8%)  dlogits<=0  9353ms  PASS
+  car       -> car        99.8%  (pc_q: car        99.8% | float  99.9%)  dlogits<=0  9351ms  PASS
+  cat       -> cat        98.4%  (pc_q: cat        98.4% | float  98.5%)  dlogits<=0  9383ms  PASS
+  deer      -> deer       91.8%  (pc_q: deer       91.8% | float  92.1%)  dlogits<=0  9363ms  PASS
+  dog       -> dog        72.4%  (pc_q: dog        72.4% | float  78.8%)  dlogits<=0  9357ms  PASS
+  horse     -> horse      94.0%  (pc_q: horse      94.0% | float  94.4%)  dlogits<=0  9361ms  PASS
+  monkey    -> monkey     86.5%  (pc_q: monkey     86.5% | float  89.9%)  dlogits<=0  9352ms  PASS
+  ship      -> ship       96.6%  (pc_q: ship       96.6% | float  96.5%)  dlogits<=0  9362ms  PASS
+  truck     -> truck      95.4%  (pc_q: truck      95.4% | float  96.6%)  dlogits<=0  9341ms  PASS
 === SELF-TEST: 10/10 PASS (vs PC cuantizado) ===
+    dlogits = max |device - sim| en LSB int8: 0 = bit-exacto
         </code></pre>
         <p style="font-size: 0.7em; color: #ff79c6;">~9.4 segundos por imagen.</p>
         <aside class="notes">
-          <p>Salida real en la ESP32-CAM (respaldo por si la placa no coopera en clase).</p>
-          <p>PASS significa que la placa da exactamente lo mismo que el modelo cuantizado simulado en la PC.</p>
-          <p>Las 10 imágenes del self-test están elegidas entre las que el modelo clasifica bien: sirven para verificar la placa y medir tiempo, no para medir accuracy.</p>
+          <p>Salida real en la ESP32-CAM; sirve de respaldo si la placa no coopera en clase.</p>
+          <p>Cada línea es una imagen de prueba. Leer una sola en voz alta: "es un avión, la placa dice avión con 99.5 %, la PC dice lo mismo, y tardó 9.4 segundos".</p>
+          <p>Lo importante: todo PASS y dlogits 0. La placa hace exactamente la misma cuenta que la PC. El despliegue es correcto.</p>
+          <p>Y el tiempo: casi 10 segundos por imagen. Para una cámara, eso no sirve.</p>
+          <p>En la diapositiva siguiente está qué significa cada número.</p>
+        </aside>
+    </section>
+
+    <section>
+        <h3>Cómo leer la salida</h3>
+        <pre style="font-size: 13.5px !important;"><code class="language-plaintext" data-trim>
+  dog       -> dog        72.4%  (pc_q: dog        72.4% | float  78.8%)  dlogits<=0  9357ms  PASS
+        </code></pre>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 0.5rem;">
+            <tbody>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 6px;"><code>dog -&gt; dog</code></td>
+                    <td style="padding: 6px;">Clase real de la imagen → clase que predijo la placa.</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 6px;"><code>72.4%</code></td>
+                    <td style="padding: 6px;"><strong>Confianza de la placa</strong>: probabilidad que el modelo le asigna a esa
+                        clase (las 10 clases suman 100 %).</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 6px;"><code>pc_q</code></td>
+                    <td style="padding: 6px;">Lo mismo, calculado en la PC con el modelo <strong>cuantizado</strong> (INT8)
+                        simulado: la referencia.</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 6px;"><code>float</code></td>
+                    <td style="padding: 6px;">Confianza del modelo <strong>original</strong> (FP32), antes de cuantizar.</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 6px;"><code>dlogits&lt;=0</code></td>
+                    <td style="padding: 6px;">Diferencia máxima entre placa y PC en las salidas INT8: 0 = idénticas.</td>
+                </tr>
+                <tr>
+                    <td style="padding: 6px;"><code>9357ms</code> / <code>PASS</code></td>
+                    <td style="padding: 6px;">Tiempo de inferencia en la placa / la placa coincide con la PC.</td>
+                </tr>
+            </tbody>
+        </table>
+        <aside class="notes">
+          <p>Tres comparaciones en una línea:</p>
+          <ul>
+            <li>placa contra PC cuantizada (72.4 contra 72.4, dlogits 0): el despliegue es correcto, el microcontrolador hace exactamente la misma cuenta;</li>
+            <li>cuantizado contra float (72.4 contra 78.8): lo que costó pasar a INT8; en esta imagen se nota, en la mayoría casi no;</li>
+            <li>el tiempo: lo que cuesta correrlo en esta placa.</li>
+          </ul>
+          <p>Ojo: las 10 imágenes están elegidas entre las que el modelo clasifica bien y con margen, para que el test sea estable. Por eso las confianzas son altas y siempre acierta: no miden la accuracy del modelo (59 % el grande, 42 % el chico), sirven para verificar la placa y medir tiempos.</p>
+          <p>La confianza no es una probabilidad "calibrada": un modelo puede decir 90 % y equivocarse.</p>
         </aside>
     </section>
 
     <section>
         <h3>En la placa: modelo chico</h3>
-        <p style="font-size: 0.6em; text-align: left;">Los mismos pasos, con el otro firmware
-            (salir antes del monitor con <strong>Ctrl+]</strong>):</p>
         <ol style="font-size: 0.6em; text-align: left;">
-            <li style="margin-bottom: 0.4rem;"><strong>Mantener BOOT</strong>, tocar <strong>RST</strong>, soltar
-                <strong>BOOT</strong>.</li>
+            <li style="margin-bottom: 0.4rem;">Modo de carga: <strong>mantener BOOT</strong>, tocar
+                <strong>RST</strong>, soltar <strong>BOOT</strong>.</li>
+            <li style="margin-bottom: 0.4rem;">Flashear:</li>
         </ol>
-        <pre style="font-size: 0.42em;"><code class="language-bash" data-trim>
+        <pre><code class="language-bash" data-trim>
 esptool.py --chip esp32 -p /dev/ttyUSB0 -b 460800 write_flash 0x0 demo/demo_chico.bin
-python -m esp_idf_monitor -p /dev/ttyUSB0      # cuando esptool termine; después RST y tecla t
         </code></pre>
-        <pre style="font-size: 0.4em;"><code class="language-plaintext" data-trim>
+        <ol start="3" style="font-size: 0.6em; text-align: left;">
+            <li style="margin-bottom: 0.4rem;">Cuando esptool termine (<code>Hash of data verified</code>), abrir el monitor
+                y después tocar <strong>RST</strong> (solo RST) para arrancar:</li>
+        </ol>
+        <pre><code class="language-bash" data-trim>
+python -m esp_idf_monitor -p /dev/ttyUSB0
+        </code></pre>
+        <ol start="4" style="font-size: 0.6em; text-align: left;">
+            <li>Tecla <code>t</code>: clasifica 10 imágenes de prueba. Tecla <code>c</code>: una foto con la cámara.
+                Tecla <code>h</code>: ayuda. <strong>Ctrl+]</strong>: salir del monitor.</li>
+        </ol>
+        <aside class="notes">
+          <p>Los mismos pasos que con el grande, cambiando el archivo: demo/demo_chico.bin.</p>
+          <p>Antes de empezar, salir del monitor anterior con Ctrl+] (si está abierto, esptool no puede usar el puerto).</p>
+          <p>Esperar a que esptool termine antes de tocar RST; después abrir el monitor, tocar RST y apretar t.</p>
+          <p>Después del self-test, probar la cámara: c para una captura, m para modo continuo. Apuntar a una foto en el celular.</p>
+        </aside>
+    </section>
+
+    <section>
+        <h3>Modelo chico: la salida</h3>
+        <pre style="font-size: 13.5px !important;"><code class="language-plaintext" data-trim>
 === SELF-TEST: 10 golden images (STL-10 test set) ===
+  PASS = coincide con el modelo CUANTIZADO simulado en PC (esperable 10/10 exacto)
   airplane  -> airplane   82.3%  (pc_q: airplane   82.3% | float  84.7%)  dlogits<=0  73ms  PASS
   bird      -> bird       60.6%  (pc_q: bird       60.6% | float  74.7%)  dlogits<=0  81ms  PASS
-  ...
+  car       -> car        83.2%  (pc_q: car        83.2% | float  82.1%)  dlogits<=0  76ms  PASS
+  cat       -> cat        27.4%  (pc_q: cat        27.4% | float  27.5%)  dlogits<=0  75ms  PASS
+  deer      -> deer       45.7%  (pc_q: deer       45.7% | float  47.0%)  dlogits<=0  72ms  PASS
+  dog       -> dog        25.7%  (pc_q: dog        25.7% | float  25.7%)  dlogits<=0  75ms  PASS
+  horse     -> horse      47.1%  (pc_q: horse      47.1% | float  48.6%)  dlogits<=0  75ms  PASS
+  monkey    -> monkey     42.7%  (pc_q: monkey     42.7% | float  41.6%)  dlogits<=0  76ms  PASS
+  ship      -> ship       72.0%  (pc_q: ship       72.0% | float  72.9%)  dlogits<=0  79ms  PASS
+  truck     -> truck      54.2%  (pc_q: truck      54.2% | float  54.2%)  dlogits<=0  74ms  PASS
 === SELF-TEST: 10/10 PASS (vs PC cuantizado) ===
+    dlogits = max |device - sim| en LSB int8: 0 = bit-exacto
         </code></pre>
         <p style="font-size: 0.7em; color: #50fa7b;">~75 milisegundos por imagen.</p>
         <aside class="notes">
-          <p>Ahora el self-test termina antes de que terminemos de leer la pantalla.</p>
-          <p>Probar la cámara con la tecla c (y m para modo continuo): apuntar a una foto en el celular.</p>
-          <p>Va a equivocarse seguido: es el modelo de 42 % de accuracy, y la cámara ve algo muy distinto de las imágenes de entrenamiento.</p>
+          <p>Salida real en la ESP32-CAM con el modelo chico.</p>
+          <p>Ahora el self-test termina antes de que terminemos de leer la pantalla: ~75 ms por imagen contra ~9.4 s.</p>
+          <p>De nuevo todo PASS y dlogits 0: el despliegue es correcto.</p>
+          <p>Pero las confianzas son mucho más bajas (cat 27 %, dog 26 %): el modelo chico duda más, aun en imágenes que clasifica bien. Es la otra cara de achicarlo.</p>
+          <p>Con la cámara (c) se va a equivocar seguido: es el modelo de 42 % de accuracy, y la cámara ve algo muy distinto de las imágenes de entrenamiento.</p>
         </aside>
     </section>
 
