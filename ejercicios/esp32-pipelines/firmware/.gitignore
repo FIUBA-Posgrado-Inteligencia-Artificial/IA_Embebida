@@ -5,3 +5,5 @@ sdkconfig
 sdkconfig.old
 dependencies.lock
 main/test_images.h
+main/model_data.h
+main/model_data.meta.json
