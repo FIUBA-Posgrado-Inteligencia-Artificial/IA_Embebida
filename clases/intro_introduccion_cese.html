@@ -251,10 +251,14 @@
       <li style="margin-bottom: 0.5rem;">
         <strong>Regresión:</strong> consiste en predecir un valor <strong>continuo</strong> a partir de un <span
           style="color: #8be9fd;">conjunto de datos</span>.
+        <br><span style="font-size: 0.85em; opacity: 0.85;">Ej.: estimar la temperatura, la distancia a un obstáculo o el
+          consumo de energía.</span>
       </li>
       <li>
         <strong>Clasificación:</strong> consiste en predecir una <strong>categoría</strong> o etiqueta a partir de un
         <span style="color: #8be9fd;">conjunto de datos</span>.
+        <br><span style="font-size: 0.85em; opacity: 0.85;">Ej.: qué objeto hay en una imagen (como en la demo), si un
+          correo es spam, si una pieza tiene fallas.</span>
       </li>
     </ul>
     <p style="font-size: 0.8em; margin-top: 1rem; font-style: italic;">
@@ -262,7 +266,38 @@
     </p>
     <aside class="notes">
       <p>Las dos grandes familias de problemas supervisados.</p>
-      <p>Ejemplos: regresión = estimar temperatura o distancia; clasificación = qué objeto hay en la imagen (como en la demo).</p>
+      <p>Pedir al grupo un ejemplo de cada tipo de su propio trabajo.</p>
+    </aside>
+  </section>
+
+  <section>
+    <h3>¿Qué es un modelo matemático?</h3>
+    <p style="font-size: 0.9em;">Una <strong>función paramétrica</strong> que aproxima una relación entre datos:</p>
+    <div
+      style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 0.5rem; display: inline-block; margin-bottom: 1rem;">
+      <code style="font-size: 1.2em;">y = f(x; &theta;)</code>
+    </div>
+    <ul style="font-size: 0.85em;">
+      <li><strong>Entradas (x):</strong> datos observados (features).</li>
+      <li><strong>Salidas (y):</strong> predicción o decisión.</li>
+      <li><strong>Parámetros (&theta;):</strong> valores internos ajustables de la función.</li>
+      <li>Ejemplos:</li>
+      <ul>
+        <li>Regresión lineal:
+          <code>y = &beta;<sub>0</sub> + &beta;<sub>1</sub>x<sub>1</sub> + ... + &beta;<sub>n</sub>x<sub>n</sub></code>
+        </li>
+        <li>Regresión logística:
+          <code>y = &sigma;(&beta;<sub>0</sub> + &beta;<sub>1</sub>x<sub>1</sub> + ... + &beta;<sub>n</sub>x<sub>n</sub>)</code>
+        </li>
+        <li>Modelo cuadrático: <code>y = ax<sup>2</sup> + bx + c</code></li>
+        <li>Recta + senoide: <code>y = a x + b + c sin(d x + e)</code></li>
+        <li>Una neurona: <code>y = &phi;(&sum;w<sub>i</sub>x<sub>i</sub> + b)</code></li>
+      </ul>
+    </ul>
+    <aside class="notes">
+      <p>Definición que usamos en toda la materia: y = f(x; θ). x son las entradas, θ los parámetros que se aprenden.</p>
+      <p>Recorrer los ejemplos de menor a mayor: hasta una neurona es una función paramétrica más.</p>
+      <p>Comprimir un modelo es, en el fondo, cambiar f o θ para que sean más baratos.</p>
     </aside>
   </section>
 
@@ -272,7 +307,7 @@
       <div style="flex: 1.2; text-align: left;">
         <ul style="font-size: 0.75em; margin-bottom: 1rem;">
           <li style="margin-bottom: 0.5rem;"><strong>Tipo de problema:</strong> predicción continua (regresión).</li>
-          <li style="margin-bottom: 0.5rem;">Modela relación entre variable dependiente ($y$) e independientes ($X$).
+          <li style="margin-bottom: 0.5rem;">Modela la relación entre la variable dependiente (<em>y</em>) y las independientes (<em>X</em>).
           </li>
           <li style="margin-bottom: 0.5rem;">Busca minimizar la suma de errores cuadráticos (<strong>MSE</strong> o
             mínimos cuadrados).</li>
@@ -329,15 +364,13 @@
     <h3>Datos, cómputo y el paradigma ML/DL</h3>
     <div style="display: flex; align-items: center; gap: 30px;">
       <div style="flex: 1.5; text-align: left;">
-        <ul style="font-size: 0.65em; margin-bottom: 1rem;">
-          <li>Al pasar de algoritmos clásicos a ML/DL, los modelos se definen como problemas de
-            optimización (regresión/clasificación).</li>
-          <li>Se pueden resolver problemas más complejos.</li>
-          <li>Están completamente impulsados por los <strong>datos</strong>, que son más complejos.</li>
-          <li>Se requieren modelos con complejidad proporcional a la tarea.</li>
-          <li>El modelo hace la parte del preprocesamiento de datos.</li>
-          <li>Casi nunca tienen <strong>forma cerrada</strong>: dependen un 100% de la optimización numérica para
-            ajustar sus parámetros.</li>
+        <ul style="font-size: 0.75em; margin-bottom: 1rem;">
+          <li style="margin-bottom: 0.6rem;"><strong>Enfoque clásico:</strong> alguien diseña a mano las
+            características (bordes, colores, formas) y un clasificador simple decide.</li>
+          <li style="margin-bottom: 0.6rem;"><strong>ML/DL:</strong> el modelo aprende las características directamente
+            de los <strong>datos</strong>, y resuelve problemas mucho más complejos.</li>
+          <li><strong>El precio:</strong> muchos más datos, más cómputo y modelos más grandes, que casi nunca tienen
+            solución cerrada: se entrenan con optimización numérica.</li>
         </ul>
       </div>
       <div style="flex: 1.2; text-align: left;">
@@ -349,39 +382,9 @@
       </div>
     </div>
     <aside class="notes">
-      <p>El cambio de paradigma: en vez de diseñar el algoritmo y las features a mano, se define un modelo grande y se lo ajusta con datos. Funciona porque hoy hay muchos datos y mucho cómputo.</p>
+      <p>Leer la figura de arriba hacia abajo: en el enfoque clásico la extracción de características es un bloque diseñado por una persona; en deep learning ese bloque lo aprende la red.</p>
+      <p>Funciona porque hoy hay muchos datos y mucho cómputo, y por eso los modelos crecieron tanto.</p>
       <p>Consecuencia para nosotros: los modelos resultantes son grandes, y hay que achicarlos.</p>
-    </aside>
-  </section>
-
-  <section>
-    <h3>¿Qué es un modelo matemático?</h3>
-    <p style="font-size: 0.9em;">Una <strong>función paramétrica</strong> que aproxima una relación entre datos:</p>
-    <div
-      style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 0.5rem; display: inline-block; margin-bottom: 1rem;">
-      <code style="font-size: 1.2em;">y = f(x; &theta;)</code>
-    </div>
-    <ul style="font-size: 0.85em;">
-      <li><strong>Entradas (x):</strong> datos observados (features).</li>
-      <li><strong>Salidas (y):</strong> predicción o decisión.</li>
-      <li><strong>Parámetros (&theta;):</strong> valores internos ajustables de la función.</li>
-      <li>Ejemplos:</li>
-      <ul>
-        <li>Regresión lineal:
-          <code>y = &beta;<sub>0</sub> + &beta;<sub>1</sub>x<sub>1</sub> + ... + &beta;<sub>n</sub>x<sub>n</sub></code>
-        </li>
-        <li>Regresión logística:
-          <code>y = &sigma;(&beta;<sub>0</sub> + &beta;<sub>1</sub>x<sub>1</sub> + ... + &beta;<sub>n</sub>x<sub>n</sub>)</code>
-        </li>
-        <li>Modelo cuadrático: <code>y = ax<sup>2</sup> + bx + c</code></li>
-        <li>Recta + senoide: <code>y = a x + b + c sin(d x + e)</code></li>
-        <li>Una neurona: <code>y = &phi;(&sum;w<sub>i</sub>x<sub>i</sub> + b)</code></li>
-      </ul>
-    </ul>
-    <aside class="notes">
-      <p>Definición que usamos en toda la materia: y = f(x; θ). x son las entradas, θ los parámetros que se aprenden.</p>
-      <p>Recorrer los ejemplos de menor a mayor: hasta una neurona es una función paramétrica más.</p>
-      <p>Comprimir un modelo es, en el fondo, cambiar f o θ para que sean más baratos.</p>
     </aside>
   </section>
 
