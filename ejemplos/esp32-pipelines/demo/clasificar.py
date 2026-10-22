@@ -9,6 +9,8 @@ Uso (desde examples/esp32-pipelines/):
 """
 
 import argparse
+import contextlib
+import io
 import sys
 import time
 from pathlib import Path
@@ -40,7 +42,9 @@ def parse_args():
 def main() -> None:
     args = parse_args()
     device = torch.device("cpu")
-    model, meta = load_checkpoint(MODELOS[args.modelo], device)
+    # load_checkpoint imprime la ruta absoluta del .pth: no aporta en la demo.
+    with contextlib.redirect_stdout(io.StringIO()):
+        model, meta = load_checkpoint(MODELOS[args.modelo], device)
     model.eval()
 
     res = meta["resolution"]

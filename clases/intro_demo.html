@@ -71,25 +71,40 @@
     <section>
         <h3>En la PC: clasificar con Python</h3>
         <p style="font-size: 0.6em; text-align: left; margin-bottom: 0.3rem;">Desde la carpeta del ejemplo <code>esp32-pipelines</code>:</p>
-        <pre style="font-size: 0.42em;"><code class="language-bash" data-trim>
-uv sync      # solo la primera vez (tarda)
-uv run python demo/clasificar.py --modelo grande demo/imagenes/*.png
-uv run python demo/clasificar.py --modelo chico  demo/imagenes/*.png
-        </code></pre>
-        <pre style="font-size: 0.42em;"><code class="language-plaintext" data-trim>
+        <pre style="font-size: 15px !important;"><code class="language-plaintext" data-trim data-line-numbers="1-2,17|2-15|17-30">
+$ uv sync      # solo la primera vez (tarda)
+$ uv run python demo/clasificar.py --modelo grande demo/imagenes/*.png
+
 Modelo grande: entrada 96x96, 60,532 parámetros, 59.63 M MACs, accuracy (test) 59.0%
 
-auto.png       -> car 63%  |  truck 15%  |  bird 8%   (1.7 ms en PC)
-avion.png      -> ship 49%  |  airplane 46%  |  truck 2%   (1.5 ms en PC)
-caballo.png    -> horse 73%  |  deer 13%  |  dog 7%   (1.5 ms en PC)
-...
+auto.png       -> car 63%  |  truck 15%  |  bird 8%   (1.6 ms en PC)
+avion.png      -> ship 49%  |  airplane 46%  |  truck 2%   (1.6 ms en PC)
+barco.png      -> ship 58%  |  airplane 40%  |  truck 1%   (1.5 ms en PC)
+caballo.png    -> horse 73%  |  deer 13%  |  dog 7%   (1.4 ms en PC)
+camion.png     -> car 53%  |  truck 37%  |  ship 2%   (1.6 ms en PC)
+ciervo.png     -> deer 32%  |  monkey 22%  |  cat 17%   (1.5 ms en PC)
+gato.png       -> dog 33%  |  monkey 31%  |  cat 19%   (1.5 ms en PC)
+mono.png       -> monkey 46%  |  bird 13%  |  dog 13%   (1.5 ms en PC)
+pajaro.png     -> bird 27%  |  monkey 24%  |  cat 14%   (1.5 ms en PC)
+perro.png      -> bird 43%  |  dog 14%  |  airplane 14%   (1.4 ms en PC)
+
+$ uv run python demo/clasificar.py --modelo chico  demo/imagenes/*.png
+
 Modelo chico: entrada 32x32, 4,206 parámetros, 0.39 M MACs, accuracy (test) 41.6%
 
-auto.png       -> car 22%  |  horse 20%  |  truck 19%   (0.7 ms en PC)
+auto.png       -> car 22%  |  horse 20%  |  truck 19%   (0.6 ms en PC)
+avion.png      -> airplane 34%  |  ship 30%  |  deer 13%   (0.5 ms en PC)
+barco.png      -> airplane 53%  |  ship 35%  |  bird 3%   (0.5 ms en PC)
 caballo.png    -> deer 19%  |  horse 19%  |  dog 18%   (0.5 ms en PC)
-...
+camion.png     -> car 40%  |  truck 29%  |  horse 8%   (0.5 ms en PC)
+ciervo.png     -> monkey 18%  |  cat 17%  |  deer 15%   (0.5 ms en PC)
+gato.png       -> monkey 23%  |  dog 19%  |  bird 19%   (0.5 ms en PC)
+mono.png       -> deer 33%  |  cat 18%  |  monkey 14%   (0.5 ms en PC)
+pajaro.png     -> monkey 25%  |  cat 21%  |  bird 18%   (0.5 ms en PC)
+perro.png      -> airplane 24%  |  deer 20%  |  bird 18%   (0.5 ms en PC)
         </code></pre>
         <aside class="notes">
+          <p>Avanzar con la flecha: primero se resaltan los comandos, después la salida del modelo grande y por último la del chico (el bloque hace scroll solo).</p>
           <p>Mismo modelo que después va a la placa, pero en PyTorch, en FP32 y en una PC.</p>
           <p>En la PC los dos tardan ~1 ms: acá no se nota ninguna diferencia de costo.</p>
           <p>Sobre estas 10 imágenes el grande acierta 6 y el chico 2: hay un costo en accuracy.</p>
