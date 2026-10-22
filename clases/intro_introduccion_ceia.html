@@ -12,6 +12,13 @@
             <li style="margin-bottom: 0.5rem;">Modelos numéricos: punto fijo y punto flotante</li>
             <li>Complejidad de operaciones en diferentes formatos</li>
         </ul>
+        <aside class="notes">
+            Sección de nivelación para quienes vienen de IA (CEIA): lo mínimo de sistemas
+            embebidos para entender por qué hay que comprimir modelos. Para los de CESE es
+            repaso; pueden aportar experiencia concreta con MCUs o FPGAs.
+            Hilo conductor: restricciones del hardware → plataformas → formatos numéricos →
+            costo de cada operación. Esto prepara el terreno para cuantización.
+        </aside>
     </section>
 
     <!-- ===================== DIFICULTADES EN SISTEMAS EMBEBIDOS ===================== -->
@@ -36,6 +43,13 @@
         <p style="font-size: 0.7em; margin-top: 1rem; font-style: italic; color: #6272a4;">
             Ejemplo: ejecutar una red neuronal en un microcontrolador con 256 KB de RAM y sin GPU.
         </p>
+        <aside class="notes">
+            La diferencia clave con una PC o un servidor: los recursos son fijos y escasos.
+            No se puede "agregar más RAM" ni escalar en la nube.
+            Las tres restricciones (memoria, cómputo, energía) van a aparecer en toda la materia.
+            Ejemplo para dimensionar: 256 KB de RAM es menos que una sola imagen RGB de
+            300×300 en FP32 (~1 MB).
+        </aside>
     </section>
 
     <!-- ===================== REQUERIMIENTOS DE LA APLICACIÓN ===================== -->
@@ -72,6 +86,13 @@
                     móviles, embebidos y datacenters.</p>
             </div>
         </div>
+        <aside class="notes">
+            Además de que el modelo "acierte", en embebidos importan métricas de sistema.
+            Diferenciar throughput (cuántas inferencias por segundo) de latencia (cuánto
+            tarda una): se pueden mejorar por separado, por ej. con batching sube el
+            throughput pero también la latencia.
+            Costos y energía suelen ser los que deciden si un producto es viable.
+        </aside>
     </section>
 
     <section>
@@ -103,6 +124,13 @@
                     cada inferencia.</p>
             </div>
         </div>
+        <aside class="notes">
+            Confusión frecuente: potencia (W) es instantánea, energía (J) es acumulada.
+            Una batería limita la energía total; la disipación térmica o la fuente limitan la potencia.
+            La cota E &lt; P / R conecta el requerimiento de la aplicación con el presupuesto
+            por inferencia. Con el ejemplo: 1 W y 10 inf/s dejan 100 mJ por inferencia.
+            Preguntar: ¿qué pasa si queremos 30 inf/s con la misma potencia?
+        </aside>
     </section>
 
     <!-- ===================== LIMITACIONES DE LA PLATAFORMA ===================== -->
@@ -138,6 +166,15 @@
                     memoria externa, y cantidad/tipo de operaciones aritméticas.</p>
             </div>
         </div>
+        <aside class="notes">
+            Ahora del lado del hardware: qué impone la plataforma.
+            Remarcar on-chip vs. off-chip: acceder a memoria externa es órdenes de magnitud
+            más caro en energía que una operación aritmética.
+            El ancho de banda suele ser el verdadero cuello de botella en redes neuronales,
+            no el cómputo.
+            El modelo de consumo simplificado (accesos a memoria + operaciones) es el que
+            vamos a usar para razonar sobre compresión.
+        </aside>
     </section>
 
     <!-- ===================== PLATAFORMAS DIGITALES ===================== -->
@@ -196,6 +233,14 @@
                 </tr>
             </tbody>
         </table>
+        <aside class="notes">
+            Recorrer la tabla de arriba hacia abajo: se gana eficiencia y se pierde flexibilidad.
+            CPU: hace de todo, pero con poco paralelismo. GPU: paralelismo masivo, alto consumo.
+            TPU: especializada en tensores, solo accesible vía Google.
+            FPGA: reconfigurable, baja latencia, pero diseñar es más complejo.
+            ASIC: máxima eficiencia, pero se fabrica una vez y no se cambia.
+            En la materia vamos a trabajar sobre todo con MCUs (una CPU chica).
+        </aside>
     </section>
 
     <section>
@@ -225,6 +270,13 @@
         <p style="font-size: 0.7em; margin-top: 1rem; font-style: italic; color: #6272a4;">
             La tendencia es un enfoque híbrido: preprocesar en edge y consultar la nube cuando sea necesario.
         </p>
+        <aside class="notes">
+            La pregunta de fondo de la materia: ¿por qué no mandar todo a la nube?
+            Edge: latencia, privacidad, funciona sin conexión; a cambio hay que optimizar.
+            Nube: recursos de sobra, pero latencia de red, costo por uso y dependencia de conectividad.
+            Preguntar por ejemplos: cámara de seguridad, asistente de voz ("wake word" en
+            el dispositivo, el resto en la nube) → enfoque híbrido.
+        </aside>
     </section>
 
     <!-- ===================== ARQUITECTURAS DIGITALES ===================== -->
@@ -264,6 +316,14 @@
         <p style="margin-top: 0.6rem; font-size: 0.9em; color: #ffb86c;">
             ⚡ Compensación: mayor paralelismo reduce tiempo, a expensas de recursos.
         </p>
+        <aside class="notes">
+            Dos formas de implementar el mismo cálculo en hardware.
+            Iterativa: un solo multiplicador reutilizado en muchos ciclos → poca área, más tiempo.
+            Desenrollada: un multiplicador por operación → mucha área, un resultado por ciclo
+            (con pipelining).
+            Es el compromiso clásico área vs. tiempo; en FPGAs y ASICs se elige el punto
+            intermedio según el requerimiento.
+        </aside>
     </section>
 
     <!-- ===================== PUNTO FIJO ===================== -->
@@ -291,6 +351,13 @@
                 </div>
             </div>
         </div>
+        <aside class="notes">
+            Arrancamos con formatos numéricos porque son la base de la cuantización.
+            Entero sin signo: suma de potencias de 2. Con signo, complemento a dos: el bit
+            más significativo pesa negativo.
+            Para los de CEIA: en PyTorch casi todo es FP32; en un MCU sin FPU, operar en
+            enteros puede ser 10× o más rápido.
+        </aside>
     </section>
 
     <section>
@@ -323,6 +390,13 @@
         <p style="margin-top: 0.6rem; font-style: italic; color: #6272a4;">
             La diferencia entre un entero y FxP es solo la <strong>interpretación</strong> del valor binario.
             Ambos usan la misma codificación.</p>
+        <aside class="notes">
+            Punto fijo = un entero con un factor de escala implícito 2^-f.
+            El hardware no "sabe" dónde está el punto: es una convención del programador.
+            Explicar la nomenclatura Q b.f con los ejemplos: Q8.4 tiene 1 bit de signo,
+            3 enteros y 4 fraccionarios.
+            Esto es exactamente lo que hace la cuantización: elegir b y f (o una escala).
+        </aside>
     </section>
 
     <section>
@@ -378,6 +452,13 @@
         <p style="font-size: 0.7em; margin-top: 0.8rem; color: #ffb86c;">
             💡 Compromiso fundamental: a mayor precisión (mayor f), menor rango, y viceversa.
         </p>
+        <aside class="notes">
+            Hacer notar el compromiso rango vs. precisión con los mismos 16 bits:
+            Q16.15 cubre [-1, 1) con mucha precisión; Q16.8 cubre [-128, 128) con menos.
+            Q8.-2: f negativo = la escala es mayor que 1; solo representa múltiplos de 4.
+            Pregunta para el grupo: si los pesos de una capa están entre -0.5 y 0.5,
+            ¿qué formato de 8 bits elegirían?
+        </aside>
     </section>
 
     <section>
@@ -410,6 +491,13 @@
                     desplazamiento adicional en HW.</p>
             </div>
         </div>
+        <aside class="notes">
+            Mostrar que en hardware solo existen operaciones enteras.
+            Suma: si ambos tienen el mismo formato, se suman los enteros directamente.
+            Multiplicación: el resultado tiene el doble de bits fraccionarios (UQ16.8), así
+            que hay que desplazar para volver al formato original.
+            Este desplazamiento (re-escalado) es el mismo que aparece en las capas cuantizadas.
+        </aside>
     </section>
 
     <section>
@@ -456,6 +544,14 @@
                 </li>
             </ul>
         </div>
+        <aside class="notes">
+            Cuando los formatos difieren hay que alinear el punto antes de sumar
+            (desplazamiento sobre un operando).
+            Remarcar las tres decisiones de diseño: truncar o redondear, ancho del
+            acumulador intermedio y saturar o hacer wrap-around.
+            Ejemplo: en una convolución se acumulan muchos productos de 8 bits → el
+            acumulador suele ser de 32 bits para no desbordar.
+        </aside>
     </section>
 
     <!-- ===================== PUNTO FLOTANTE ===================== -->
@@ -482,6 +578,12 @@
         </div>
         <img src="./figures/specific_fp64_fp32_fp16.png"
             style="width: 80%; background: white; border-radius: 0.5rem; margin-top: 0.5rem;">
+        <aside class="notes">
+            Punto flotante: el exponente mueve el punto, así se cubre un rango enorme.
+            Bit oculto: la mantisa normalizada siempre empieza en 1, por eso no se guarda.
+            El bias permite representar exponentes negativos sin bit de signo propio.
+            FP32 es el estándar para entrenar; FP16 ya es común en inferencia en GPU.
+        </aside>
     </section>
 
     <section>
@@ -531,6 +633,14 @@
             ⚠️ Cada valor especial requiere lógica de detección y manejo dedicada en hardware, aumentando la
             complejidad del diseño respecto a FxP.
         </p>
+        <aside class="notes">
+            Mencionar rápido; el punto importante es el costo en hardware.
+            Subnormales: rellenan el hueco cerca de 0, pero muchos aceleradores los
+            redondean a 0 (flush-to-zero) para ahorrar lógica.
+            NaN se propaga: un NaN en una capa arruina toda la salida (típico al entrenar
+            con learning rate alto).
+            Toda esta lógica extra es parte de por qué FlP es más caro que FxP.
+        </aside>
     </section>
 
     <section>
@@ -580,6 +690,14 @@
                     energía y área.</p>
             </div>
         </div>
+        <aside class="notes">
+            Comparar el rango de FP16 (~65 000) con el de FP32 (~10^38): FP16 desborda
+            con facilidad, por eso entrenar en FP16 requiere loss scaling.
+            Las columnas de "precisión" muestran el menor valor normal y el menor subnormal
+            representables, no el error relativo.
+            Cierre: FlP da rango dinámico casi sin preocuparse, a cambio de hardware más
+            complejo.
+        </aside>
     </section>
 
     <!-- ===================== FORMATOS AVANZADOS ===================== -->
@@ -607,6 +725,13 @@
                     style="width: 100%; background: white; border-radius: 0.5rem;">
             </div>
         </div>
+        <aside class="notes">
+            Formatos "intermedios" que nacieron para entrenar más rápido.
+            BF16: mismo exponente que FP32 (mismo rango), menos mantisa; convertir es
+            truncar. Muy usado hoy en entrenamiento de LLMs.
+            TF32: formato interno de los Tensor Cores de NVIDIA; el usuario sigue viendo FP32.
+            Idea clave: para deep learning el rango importa más que la precisión.
+        </aside>
     </section>
 
     <section>
@@ -708,6 +833,14 @@
         <p style="font-size: 0.65em; margin-top: 0.5rem; color: #ffb86c;">
             Tendencia: precisiones cada vez más bajas + calibración y entrenamiento consciente de la cuantización.
         </p>
+        <aside class="notes">
+            No leer la tabla entera; destacar el patrón:
+            arriba formatos de entrenamiento (FP64/FP32/BF16), abajo de inferencia (INT8/INT4).
+            INT8 es hoy el estándar de facto para inferencia en edge, y es lo que vamos a
+            usar en el ESP32.
+            FP8 (E4M3/E5M2) es lo más nuevo, en GPUs de datacenter.
+            Tendencia: cada vez menos bits, compensando con calibración y QAT.
+        </aside>
     </section>
 
     <!-- ===================== ESTRATEGIAS COMPLEMENTARIAS ===================== -->
@@ -743,6 +876,14 @@
         <p style="font-size: 0.65em; margin-top: 0.8rem; font-style: italic; color: #6272a4;">
             Varias de estas estrategias solo son eficientes en hardware reconfigurable o dedicado (FPGAs/ASICs).
         </p>
+        <aside class="notes">
+            Variantes que mezclan las ideas anteriores.
+            Block floating point: un exponente compartido por un bloque; es la base de
+            formatos como MX (microscaling).
+            Punto fijo dinámico y mixed-precision: elegir la escala o los bits por capa;
+            lo vamos a ver en la sección de cuantización.
+            Aclarar que en CPUs y MCUs no todas son eficientes: necesitan hardware que las soporte.
+        </aside>
     </section>
 
     <!-- ===================== EJEMPLO CONCRETO ===================== -->
@@ -791,6 +932,13 @@
             Fuente: valores representativos de TensorFlow Lite model benchmarks.
             PTQ = post-training quantization.
         </p>
+        <aside class="notes">
+            Ejemplo para bajar a tierra el impacto de cuantizar.
+            Pasar de FP32 a INT8 reduce el tamaño ~4× (32 → 8 bits por peso), la latencia
+            ~2.5× y la energía ~3×, perdiendo menos de 1 punto de accuracy.
+            Aclarar que son valores aproximados y representativos: dependen del hardware y
+            del runtime.
+        </aside>
     </section>
 
     <!-- ===================== ACCURACY VS BITWIDTH ===================== -->
@@ -871,6 +1019,14 @@
                 </div>
             </div>
         </div>
+        <aside class="notes">
+            El trade-off central de la cuantización en una sola figura.
+            ≥8 bits: casi gratis, alcanza con PTQ (cuantizar después de entrenar).
+            4 bits: hace falta QAT (entrenar sabiendo que se va a cuantizar).
+            ≤2 bits: degradación fuerte, solo con arquitecturas y técnicas especiales.
+            Los números son representativos; lo importante es la forma de la curva.
+            Esto lo vamos a reproducir con los scripts de la sección de cuantización.
+        </aside>
     </section>
 
     <!-- ===================== COMPLEJIDAD ===================== -->
@@ -902,6 +1058,13 @@
                     style="width: 100%; background: white; border-radius: 0.5rem;">
             </div>
         </div>
+        <aside class="notes">
+            Por qué menos bits = más barato.
+            Sumador: crece lineal con la cantidad de bits (cadena de acarreo).
+            Multiplicador: crece cuadrático, es una suma de b productos parciales.
+            Las figuras muestran el sumador y el arreglo de un multiplicador.
+            Conclusión: pasar de 16 a 8 bits divide por ~4 el costo de un multiplicador.
+        </aside>
     </section>
 
     <section>
@@ -933,6 +1096,13 @@
                 <img src="./figures/03-flp_mult.png" style="width: 70%; background: white; border-radius: 0.5rem;">
             </div>
         </div>
+        <aside class="notes">
+            Una operación FlP es en realidad varias operaciones enteras más lógica de control.
+            Suma: alinear exponentes (desplazador), sumar mantisas, renormalizar, redondear.
+            Multiplicación: sumar exponentes y multiplicar mantisas; paradójicamente es más
+            simple que la suma.
+            Por esto un MCU sin FPU emula FlP por software y es mucho más lento.
+        </aside>
     </section>
 
     <section>
@@ -998,6 +1168,13 @@
         </div>
         <p style="font-size: 0.6em; margin-top: 0.8rem; color: #ffb86c;">💡 Reducir bits de representación
             reduce cuadráticamente el costo de multiplicaciones y linealmente el de sumas.</p>
+        <aside class="notes">
+            Juntar todo: temporalmente, la multiplicación domina y escala cuadrático con
+            los bits; espacialmente, el almacenamiento escala lineal.
+            Como una red neuronal es casi todo multiplicaciones y sumas (MACs), reducir
+            bits impacta en las dos dimensiones.
+            Este es el argumento cuantitativo para cuantizar.
+        </aside>
     </section>
 
     <!-- ===================== CIERRE ===================== -->
@@ -1024,6 +1201,13 @@
         <p style="font-size: 0.65em; margin-top: 2rem; color: #6272a4; font-style: italic;">
             A continuación: introducción a IA embebida →
         </p>
+        <aside class="notes">
+            Repasar en voz alta el hilo: restricciones → requerimientos → plataformas →
+            arquitecturas → formatos numéricos → costo.
+            El mensaje para llevarse: el formato numérico no es un detalle de
+            implementación, define área, consumo y velocidad.
+            Preguntar si quedó alguna duda antes de pasar a la introducción a IA embebida.
+        </aside>
     </section>
 
 </section>
