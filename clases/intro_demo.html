@@ -115,7 +115,7 @@
         <style>
             .reveal pre.sin-numeros .hljs-ln-numbers { display: none; }
         </style>
-        <pre class="sin-numeros" style="font-size: 15px !important;"><code class="language-plaintext" data-trim data-line-numbers="1-2,17|2-15|17-30">
+        <pre class="sin-numeros" style="font-size: 15px !important;"><code class="language-plaintext" data-trim data-line-numbers="1|2-15|17-30">
 $ uv sync      # solo la primera vez (tarda)
 $ uv run python demo/clasificar.py --modelo grande demo/imagenes/*.png
 
@@ -148,7 +148,7 @@ pajaro.png     -> monkey 25%  |  cat 21%  |  bird 18%   (0.5 ms en PC)
 perro.png      -> airplane 24%  |  deer 20%  |  bird 18%   (0.5 ms en PC)
         </code></pre>
         <aside class="notes">
-          <p>Avanzar con la flecha: primero se resaltan los comandos, después la salida del modelo grande y por último la del chico (el bloque hace scroll solo).</p>
+          <p>Avanzar con la flecha: primero se resalta uv sync, después el comando y la salida del modelo grande y por último la del chico (el bloque hace scroll solo).</p>
           <p>Mismo modelo que después va a la placa, pero en PyTorch, en FP32 y en una PC.</p>
           <p>En la PC los dos tardan ~1 ms: acá no se nota ninguna diferencia de costo.</p>
           <p>Sobre estas 10 imágenes el grande acierta 6 y el chico 2: hay un costo en accuracy.</p>
