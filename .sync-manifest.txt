@@ -55,6 +55,7 @@ clases/figures/02-rnn.png
 clases/figures/02-rnn_diagram.html
 clases/figures/02-topology_branching.html
 clases/figures/02-topology_residual.html
+clases/figures/02-unet_diagram.html
 clases/figures/02-vgg_diagram.html
 clases/figures/03-flp_mult.png
 clases/figures/03-flp_sum.png

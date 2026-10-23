@@ -1,0 +1,69 @@
+<svg viewBox="0 0 600 200"
+    style="width: 100%; display: block; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3)); border-radius: 0.5rem; background: rgba(255,255,255,0.05);">
+    <defs>
+        <marker id="arrow-unet" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6"
+            orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="rgba(248, 248, 242, 0.4)" />
+        </marker>
+        <marker id="arrow-unet-skip" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6"
+            orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#ff79c6" />
+        </marker>
+    </defs>
+
+    <text x="300" y="22" fill="#f8f8f2" font-size="14" font-weight="bold" font-family="sans-serif"
+        text-anchor="middle">U-Net: codificador y decodificador</text>
+
+    <!-- Entrada -->
+    <line x1="30" y1="65" x2="66" y2="65" stroke="rgba(248, 248, 242, 0.4)" stroke-width="2"
+        marker-end="url(#arrow-unet)" />
+
+    <!-- Codificador: baja la resolución (bloques más bajos) y sube los canales (más anchos) -->
+    <rect x="70" y="40" width="22" height="50" rx="4" fill="rgba(189, 147, 249, 0.6)" stroke="#bd93f9" />
+    <rect x="130" y="80" width="26" height="38" rx="4" fill="rgba(189, 147, 249, 0.7)" stroke="#bd93f9" />
+    <rect x="190" y="112" width="30" height="28" rx="4" fill="rgba(189, 147, 249, 0.8)" stroke="#bd93f9" />
+    <line x1="92" y1="88" x2="127" y2="96" stroke="rgba(248, 248, 242, 0.4)" stroke-width="2"
+        marker-end="url(#arrow-unet)" />
+    <line x1="156" y1="116" x2="187" y2="122" stroke="rgba(248, 248, 242, 0.4)" stroke-width="2"
+        marker-end="url(#arrow-unet)" />
+    <line x1="220" y1="138" x2="277" y2="150" stroke="rgba(248, 248, 242, 0.4)" stroke-width="2"
+        marker-end="url(#arrow-unet)" />
+
+    <!-- Cuello de botella -->
+    <rect x="280" y="140" width="40" height="22" rx="4" fill="rgba(255, 184, 108, 0.8)" stroke="#ffb86c" />
+    <text x="300" y="155" fill="#f8f8f2" font-size="9" font-weight="bold" font-family="sans-serif"
+        text-anchor="middle">Cuello</text>
+
+    <!-- Decodificador: sube la resolución -->
+    <line x1="320" y1="150" x2="377" y2="138" stroke="rgba(248, 248, 242, 0.4)" stroke-width="2"
+        marker-end="url(#arrow-unet)" />
+    <rect x="380" y="112" width="30" height="28" rx="4" fill="rgba(139, 233, 253, 0.8)" stroke="#8be9fd" />
+    <line x1="410" y1="116" x2="441" y2="104" stroke="rgba(248, 248, 242, 0.4)" stroke-width="2"
+        marker-end="url(#arrow-unet)" />
+    <rect x="444" y="80" width="26" height="38" rx="4" fill="rgba(139, 233, 253, 0.7)" stroke="#8be9fd" />
+    <line x1="470" y1="82" x2="505" y2="74" stroke="rgba(248, 248, 242, 0.4)" stroke-width="2"
+        marker-end="url(#arrow-unet)" />
+    <rect x="508" y="40" width="22" height="50" rx="4" fill="rgba(139, 233, 253, 0.6)" stroke="#8be9fd" />
+
+    <!-- Conexiones skip: se concatenan en el decodificador -->
+    <line x1="94" y1="56" x2="505" y2="56" stroke="#ff79c6" stroke-width="2" stroke-dasharray="4"
+        marker-end="url(#arrow-unet-skip)" />
+    <line x1="158" y1="94" x2="441" y2="94" stroke="#ff79c6" stroke-width="2" stroke-dasharray="4"
+        marker-end="url(#arrow-unet-skip)" />
+    <line x1="222" y1="124" x2="377" y2="124" stroke="#ff79c6" stroke-width="2" stroke-dasharray="4"
+        marker-end="url(#arrow-unet-skip)" />
+    <text x="300" y="48" fill="#ff79c6" font-size="11" font-weight="bold" font-family="sans-serif"
+        text-anchor="middle">Conexiones "skip" (concatenación)</text>
+
+    <!-- Salida: una clase por píxel -->
+    <line x1="530" y1="65" x2="553" y2="65" stroke="rgba(248, 248, 242, 0.4)" stroke-width="2"
+        marker-end="url(#arrow-unet)" />
+    <rect x="556" y="45" width="16" height="40" rx="4" fill="rgba(80, 250, 123, 0.8)" stroke="#50fa7b" />
+    <text x="564" y="65" fill="#f8f8f2" font-size="8" font-family="sans-serif" text-anchor="middle"
+        transform="rotate(-90 564,65)">Máscara</text>
+
+    <text x="145" y="185" fill="#bd93f9" font-size="11" font-family="sans-serif"
+        text-anchor="middle">Codificador (baja la resolución)</text>
+    <text x="455" y="185" fill="#8be9fd" font-size="11" font-family="sans-serif"
+        text-anchor="middle">Decodificador (sube la resolución)</text>
+</svg>

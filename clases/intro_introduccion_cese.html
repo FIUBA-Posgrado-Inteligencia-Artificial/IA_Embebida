@@ -908,6 +908,31 @@
   </section>
 
   <section>
+    <h3>U-Net (2015)</h3>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+      <div style="font-size: 0.8em; text-align: left; width: 100%;">
+        <p>De clasificar la imagen a clasificar <strong>cada píxel</strong> (segmentación).</p>
+        <ul>
+          <li style="margin-bottom: 0.5rem;">Diseñada para segmentar imágenes biomédicas con pocos datos de
+            entrenamiento.</li>
+          <li style="margin-bottom: 0.5rem;">Forma de "U": un codificador baja la resolución y un decodificador la
+            recupera.</li>
+          <li>Conexiones <em>skip</em> entre ambos lados para no perder el detalle fino.</li>
+        </ul>
+      </div>
+      <div style="width: 100%;">
+        <div data-external-replace="./figures/02-unet_diagram.html"></div>
+      </div>
+    </div>
+    <aside class="notes">
+      <p>Cambia la tarea: la salida no es una clase para toda la imagen sino una máscara, con una clase por píxel (segmentación).</p>
+      <p>El codificador es una CNN como las anteriores. El decodificador sube la resolución hasta la de la entrada, y las conexiones skip le pasan (por concatenación) el detalle fino que se perdió al bajar.</p>
+      <p>Sale de imágenes médicas (Ronneberger et al., 2015). Hoy se usa en conducción autónoma, imágenes satelitales y es el núcleo de los modelos de difusión que generan imágenes.</p>
+      <p>Para embebidos: la salida es tan grande como la entrada, así que pesa mucho en memoria de activaciones, no solo en parámetros.</p>
+    </aside>
+  </section>
+
+  <section>
     <h3>ResNet (2015)</h3>
     <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
       <div style="font-size: 0.8em; text-align: left; width: 100%;">
@@ -994,6 +1019,13 @@
           <td style="padding: 10px;">Extremadamente eficiente. Introdujo múltiples caminos.</td>
         </tr>
         <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+          <td style="padding: 10px;"><strong>U-Net</strong></td>
+          <td style="padding: 10px;">2015</td>
+          <td style="padding: 10px;">~ 31 M</td>
+          <td style="padding: 10px;">N/A (segmentación)</td>
+          <td style="padding: 10px;">Clasifica cada píxel; codificador-decodificador con conexiones skip.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
           <td style="padding: 10px;"><strong>ResNet-50</strong></td>
           <td style="padding: 10px;">2015</td>
           <td style="padding: 10px;">~ 25 M</td>
@@ -1013,6 +1045,7 @@
       los protocolos de evaluación (recortes, ensambles) varían entre papers.</p>
     <aside class="notes">
       <p>Hacer notar la tendencia: de VGG (138 M) a MobileNet (4.2 M) con accuracy parecida.</p>
+      <p>U-Net no tiene accuracy de ImageNet porque resuelve otra tarea (segmentación). Los ~31 M son de la versión original, con 64 filtros en el primer nivel; hay variantes mucho más livianas.</p>
       <p>Mejorar la arquitectura es una de las formas más efectivas de "comprimir".</p>
       <p>Las cifras de accuracy son las de cada paper (protocolos distintos); por ejemplo, ResNet-50 da 93.3 % con 10 recortes (He et al., 2015) y ~92.9 % con un solo recorte.</p>
     </aside>
