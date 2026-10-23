@@ -199,6 +199,17 @@
 			plugins: [RevealMarkdown, RevealHighlight, RevealNotes]
 		});
 
+		// Vista general (ESC): reveal.js oculta las diapos a más de 10 pasos de la
+		// actual (límite fijo, no configurable), así que en las otras secciones
+		// desaparecían de la décima en adelante. Mientras la vista general está
+		// abierta, se muestran todas.
+		function mostrarTodasEnVistaGeneral() {
+			if (!Reveal.isOverview()) return;
+			Reveal.getSlides().forEach((s) => { s.style.display = 'block'; });
+		}
+		Reveal.on('overviewshown', mostrarTodasEnVistaGeneral);
+		Reveal.on('slidechanged', mostrarTodasEnVistaGeneral);
+
 		Reveal.on('ready', () => {
 			document.querySelectorAll('section').forEach(s => {
 				if (!s.hasAttribute('data-auto-animate')) {
