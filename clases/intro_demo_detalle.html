@@ -283,6 +283,35 @@
 
     <section>
         <h3>Muchas combinaciones posibles</h3>
+        <div style="font-size: 0.7em; text-align: left;">
+            <p style="margin-bottom: 0.6rem;">Cada modelo <em>m</em> tiene una métrica de desempeño
+                <em>acc</em>(<em>m</em>) (más es mejor) y un costo <em>c</em>(<em>m</em>) (menos es mejor).</p>
+            <div class="fragment" style="background: rgba(189,147,249,0.1); padding: 0.7rem 0.9rem; border-radius: 0.5rem; margin-bottom: 0.6rem;">
+                <p style="color: #bd93f9; margin: 0 0 0.3rem;"><strong>Dominancia</strong></p>
+                <p style="margin: 0;"><em>a</em> domina a <em>b</em> si
+                    <em>acc</em>(<em>a</em>) ≥ <em>acc</em>(<em>b</em>) y <em>c</em>(<em>a</em>) ≤ <em>c</em>(<em>b</em>),
+                    con al menos una de las dos desigualdades estricta.</p>
+            </div>
+            <div class="fragment" style="background: rgba(80,250,123,0.1); padding: 0.7rem 0.9rem; border-radius: 0.5rem; margin-bottom: 0.6rem;">
+                <p style="color: #50fa7b; margin: 0 0 0.3rem;"><strong>Frontera de Pareto</strong></p>
+                <p style="margin: 0;">El conjunto de modelos que ningún otro domina:<br>
+                    <span style="display: block; text-align: center; margin-top: 0.3rem;">
+                        <em>P</em> = { <em>m</em> ∈ <em>M</em> : no existe <em>m'</em> ∈ <em>M</em> que domine a <em>m</em> }</span></p>
+            </div>
+            <p class="fragment" style="margin: 0;">Con más objetivos (tiempo, memoria, energía, ...) la definición es
+                la misma: <em>a</em> no es peor que <em>b</em> en ninguno y es mejor en al menos uno.</p>
+        </div>
+        <aside class="notes">
+          <p>Antes de mostrar los gráficos, la definición formal. M es el conjunto de todos los modelos que entrenamos.</p>
+          <p>Dominancia: a domina a b si es al menos igual de bueno en todo y estrictamente mejor en algo. Si a domina a b, no hay ningún motivo para elegir b.</p>
+          <p>La frontera de Pareto es lo que queda después de descartar todos los modelos dominados. Ninguno de ellos es "el mejor": para ganar en un objetivo, hay que perder en otro.</p>
+          <p>Ojo: la frontera depende de qué costo se elija. Lo vamos a ver ahora mismo con dos costos distintos (MACs y parámetros).</p>
+          <p>Con k objetivos es lo mismo, comparando componente a componente. La frontera de Pareto vuelve a aparecer en NAS.</p>
+        </aside>
+    </section>
+
+    <section>
+        <h3>Muchas combinaciones posibles</h3>
         <div style="display: flex; align-items: center; justify-content: center; gap: 2%;">
             <img data-id="pareto-macs" src="figures/demo_detalle-pareto-macs.png"
                 alt="Accuracy vs. MACs de 299 modelos, con la frontera de Pareto" style="width: 64%; margin: 0;">
@@ -293,7 +322,7 @@
             distintas combinaciones de técnicas de compresión.</p>
         <aside class="notes">
           <p>Grande y chico son solo dos de los 299 modelos que entrenamos para preparar la demo, combinando de distintas formas las técnicas de la materia. Todavía no importa qué se hizo en cada uno.</p>
-          <p>Dos gráficos con los mismos modelos y el mismo eje vertical (accuracy), pero distinto costo en el horizontal. Empezamos por el de la izquierda: operaciones (MACs, escala logarítmica), un proxy del tiempo.</p>
+          <p>Ahora sí, los modelos de verdad. Dos gráficos con los mismos modelos y el mismo eje vertical (accuracy), pero distinto costo en el horizontal. Empezamos por el de la izquierda: operaciones (MACs, escala logarítmica), un proxy del tiempo.</p>
           <p>La frontera de Pareto (verde) son los modelos que nadie supera en las dos cosas a la vez: para mejorar uno, hay que empeorar el otro. Todo lo que está debajo es "dominado": existe otro modelo más rápido y con más accuracy.</p>
           <p>Lo interesante: ni el grande ni el chico están en la frontera. Hay un modelo con 7 veces menos MACs que el grande y casi la misma accuracy, y uno con los mismos MACs que el chico y 5 puntos más.</p>
           <p>Los puntos en ~10 % son combinaciones que rompieron el modelo (comprimir de más, sin reentrenar): adivinan al azar.</p>
