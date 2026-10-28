@@ -10,7 +10,8 @@
             <li style="margin-bottom: 0.5rem;">Operaciones vs. tiempo</li>
             <li style="margin-bottom: 0.5rem;">La plataforma importa</li>
             <li style="margin-bottom: 0.5rem;">El runtime importa</li>
-            <li>El costo: accuracy</li>
+            <li style="margin-bottom: 0.5rem;">El costo: accuracy</li>
+            <li>Muchas combinaciones posibles</li>
         </ul>
         <aside class="notes">
           <p>Cierre de la clase 1. Ahora que saben qué es un MAC, qué es INT8 y por qué importan la memoria y el ancho de banda, volvemos a la demo y la desarmamos.</p>
@@ -277,6 +278,96 @@
           <p>La accuracy de los modelos desplegados es la medida antes de cuantizar (en PC); la cuantización puede sumar alguna pérdida extra.</p>
           <p>Los valores son bajos en general (el azar es 10 %): modelos minúsculos y un dataset difícil. No es un producto, es un ejemplo para ver los compromisos.</p>
           <p>Para el TP: definir primero la restricción (por ejemplo, tiempo máximo o caída máxima de accuracy) y después elegir las técnicas.</p>
+        </aside>
+    </section>
+
+    <section>
+        <h3>Muchas combinaciones posibles</h3>
+        <img src="figures/demo_detalle-pareto.png" alt="Accuracy vs. MACs de 299 modelos, con la frontera de Pareto"
+            style="max-height: 470px; margin: 0;">
+        <p style="font-size: 0.6em; margin-top: 0.3rem;">Cada punto es un modelo: la misma red de partida, con
+            distintas combinaciones de técnicas de compresión.</p>
+        <aside class="notes">
+          <p>Grande y chico son solo dos de los 299 modelos que entrenamos para preparar la demo, combinando de distintas formas las técnicas de la materia. Todavía no importa qué se hizo en cada uno.</p>
+          <p>Eje horizontal: operaciones (MACs, escala logarítmica), un proxy del tiempo. Eje vertical: accuracy.</p>
+          <p>La frontera de Pareto (verde) son los modelos que nadie supera en las dos cosas a la vez: para mejorar uno, hay que empeorar el otro. Todo lo que está debajo es "dominado": existe otro modelo más rápido y con más accuracy.</p>
+          <p>Lo interesante: ni el grande ni el chico están en la frontera. Hay un modelo con 7 veces menos MACs que el grande y casi la misma accuracy, y uno con los mismos MACs que el chico y 5 puntos más.</p>
+          <p>Los puntos en ~10 % son combinaciones que rompieron el modelo (comprimir de más, sin reentrenar): adivinan al azar.</p>
+          <p>Y esto es un solo eje de costo. En la práctica hay varios a la vez (tiempo, memoria, energía) y la métrica de desempeño depende del problema (accuracy, IoU, etc.).</p>
+        </aside>
+    </section>
+
+    <section>
+        <h3>Algunos de esos modelos, en la placa</h3>
+        <table style="font-size: 0.55em; width: 100%; border-collapse: collapse; margin-top: 0.5rem;">
+            <thead>
+                <tr style="border-bottom: 2px solid #fff;">
+                    <th style="padding: 6px;">Modelo</th>
+                    <th style="padding: 6px;">Accuracy</th>
+                    <th style="padding: 6px;">MACs</th>
+                    <th style="padding: 6px;">Tamaño</th>
+                    <th style="padding: 6px;">Tiempo (ESP32-CAM)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2); color: #50fa7b;">
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">A</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">61.9 %</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">74 M</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2); color: #6272a4;">pendiente</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2); color: #6272a4;">pendiente</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2); color: #ffb86c;">B (grande)</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">59.0 %</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">60 M</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">68 KB</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">9.4 s</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2); color: #50fa7b;">
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">C</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">58.8 %</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">8.2 M</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2); color: #6272a4;">pendiente</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2); color: #6272a4;">pendiente</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">D</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">56.6 %</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">5.1 M</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">54 KB</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">658 ms</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2); color: #50fa7b;">
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">E</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">58.6 %</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">3.4 M</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2); color: #6272a4;">pendiente</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2); color: #6272a4;">pendiente</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2); color: #50fa7b;">
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">F</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">47.1 %</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">0.38 M</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2); color: #6272a4;">pendiente</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2); color: #6272a4;">pendiente</td>
+                </tr>
+                <tr>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2); color: #8be9fd;">G (chico)</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">41.6 %</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">0.39 M</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">15 KB</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">75 ms</td>
+                </tr>
+            </tbody>
+        </table>
+        <p style="font-size: 0.55em; margin-top: 0.6rem;"><span style="color: #50fa7b;">En verde</span>: modelos
+            de la frontera de Pareto. Ningún modelo es "el mejor": depende de qué restricción pese más.</p>
+        <aside class="notes">
+          <p>Tres métricas a la vez: desempeño (accuracy), tamaño (memoria que ocupa el modelo en la placa) y tiempo (medido en la ESP32-CAM).</p>
+          <p>Comparar C con B: casi la misma accuracy con 7 veces menos operaciones. Y F con G: los mismos MACs, 5 puntos más de accuracy.</p>
+          <p>Para elegir, primero se fija la restricción (por ejemplo, "menos de 100 ms por imagen") y entre los que la cumplen se elige el de mejor desempeño. Es lo mismo que van a tener que hacer en el TP.</p>
+          <p>(Para nosotros: los "pendiente" todavía no se desplegaron; la accuracy es la medida en PC antes de cuantizar, igual que en la diapo anterior. Ver TODO.md.)</p>
         </aside>
     </section>
 

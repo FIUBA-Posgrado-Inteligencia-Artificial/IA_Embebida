@@ -74,6 +74,7 @@ clases/figures/demo/gato.png
 clases/figures/demo/mono.png
 clases/figures/demo/pajaro.png
 clases/figures/demo/perro.png
+clases/figures/demo_detalle-pareto.png
 clases/figures/fit_datos_reales.png
 clases/figures/fit_models_1d.png
 clases/figures/general_bigo.png
@@ -101,6 +102,7 @@ clases/files/big_o_visualization.py
 clases/files/fit_models_1d.py
 clases/files/linear_regression_simple.py
 clases/files/logistic_regression_simple.py
+clases/files/pareto_modelos.py
 clases/intro_avisos.html
 clases/intro_demo.html
 clases/intro_demo_detalle.html
