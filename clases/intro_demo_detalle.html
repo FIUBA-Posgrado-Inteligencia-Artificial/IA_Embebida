@@ -351,12 +351,17 @@
         <h3>Algunos de esos modelos, en la placa</h3>
         <table style="font-size: 0.55em; width: 100%; border-collapse: collapse; margin-top: 0.5rem;">
             <thead>
+                <tr>
+                    <th rowspan="2" style="padding: 6px; vertical-align: bottom; border-bottom: 2px solid #fff;">Modelo</th>
+                    <th rowspan="2" style="padding: 6px; vertical-align: bottom; border-bottom: 2px solid #fff;">Accuracy</th>
+                    <th rowspan="2" style="padding: 6px; vertical-align: bottom; border-bottom: 2px solid #fff;">MACs</th>
+                    <th rowspan="2" style="padding: 6px; vertical-align: bottom; border-bottom: 2px solid #fff;">Tamaño</th>
+                    <th colspan="3" style="padding: 6px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.4);">Tiempo por imagen</th>
+                </tr>
                 <tr style="border-bottom: 2px solid #fff;">
-                    <th style="padding: 6px;">Modelo</th>
-                    <th style="padding: 6px;">Accuracy</th>
-                    <th style="padding: 6px;">MACs</th>
-                    <th style="padding: 6px;">Tamaño</th>
-                    <th style="padding: 6px;">Tiempo (ESP32-CAM)</th>
+                    <th style="padding: 6px; border-bottom: 2px solid #fff;">ESP32-CAM</th>
+                    <th style="padding: 6px; border-bottom: 2px solid #fff;">ESP32-S3</th>
+                    <th style="padding: 6px; border-bottom: 2px solid #fff;">ESP32-S3-CAM</th>
                 </tr>
             </thead>
             <tbody>
@@ -364,8 +369,10 @@
                     <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">A</td>
                     <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">61.9 %</td>
                     <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">74 M</td>
-                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2); color: #6272a4;">pendiente</td>
-                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2); color: #6272a4;">pendiente</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2); color: #6272a4;">–</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2); color: #6272a4;">–</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2); color: #6272a4;">–</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2); color: #6272a4;">–</td>
                 </tr>
                 <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
                     <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2); color: #ffb86c;">B (grande)</td>
@@ -373,13 +380,17 @@
                     <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">60 M</td>
                     <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">68 KB</td>
                     <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">9.4 s</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">619 ms</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2); color: #6272a4;">–</td>
                 </tr>
                 <tr style="border-bottom: 1px solid rgba(255,255,255,0.2); color: #50fa7b;">
                     <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">C</td>
                     <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">58.8 %</td>
                     <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">8.2 M</td>
-                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2); color: #6272a4;">pendiente</td>
-                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2); color: #6272a4;">pendiente</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2); color: #6272a4;">–</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2); color: #6272a4;">–</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2); color: #6272a4;">–</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2); color: #6272a4;">–</td>
                 </tr>
                 <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
                     <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">D</td>
@@ -387,20 +398,26 @@
                     <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">5.1 M</td>
                     <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">54 KB</td>
                     <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">658 ms</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">39 ms</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">126 ms</td>
                 </tr>
                 <tr style="border-bottom: 1px solid rgba(255,255,255,0.2); color: #50fa7b;">
                     <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">E</td>
                     <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">58.6 %</td>
                     <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">3.4 M</td>
-                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2); color: #6272a4;">pendiente</td>
-                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2); color: #6272a4;">pendiente</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2); color: #6272a4;">–</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2); color: #6272a4;">–</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2); color: #6272a4;">–</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2); color: #6272a4;">–</td>
                 </tr>
                 <tr style="border-bottom: 1px solid rgba(255,255,255,0.2); color: #50fa7b;">
                     <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">F</td>
                     <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">47.1 %</td>
                     <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">0.38 M</td>
-                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2); color: #6272a4;">pendiente</td>
-                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2); color: #6272a4;">pendiente</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2); color: #6272a4;">–</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2); color: #6272a4;">–</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2); color: #6272a4;">–</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2); color: #6272a4;">–</td>
                 </tr>
                 <tr>
                     <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2); color: #8be9fd;">G (chico)</td>
@@ -408,16 +425,22 @@
                     <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">0.39 M</td>
                     <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">15 KB</td>
                     <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">75 ms</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">6.4 ms</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">9.3 ms</td>
                 </tr>
             </tbody>
         </table>
         <p style="font-size: 0.55em; margin-top: 0.6rem;"><span style="color: #50fa7b;">En verde</span>: modelos
-            de la frontera de Pareto. Ningún modelo es "el mejor": depende de qué restricción pese más.</p>
+            de la frontera de Pareto. Ningún modelo es "el mejor": depende de qué restricción pese más.<br>
+            <span style="color: #6272a4;">–: todavía sin medir</span></p>
         <aside class="notes">
-          <p>Tres métricas a la vez: desempeño (accuracy), tamaño (memoria que ocupa el modelo en la placa) y tiempo (medido en la ESP32-CAM).</p>
+          <p>Tres métricas a la vez: desempeño (accuracy), tamaño (memoria que ocupa el modelo en la placa) y tiempo por imagen, medido en tres placas.</p>
+          <p>El mismo modelo cambia hasta 15 veces de tiempo según la placa: el ESP32-S3 tiene instrucciones vectoriales (SIMD) que la ESP32-CAM (ESP32 clásico) no tiene. El grande, inusable a 9.4 s en la ESP32-CAM, anda a 0.6 s en el S3.</p>
+          <p>ESP32-S3 y ESP32-S3-CAM tienen el mismo chip pero son placas distintas (memoria y configuración), y eso también se nota en el tiempo.</p>
+          <p>Moraleja: la restricción de tiempo depende de la placa, así que el modelo elegido también. Elegir hardware es parte del problema.</p>
           <p>Comparar C con B: casi la misma accuracy con 7 veces menos operaciones. Y F con G: los mismos MACs, 5 puntos más de accuracy.</p>
           <p>Para elegir, primero se fija la restricción (por ejemplo, "menos de 100 ms por imagen") y entre los que la cumplen se elige el de mejor desempeño. Es lo mismo que van a tener que hacer en el TP.</p>
-          <p>(Para nosotros: los "pendiente" todavía no se desplegaron; la accuracy es la medida en PC antes de cuantizar, igual que en la diapo anterior. Ver TODO.md.)</p>
+          <p>(Para nosotros: los "–" todavía no se midieron; la accuracy es la medida en PC antes de cuantizar, igual que en la diapo anterior. Ver TODO.md.)</p>
         </aside>
     </section>
 
