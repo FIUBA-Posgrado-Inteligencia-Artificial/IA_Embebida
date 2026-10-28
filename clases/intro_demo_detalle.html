@@ -283,17 +283,38 @@
 
     <section>
         <h3>Muchas combinaciones posibles</h3>
-        <img src="figures/demo_detalle-pareto.png" alt="Accuracy vs. MACs de 299 modelos, con la frontera de Pareto"
-            style="max-height: 470px; margin: 0;">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 2%;">
+            <img data-id="pareto-macs" src="figures/demo_detalle-pareto-macs.png"
+                alt="Accuracy vs. MACs de 299 modelos, con la frontera de Pareto" style="width: 64%; margin: 0;">
+            <img data-id="pareto-params" src="figures/demo_detalle-pareto-params.png"
+                alt="Accuracy vs. parámetros de 299 modelos, con la frontera de Pareto" style="width: 34%; margin: 0;">
+        </div>
         <p style="font-size: 0.6em; margin-top: 0.3rem;">Cada punto es un modelo: la misma red de partida, con
             distintas combinaciones de técnicas de compresión.</p>
         <aside class="notes">
           <p>Grande y chico son solo dos de los 299 modelos que entrenamos para preparar la demo, combinando de distintas formas las técnicas de la materia. Todavía no importa qué se hizo en cada uno.</p>
-          <p>Eje horizontal: operaciones (MACs, escala logarítmica), un proxy del tiempo. Eje vertical: accuracy.</p>
+          <p>Dos gráficos con los mismos modelos y el mismo eje vertical (accuracy), pero distinto costo en el horizontal. Empezamos por el de la izquierda: operaciones (MACs, escala logarítmica), un proxy del tiempo.</p>
           <p>La frontera de Pareto (verde) son los modelos que nadie supera en las dos cosas a la vez: para mejorar uno, hay que empeorar el otro. Todo lo que está debajo es "dominado": existe otro modelo más rápido y con más accuracy.</p>
           <p>Lo interesante: ni el grande ni el chico están en la frontera. Hay un modelo con 7 veces menos MACs que el grande y casi la misma accuracy, y uno con los mismos MACs que el chico y 5 puntos más.</p>
           <p>Los puntos en ~10 % son combinaciones que rompieron el modelo (comprimir de más, sin reentrenar): adivinan al azar.</p>
-          <p>Y esto es un solo eje de costo. En la práctica hay varios a la vez (tiempo, memoria, energía) y la métrica de desempeño depende del problema (accuracy, IoU, etc.).</p>
+        </aside>
+    </section>
+
+    <section>
+        <h3>Muchas combinaciones posibles</h3>
+        <div style="display: flex; align-items: center; justify-content: center; gap: 2%;">
+            <img data-id="pareto-macs" src="figures/demo_detalle-pareto-macs.png"
+                alt="Accuracy vs. MACs de 299 modelos, con la frontera de Pareto" style="width: 34%; margin: 0;">
+            <img data-id="pareto-params" src="figures/demo_detalle-pareto-params.png"
+                alt="Accuracy vs. parámetros de 299 modelos, con la frontera de Pareto" style="width: 64%; margin: 0;">
+        </div>
+        <p style="font-size: 0.6em; margin-top: 0.3rem;">Cada punto es un modelo: la misma red de partida, con
+            distintas combinaciones de técnicas de compresión.</p>
+        <aside class="notes">
+          <p>Mismos 299 modelos, ahora contra la cantidad de parámetros: un proxy de la memoria (cuánto ocupa el modelo en la flash).</p>
+          <p>La frontera cambia: un modelo puede ser óptimo en un costo y no en el otro. Por ejemplo, los de entrada grande (96×96) con pocos parámetros están en esta frontera, pero hacen muchas más operaciones, así que en la de MACs no aparecen.</p>
+          <p>El chico sigue lejos de la frontera: con sus mismos parámetros hay modelos con 7 puntos más de accuracy (aunque con 9 veces más MACs). El grande queda cerca, pero hay uno con 2.5 veces menos parámetros y casi la misma accuracy.</p>
+          <p>Moraleja: "el mejor modelo" depende de qué recurso escasea en la placa. Y en la práctica hay varios costos a la vez (tiempo, memoria, energía), y la métrica de desempeño depende del problema (accuracy, IoU, etc.).</p>
         </aside>
     </section>
 

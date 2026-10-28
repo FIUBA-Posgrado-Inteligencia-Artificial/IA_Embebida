@@ -74,6 +74,8 @@ clases/figures/demo/gato.png
 clases/figures/demo/mono.png
 clases/figures/demo/pajaro.png
 clases/figures/demo/perro.png
+clases/figures/demo_detalle-pareto-macs.png
+clases/figures/demo_detalle-pareto-params.png
 clases/figures/demo_detalle-pareto.png
 clases/figures/fit_datos_reales.png
 clases/figures/fit_models_1d.png
