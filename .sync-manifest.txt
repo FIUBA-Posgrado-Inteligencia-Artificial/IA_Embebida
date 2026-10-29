@@ -63,6 +63,11 @@ clases/figures/04-capas_de_la_ia.jpeg
 clases/figures/Turing_Test_version_3.png
 clases/figures/_old_ia_ml_ann_dl.png
 clases/figures/costo.png
+clases/figures/cuantizacion-3pasos_8vs4.png
+clases/figures/cuantizacion-funcion_no_uniforme.png
+clases/figures/cuantizacion-funcion_uniforme.png
+clases/figures/cuantizacion-soft.png
+clases/figures/cuantizacion-ste.png
 clases/figures/darts_paper.png
 clases/figures/demo/auto.png
 clases/figures/demo/avion.png
@@ -101,6 +106,7 @@ clases/figures/specific_unsigned_integer.png
 clases/figures/timeline.png
 clases/files/activation_functions.py
 clases/files/big_o_visualization.py
+clases/files/cuantizacion_figuras.py
 clases/files/fit_models_1d.py
 clases/files/linear_regression_simple.py
 clases/files/logistic_regression_simple.py
@@ -129,6 +135,8 @@ clases/outputs/pruning_log_script01.txt
 clases/outputs/pruning_log_script02.txt
 clases/outputs/pruning_log_script03.txt
 clases/outputs/pruning_magnitud.png
+clases/outputs/quantization_barrido_3pasos.png
+clases/outputs/quantization_calibracion_clipping.png
 clases/reveal.js-master/.codespellrc
 clases/reveal.js-master/.github/CONTRIBUTING.md
 clases/reveal.js-master/.github/FUNDING.yml

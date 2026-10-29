@@ -3,6 +3,18 @@
     <section>
         <h2 class="gradient-text">9. Cuantización</h2>
         <p>Reducción de la resolución numérica para optimizar la implementación</p>
+        <ul style="font-size: 0.75em; text-align: left; max-width: 750px; margin: 1.2rem auto;">
+            <li style="margin-bottom: 0.3rem;">Qué es: la función de cuantización y su paso Δ</li>
+            <li style="margin-bottom: 0.3rem;">De Δ al punto fijo: bits enteros y fraccionarios</li>
+            <li style="margin-bottom: 0.3rem;">Esquemas: simetría, estática/dinámica, granularidad</li>
+            <li style="margin-bottom: 0.3rem;">PTQ y QAT</li>
+            <li style="margin-bottom: 0.3rem;">Casos especiales, LLMs y eficiencia en hardware</li>
+            <li>Ejemplo en código: cuantización en 3 pasos, a 8 y a 4 bits</li>
+        </ul>
+        <aside class="notes">
+            <p>La técnica más usada de la materia: casi todo despliegue en embebidos pasa por acá. En la demo, los dos modelos están cuantizados a INT8.</p>
+            <p>Recorrido: primero la idea (la función de cuantización), después cómo se baja a punto fijo (que es lo que corre en un micro), los esquemas posibles, las dos formas de aplicarla (PTQ y QAT), y al final un ejemplo completo con su ejercicio.</p>
+        </aside>
     </section>
 
     <section>
@@ -12,17 +24,16 @@
                 de menor precisión (ej. INT8 en vez de FP32).</p>
             <div
                 style="background: rgba(255,255,255,0.1); padding: 0.8rem; border-radius: 0.5rem; text-align: center; margin: 0.8rem 0; font-size: 1.1em;">
-                <code>x<sub>q</sub> = round(x / Δ) · Δ</code>
+                <code>x<sub>q</sub> = clip(round(x / Δ), q<sub>min</sub>, q<sub>max</sub>) · Δ</code>
             </div>
-            <p>Donde <strong>Δ</strong> es el paso de cuantización (escala) y la operación de redondeo puede ser
-                <code>round</code>, <code>floor</code>, <code>ceil</code>, o <strong>estocástico</strong>.
-            </p>
+            <p><strong>Δ</strong> es el paso de cuantización (escala); <code>round(x / Δ)</code> es el entero que se
+                guarda, y el <code>clip</code> lo limita a lo que entra en los bits disponibles.</p>
             <div style="display: flex; gap: 1.5rem; margin-top: 0.8rem;">
                 <div style="flex: 1;">
                     <p style="color: #50fa7b; margin-bottom: 0.3rem;"><strong>Beneficios:</strong></p>
                     <ul style="font-size: 0.85em;">
-                        <li>Reduce tamaño del modelo 4–8×</li>
-                        <li>Acelera inferencia (aritmética entera)</li>
+                        <li>Reduce el tamaño del modelo 4× (INT8) a 8× (INT4)</li>
+                        <li>Acelera la inferencia (aritmética entera)</li>
                         <li>Menor consumo energético</li>
                     </ul>
                 </div>
@@ -30,89 +41,214 @@
                     <p style="color: #ff5555; margin-bottom: 0.3rem;"><strong>Desafíos:</strong></p>
                     <ul style="font-size: 0.85em;">
                         <li>Pérdida de precisión por discretización</li>
-                        <li>Elección del rango y escala</li>
-                        <li>Sensibilidad variable por capa</li>
+                        <li>Elección del rango y de la escala</li>
+                        <li>Sensibilidad distinta en cada capa</li>
                     </ul>
                 </div>
             </div>
         </div>
+        <aside class="notes">
+            <p>La idea: dividir por Δ "estira" los valores para que el redondeo los lleve a enteros; multiplicar por Δ los devuelve a su escala. Lo que se guarda en memoria es el entero.</p>
+            <p>El clip importa: con b bits hay solo 2<sup>b</sup> enteros posibles, así que lo que se pase del rango satura.</p>
+            <p>El redondeo puede ser round (al más cercano), floor (hacia abajo), ceil (hacia arriba) o estocástico (redondea hacia arriba o abajo con probabilidad según la distancia; útil durante el entrenamiento, porque deja que los pesos se muevan de a poco). Ojo al explicarlo: floor es hacia abajo y ceil hacia arriba.</p>
+            <p>El problema de fondo: entrenamos para minimizar la función de costo, y después modificamos los pesos con un criterio que no la mira. Por eso se pierde precisión.</p>
+        </aside>
+    </section>
+
+    <section>
+        <h3>Ejemplo: elegir Δ</h3>
+        <div style="font-size: 0.7em;">
+            <p style="text-align: left;">Cuatro pesos, cuantizados con <code>round</code> y tres pasos distintos:</p>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 0.4rem;">
+                <thead>
+                    <tr style="border-bottom: 2px solid #fff;">
+                        <th style="padding: 6px;"><code>x</code></th>
+                        <th style="padding: 6px;">0.30</th>
+                        <th style="padding: 6px;">0.80</th>
+                        <th style="padding: 6px;">1.45</th>
+                        <th style="padding: 6px;">1.90</th>
+                        <th style="padding: 6px;">Error máx.</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                        <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">Δ = 1</td>
+                        <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">0</td>
+                        <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">1</td>
+                        <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">1</td>
+                        <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">2</td>
+                        <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2); color: #ff5555;">0.45</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                        <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">Δ = 0.5</td>
+                        <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">0.5</td>
+                        <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">1</td>
+                        <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">1.5</td>
+                        <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">2</td>
+                        <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2); color: #ffb86c;">0.2</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">Δ = 0.125</td>
+                        <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">0.25</td>
+                        <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">0.75</td>
+                        <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">1.5</td>
+                        <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">1.875</td>
+                        <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2); color: #50fa7b;">0.05</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p class="fragment" style="margin-top: 1rem; color: #ffb86c;">¿Por qué no usar siempre un Δ muy chico?</p>
+            <p class="fragment" style="text-align: left;">Con <code>b</code> bits hay solo 2<sup>b</sup> niveles: el
+                rango representable es ≈ 2<sup>b</sup> · Δ. <strong>Achicar Δ mejora la resolución pero achica el
+                    rango</strong>, y lo que queda afuera satura.</p>
+        </div>
+        <aside class="notes">
+            <p>Hacerlo en vivo: preguntar a qué valor va cada peso antes de mostrar la fila.</p>
+            <p>Con Δ = 1 los cuatro pesos quedan en tres valores (0, 1, 2) y el error es grande. A medida que Δ baja, el error baja.</p>
+            <p>Los tres Δ del ejemplo son potencias de 2 (2<sup>0</sup>, 2<sup>-1</sup>, 2<sup>-3</sup>): eso equivale a usar 0, 1 y 3 bits fraccionarios. Es la conexión con la diapo que sigue.</p>
+            <p>La pregunta del final es el compromiso central de toda la sección: con un número fijo de bits, resolución y rango compiten. Todo lo que viene (clipping, bits por capa) es elegir bien ese compromiso.</p>
+        </aside>
+    </section>
+
+    <section>
+        <h3>De Δ al punto fijo</h3>
+        <div style="font-size: 0.7em; text-align: left;">
+            <p>En hardware de punto fijo, Δ es una <strong>potencia de 2</strong>: Δ = 2<sup>−f</sup>. Multiplicar por Δ
+                es correr la coma <code>f</code> lugares (un <em>shift</em>), sin multiplicador.</p>
+            <p style="margin-top: 0.6rem;">Con <code>b</code> bits: 1 de signo, <code>i</code> enteros y <code>f = b − 1 − i</code>
+                fraccionarios. Rango: <code>[−2<sup>i</sup>, 2<sup>i</sup> − Δ]</code>.</p>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 0.5rem; font-size: 0.95em;">
+                <thead>
+                    <tr style="border-bottom: 2px solid #fff;">
+                        <th style="padding: 5px;">8 bits, bits enteros <code>i</code></th>
+                        <th style="padding: 5px;">Δ</th>
+                        <th style="padding: 5px;">Rango</th>
+                        <th style="padding: 5px;">Para valores como...</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                        <td style="padding: 5px; border-bottom-color: rgba(255,255,255,0.2);"><code>i = 3</code></td>
+                        <td style="padding: 5px; border-bottom-color: rgba(255,255,255,0.2);">2<sup>−4</sup> = 0.0625</td>
+                        <td style="padding: 5px; border-bottom-color: rgba(255,255,255,0.2);">[−8, 8)</td>
+                        <td style="padding: 5px; border-bottom-color: rgba(255,255,255,0.2);">activaciones grandes</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                        <td style="padding: 5px; border-bottom-color: rgba(255,255,255,0.2);"><code>i = 0</code></td>
+                        <td style="padding: 5px; border-bottom-color: rgba(255,255,255,0.2);">2<sup>−7</sup> ≈ 0.0078</td>
+                        <td style="padding: 5px; border-bottom-color: rgba(255,255,255,0.2);">[−1, 1)</td>
+                        <td style="padding: 5px; border-bottom-color: rgba(255,255,255,0.2);">pesos de una capa típica</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px; border-bottom-color: rgba(255,255,255,0.2);"><code>i = −2</code></td>
+                        <td style="padding: 5px; border-bottom-color: rgba(255,255,255,0.2);">2<sup>−9</sup> ≈ 0.0020</td>
+                        <td style="padding: 5px; border-bottom-color: rgba(255,255,255,0.2);">[−0.25, 0.25)</td>
+                        <td style="padding: 5px; border-bottom-color: rgba(255,255,255,0.2);">sesgos con máx. 0.13</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p class="fragment" style="margin-top: 0.7rem; color: #ffb86c;">Bits enteros negativos: la coma queda
+                <em>a la izquierda</em> del primer bit, como si hubiera ceros implícitos. Sirven para valores chicos.</p>
+        </div>
+        <aside class="notes">
+            <p>La función genérica acepta cualquier Δ, y muchos frameworks (TFLite, PyTorch) usan escalas arbitrarias: después hay que reescalar con una multiplicación entera y un shift. En punto fijo puro, Δ es 2<sup>−f</sup> y el reescalado es solo un shift.</p>
+            <p>Los <code>b</code> bits se reparten entre signo, parte entera y parte fraccionaria. Más bits enteros = más rango, menos resolución (el compromiso de la diapo anterior).</p>
+            <p>Bits enteros negativos (la pregunta de la edición pasada que quedó en el aire): con <code>i = −2</code>, el primer bit después del signo ya vale 2<sup>−3</sup>. Es como si la coma estuviera 2 lugares a la izquierda, con dos ceros que no se guardan. Se usan cuando todos los valores son chicos (sesgos, por ejemplo), para no desperdiciar bits.</p>
+            <p>Referencia INT8: un entero con signo va de −128 a 127; si se quiere simetría exacta, se descarta el −128 y queda de −127 a 127.</p>
+            <p>Es el formato Qm.n de la intro para CEIA: acá <code>m = i</code> y <code>n = f</code>.</p>
+        </aside>
     </section>
 
     <section>
         <h3>Función de cuantización</h3>
-        <div style="display: flex; gap: 2rem; align-items: center;">
-            <div style="flex: 1; font-size: 0.7em; text-align: left;">
-                <p>Función por tramos constantes que mapea valores continuos a un conjunto finito de niveles:</p>
-                <div style="display: flex; gap: 1rem; margin-top: 0.8rem;">
-                    <div style="flex: 1; background: rgba(80,250,123,0.1); padding: 0.8rem; border-radius: 0.5rem;">
-                        <strong style="color: #50fa7b;">Uniforme</strong>
-                        <ul style="font-size: 0.85em; margin-top: 0.3rem;">
-                            <li>Intervalos iguales, niveles equiespaciados.</li>
-                            <li>Compatible con aritmética matemática estándar.</li>
-                            <li>Simple en hardware.</li>
-                        </ul>
-                    </div>
-                    <div style="flex: 1; background: rgba(255,121,198,0.1); padding: 0.8rem; border-radius: 0.5rem;">
-                        <strong style="color: #ff79c6;">No uniforme</strong>
-                        <ul style="font-size: 0.85em; margin-top: 0.3rem;">
-                            <li>Intervalos adaptados a la distribución.</li>
-                            <li>Mayor precisión con pocos niveles.</li>
-                            <li>Más compleja en HW.</li>
-                        </ul>
-                    </div>
+        <div style="display: flex; gap: 1.5rem; align-items: center;">
+            <div style="flex: 1; font-size: 0.68em; text-align: left;">
+                <p>Función <strong>no decreciente y constante por tramos</strong>, que mapea valores continuos a un
+                    conjunto finito de niveles:</p>
+                <div style="background: rgba(80,250,123,0.1); padding: 0.7rem; border-radius: 0.5rem; margin-top: 0.6rem;">
+                    <strong style="color: #50fa7b;">Uniforme</strong>
+                    <ul style="font-size: 0.9em; margin-top: 0.3rem;">
+                        <li>Niveles equiespaciados (paso Δ constante).</li>
+                        <li>Se implementa con aritmética entera / punto fijo.</li>
+                        <li>Es la que se usa en la práctica.</li>
+                    </ul>
+                </div>
+                <div style="background: rgba(255,121,198,0.1); padding: 0.7rem; border-radius: 0.5rem; margin-top: 0.6rem;">
+                    <strong style="color: #ff79c6;">No uniforme</strong>
+                    <ul style="font-size: 0.9em; margin-top: 0.3rem;">
+                        <li>Niveles adaptados a la distribución.</li>
+                        <li>Se guarda una tabla de valores y un índice por peso.</li>
+                        <li>Comprime memoria, pero hay que decodificar para operar.</li>
+                    </ul>
                 </div>
             </div>
-            <div style="flex: 0.8;">
-                <img src="./figures/specific_quantization_function_uniform.png"
-                    style="width: 100%; background: white; border-radius: 0.5rem; margin-bottom: 0.5rem;">
-                <img src="./figures/specific_quantization_function_nonuniform.png"
-                    style="width: 100%; background: white; border-radius: 0.5rem;">
+            <div style="flex: 1;">
+                <img src="./figures/cuantizacion-funcion_uniforme.png" style="max-height: 245px; border-radius: 0.5rem; margin: 0 0 0.4rem;">
+                <img src="./figures/cuantizacion-funcion_no_uniforme.png" style="max-height: 245px; border-radius: 0.5rem; margin: 0;">
             </div>
         </div>
+        <aside class="notes">
+            <p>Cualquier función de cuantización es escalonada: no decreciente y constante por tramos. Queda definida por dónde están los saltos (umbrales) y a qué valor va cada escalón (niveles).</p>
+            <p>Uniforme: umbrales y niveles equiespaciados. Es la que corre directo en hardware de punto fijo o entero. Ojo con decir "compatible con punto flotante": es al revés, lo que la hace útil es que no necesita punto flotante.</p>
+            <p>No uniforme: niveles más densos donde hay más valores (cerca de cero). Se usaba guardando una tabla con los valores posibles y un índice por peso. Ejemplo: 100 000 pesos con 4 valores distintos se guardan como 4 números de 32 bits más 100 000 índices de 2 bits, en lugar de 100 000 × 32 bits.</p>
+            <p>Eso es weight sharing; vuelve a aparecer con la codificación (Huffman).</p>
+        </aside>
     </section>
 
     <section>
         <h3>Esquemas de cuantización</h3>
-        <div style="font-size: 0.65em; text-align: left;">
+        <div style="font-size: 0.62em; text-align: left;">
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                 <div style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px;">
                     <strong style="color: #8be9fd;">Simétrica vs. asimétrica</strong>
-                    <p style="margin: 0.3rem 0 0;">Simétrica: niveles centrados en 0 (ideal para pesos).
-                        Asimétrica: permite un <em>zero-point</em> para rangos no centrados.</p>
+                    <p style="margin: 0.3rem 0 0;">Simétrica: rango centrado en 0 (ej. INT8 de −127 a 127; ideal para
+                        pesos). Asimétrica: agrega un <em>zero-point</em> para rangos no centrados (ej. activaciones
+                        ReLU, de 0 a un máximo, en UINT8 de 0 a 255).</p>
                 </div>
                 <div style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px;">
                     <strong style="color: #50fa7b;">Estática vs. dinámica</strong>
-                    <p style="margin: 0.3rem 0 0;">Estática: rangos fijados en calibración. Dinámica: rangos
-                        recalculados en tiempo real (más precisa, más costosa).</p>
+                    <p style="margin: 0.3rem 0 0;">Estática: los rangos de las activaciones se fijan antes, en la
+                        calibración. Dinámica: se calculan en ejecución, con cada entrada (más precisa, más costosa).</p>
                 </div>
                 <div style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px;">
                     <strong style="color: #ff79c6;">Granularidad</strong>
-                    <p style="margin: 0.3rem 0 0;">Por tensor (una escala para toda la capa), por canal (una por canal),
-                        o por bloque. Mayor granularidad = mejor adaptación.</p>
+                    <p style="margin: 0.3rem 0 0;">Una escala para toda la red (global) → por tipo de tensor → por
+                        capa → por canal. Más fina = mejor adaptación, pero más complejo de implementar.</p>
                 </div>
                 <div style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px;">
-                    <strong style="color: #ffb86c;">Precisión</strong>
-                    <p style="margin: 0.3rem 0 0;">INT8 (estándar), INT4 (agresiva), binaria/ternaria (extrema).
-                        A menor precisión, mayor compresión pero más riesgo.</p>
+                    <strong style="color: #ffb86c;">Qué se cuantiza</strong>
+                    <p style="margin: 0.3rem 0 0;">En cada capa, tres cosas por separado: pesos, sesgos y
+                        activaciones. Las activaciones también, porque son la entrada de la capa siguiente.</p>
                 </div>
             </div>
         </div>
+        <aside class="notes">
+            <p>Simetría: en punto fijo el cero no puede estar en cualquier lado. Simétrica para pesos (distribución centrada en 0). Asimétrica (zero-point) para activaciones después de una ReLU, que son todas positivas: si no, se desperdicia el bit de signo.</p>
+            <p>Estática vs. dinámica: en la estática todo queda fijo antes de desplegar. En la dinámica la escala de las activaciones se calcula sobre la marcha para cada entrada; hay que guardar los valores sin cuantizar hasta conocer el máximo, y eso cuesta memoria y tiempo. En PyTorch, por ejemplo, la dinámica solo cuantiza capas densas y recurrentes, no convoluciones (es una limitación de la implementación).</p>
+            <p>Granularidad, de menos a más fina:</p>
+            <ul>
+                <li>global: la misma aritmética para toda la red;</li>
+                <li>por tipo de tensor: una para pesos, otra para sesgos, otra para activaciones;</li>
+                <li>por capa (precisión mixta): lo más usado, funciona bien;</li>
+                <li>por canal: estándar para los pesos de convoluciones en TFLite y PyTorch.</li>
+            </ul>
+            <p>Más granularidad, mejor precisión, pero la red pierde uniformidad: hay que alinear comas (shifts) entre capas con distinta aritmética.</p>
+            <p>Para cuantizar las activaciones hacen falta sus rangos, y eso solo se conoce pasando datos por la red. De ahí la calibración.</p>
+        </aside>
     </section>
 
     <!-- ===================== PTQ ===================== -->
 
     <section>
-        <h3>Post-Training Quantization (PTQ)</h3>
+        <h3>Post-training quantization (PTQ)</h3>
         <div style="font-size: 0.7em; text-align: left;">
             <p>Cuantización aplicada <strong>después</strong> del entrenamiento, sin reentrenar el modelo:</p>
             <ol style="margin-top: 0.5rem;">
-                <li style="margin-bottom: 0.4rem;"><strong>Calibración:</strong> ejecutar el modelo sobre un subconjunto
-                    pequeño
-                    para estimar rangos de pesos y activaciones.</li>
-                <li style="margin-bottom: 0.4rem;"><strong>Determinar parámetros:</strong> seleccionar escala y
-                    desplazamiento para cada tensor.</li>
-                <li><strong>Aplicar cuantización:</strong> transformar el modelo a representación de menor precisión.
-                </li>
+                <li style="margin-bottom: 0.4rem;"><strong>Calibración:</strong> pasar un subconjunto pequeño de datos
+                    (reales o sintéticos) por la red para estimar los rangos de las activaciones.</li>
+                <li style="margin-bottom: 0.4rem;"><strong>Parámetros:</strong> elegir escala (y zero-point) para cada
+                    tensor.</li>
+                <li><strong>Aplicar:</strong> convertir el modelo a la representación de menor precisión.</li>
             </ol>
             <div style="display: flex; gap: 1.5rem; margin-top: 1rem;">
                 <div style="flex: 1;">
@@ -120,64 +256,75 @@
                     <ul style="font-size: 0.9em;">
                         <li>Simple y rápido</li>
                         <li>No requiere reentrenamiento</li>
-                        <li>No necesita dataset completo</li>
+                        <li>No necesita el dataset etiquetado</li>
                     </ul>
                 </div>
                 <div style="flex: 1;">
                     <p style="color: #ff5555;"><strong>✗ Limitaciones:</strong></p>
                     <ul style="font-size: 0.9em;">
-                        <li>Posible pérdida de precisión</li>
-                        <li>Difícil con cuantización agresiva (&lt;8 bits)</li>
-                        <li>Calibración inadecuada → errores sistemáticos</li>
+                        <li>Más pérdida de precisión que QAT</li>
+                        <li>Difícil por debajo de 8 bits</li>
+                        <li>Mala calibración → errores sistemáticos</li>
                     </ul>
                 </div>
             </div>
         </div>
+        <aside class="notes">
+            <p>Se toma la red ya entrenada, se miden estadísticas (máximo, mínimo, percentiles) de pesos y activaciones, se elige la aritmética de cada tensor y se cuantiza. Nada de backpropagation.</p>
+            <p>Para los pesos alcanza con mirarlos. Para las activaciones hay que pasar datos. Si no hay dataset (por la razón que sea), sirven imágenes sintéticas o incluso aleatorias: lo que hace falta es una idea razonable de los rangos, no las etiquetas.</p>
+            <p>A 8 bits suele andar muy bien. Por debajo (6, 4 bits) empieza a fallar, y una mala calibración (datos poco representativos) da errores sistemáticos, aunque se pueden detectar y recalibrar.</p>
+            <p>Es lo que se usó en la demo: PTQ a INT8 con la herramienta de Espressif (esp-ppq).</p>
+        </aside>
     </section>
 
     <!-- ===================== QAT ===================== -->
 
     <section>
-        <h3>Quantization-Aware Training (QAT)</h3>
+        <h3>Quantization-aware training (QAT)</h3>
         <div style="font-size: 0.7em; text-align: left;">
-            <p>Se simulan los efectos de cuantización <strong>durante</strong> el entrenamiento,
-                permitiendo que el modelo se adapte:</p>
+            <p>Se parte del modelo entrenado y se hace un <strong>fine-tuning corto</strong> simulando la cuantización,
+                para que el modelo se adapte:</p>
             <ol style="margin-top: 0.5rem;">
                 <li style="margin-bottom: 0.4rem;"><strong>Forward pass:</strong> pesos y activaciones se cuantizan
-                    con funciones de <em>fake quantization</em>.</li>
+                    con <em>fake quantization</em>: se cuantizan para calcular, pero los pesos se siguen guardando en FP32.</li>
                 <li style="margin-bottom: 0.4rem;"><strong>Backward pass:</strong> como la cuantización no es
-                    diferenciable,
-                    se usa el <strong>Straight-Through Estimator (STE)</strong>.</li>
-                <li><strong>Resultado:</strong> red optimizada para operar con precisión reducida.</li>
+                    diferenciable, se usa el <strong>straight-through estimator (STE)</strong>.</li>
+                <li>Al terminar, se cuantizan los pesos de verdad y se exporta el modelo.</li>
             </ol>
+            <p class="fragment" style="margin-top: 1rem; color: #ffb86c;">¿Por qué no guardar directamente los pesos
+                cuantizados durante el entrenamiento?</p>
         </div>
+        <aside class="notes">
+            <p>Típicamente son pocas épocas (1 a 5) con learning rate bajo, no un entrenamiento desde cero.</p>
+            <p>Respuesta a la pregunta: los gradientes son chiquitos. Si los pesos se guardaran cuantizados, cada actualización movería el peso un poquito y al volver a cuantizarlo caería en el mismo nivel: el peso no se movería nunca (salvo los que están justo en un umbral). Por eso se guarda la copia en FP32 y se cuantiza solo para calcular.</p>
+            <p>Acá es donde sirve el redondeo estocástico: deja que los pesos crucen umbrales aunque el gradiente sea chico.</p>
+            <p>Si alguien diseña una capa nueva, no alcanza con cuantizar sus pesos: hay que definir cómo se propaga el gradiente a través de la cuantización.</p>
+        </aside>
     </section>
 
     <section>
-        <h3>Straight-Through Estimator (STE)</h3>
-        <div style="display: flex; gap: 2rem; align-items: center;">
-            <div style="flex: 1; font-size: 0.7em; text-align: left;">
-                <p>La función de cuantización es <strong>no diferenciable</strong> (saltos discretos).
-                    El STE la aproxima como la identidad durante el backward pass:</p>
-                <div
-                    style="background: rgba(255,255,255,0.1); padding: 0.8rem; border-radius: 0.5rem; text-align: center; margin: 0.8rem 0; font-size: 1.2em;">
-                    <code>∂round(x)/∂x ≈ 1</code>
-                </div>
-                <ul style="font-size: 0.85em;">
-                    <li style="margin-bottom: 0.3rem;">Permite que los gradientes fluyan a través de la cuantización.
-                    </li>
-                    <li style="margin-bottom: 0.3rem;">Es una aproximación heurística pero funciona bien en la práctica.
-                    </li>
-                    <li>Alternativas: <em>soft quantization</em> (funciones suaves diferenciables).</li>
-                </ul>
-            </div>
-            <div style="flex: 0.7;">
-                <img src="./figures/specific_ste.png"
-                    style="width: 100%; background: white; border-radius: 0.5rem; margin-bottom: 0.5rem;">
-                <img src="./figures/specific_soft_quantization.png"
-                    style="width: 100%; background: white; border-radius: 0.5rem;">
+        <h3>Straight-through estimator (STE)</h3>
+        <div style="font-size: 0.68em; text-align: left;">
+            <p>La función de cuantización es <strong>no diferenciable</strong>: su derivada es 0 en casi todos lados
+                y no está definida en los saltos. El STE usa la identidad en el backward pass:</p>
+            <div
+                style="background: rgba(255,255,255,0.1); padding: 0.6rem; border-radius: 0.5rem; text-align: center; margin: 0.6rem 0; font-size: 1.15em;">
+                <code>∂round(x)/∂x ≈ 1</code>
             </div>
         </div>
+        <div style="display: flex; gap: 1rem; align-items: center;">
+            <img src="./figures/cuantizacion-ste.png" style="width: 62%; border-radius: 0.5rem; margin: 0;">
+            <div style="width: 36%; font-size: 0.6em; text-align: left;">
+                <img src="./figures/cuantizacion-soft.png" style="width: 100%; border-radius: 0.5rem; margin: 0;">
+                <p style="margin: 0.3rem 0 0;">Alternativa: <em>soft quantization</em>, una versión suave que sí tiene
+                    derivada.</p>
+            </div>
+        </div>
+        <aside class="notes">
+            <p>Backpropagation necesita la derivada de cada operación. La de una escalera es 0 en los tramos planos y no existe en los saltos: con eso no se puede entrenar.</p>
+            <p>El STE hace trampa: en el forward usa la escalera (verde), en el backward hace como si fuera la identidad (naranja), o sea, derivada 1. Es una heurística, pero funciona muy bien y es lo que usan casi todos los frameworks.</p>
+            <p>Alternativa: reemplazar la escalera por una función suave (suma de sigmoides) cuya pendiente se va endureciendo durante el entrenamiento (T más chico = más parecida a la escalera).</p>
+        </aside>
     </section>
 
     <section>
@@ -192,294 +339,368 @@
             </thead>
             <tbody>
                 <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
-                    <td style="padding: 10px;"><strong>Reentrenamiento</strong></td>
-                    <td style="padding: 10px;">No</td>
-                    <td style="padding: 10px;">Sí</td>
+                    <td style="padding: 10px; border-bottom-color: rgba(255,255,255,0.2);"><strong>Reentrenamiento</strong></td>
+                    <td style="padding: 10px; border-bottom-color: rgba(255,255,255,0.2);">No</td>
+                    <td style="padding: 10px; border-bottom-color: rgba(255,255,255,0.2);">Fine-tuning de pocas épocas</td>
                 </tr>
                 <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
-                    <td style="padding: 10px;"><strong>Precisión alcanzable</strong></td>
-                    <td style="padding: 10px;">Buena (≥8 bits)</td>
-                    <td style="padding: 10px;">Excelente (incluso ≤4 bits)</td>
+                    <td style="padding: 10px; border-bottom-color: rgba(255,255,255,0.2);"><strong>Precisión alcanzable</strong></td>
+                    <td style="padding: 10px; border-bottom-color: rgba(255,255,255,0.2);">Buena a 8 bits</td>
+                    <td style="padding: 10px; border-bottom-color: rgba(255,255,255,0.2);">Mejor; suele hacer falta a ≤ 4 bits</td>
                 </tr>
                 <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
-                    <td style="padding: 10px;"><strong>Datos necesarios</strong></td>
-                    <td style="padding: 10px;">Subconjunto de calibración</td>
-                    <td style="padding: 10px;">Dataset completo</td>
+                    <td style="padding: 10px; border-bottom-color: rgba(255,255,255,0.2);"><strong>Datos necesarios</strong></td>
+                    <td style="padding: 10px; border-bottom-color: rgba(255,255,255,0.2);">Subconjunto de calibración (puede ser sintético)</td>
+                    <td style="padding: 10px; border-bottom-color: rgba(255,255,255,0.2);">Datos reales etiquetados</td>
                 </tr>
-                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
-                    <td style="padding: 10px;"><strong>Costo computacional</strong></td>
-                    <td style="padding: 10px;">Bajo</td>
-                    <td style="padding: 10px;">Alto (como reentrenar)</td>
+                <tr>
+                    <td style="padding: 10px; border-bottom-color: rgba(255,255,255,0.2);"><strong>Costo computacional</strong></td>
+                    <td style="padding: 10px; border-bottom-color: rgba(255,255,255,0.2);">Bajo</td>
+                    <td style="padding: 10px; border-bottom-color: rgba(255,255,255,0.2);">Medio (unas épocas de entrenamiento)</td>
                 </tr>
             </tbody>
         </table>
         <p style="font-size: 0.65em; margin-top: 0.8rem; color: #ffb86c;">
-            Regla general: PTQ primero (es gratis). Si no alcanza, pasar a QAT.
+            Regla general: PTQ primero (es casi gratis). Si no alcanza, pasar a QAT.
         </p>
+        <aside class="notes">
+            <p>PTQ no toca el entrenamiento: es barato y no necesita etiquetas. QAT corrige buena parte de la pérdida con un fine-tuning corto, pero necesita datos reales y algo de cómputo.</p>
+            <p>Un efecto curioso que van a ver en el ejemplo: a veces el modelo con QAT supera al FP32 original. Se asocia a un efecto de regularización (parecido a dropout): el ruido de cuantización le "saca vicios" al modelo y generaliza un poco mejor. En modelos chicos pasa bastante.</p>
+            <p>No siempre se puede hacer QAT: depende de que el framework de despliegue lo soporte. En la demo, la herramienta de Espressif solo hace PTQ; para QAT hay que usar torchao o brevitas y convertir.</p>
+        </aside>
     </section>
 
-    <!-- ===================== ESTADO DEL ARTE Y CASOS ===================== -->
+    <!-- ===================== CASOS ESPECIALES ===================== -->
 
     <section>
-        <h3>Hitos y Casos Especiales</h3>
+        <h3>Hitos y casos especiales</h3>
         <div style="font-size: 0.6em; text-align: left;">
             <div style="display: flex; flex-direction: column; gap: 8px;">
                 <div style="display: flex; gap: 10px; align-items: flex-start;">
-                    <span style="color: #ff79c6; font-weight: bold; min-width: 100px;">8 Bits</span>
-                    <span><strong>El estándar (INT-only):</strong> Base de TensorFlow Lite, TensorRT. Se fusionan
-                        operaciones (ej. BatchNorm) con las capas convolucionales, perdiendo &lt;1% de precisión
-                        comparado con FP32.</span>
+                    <span style="color: #ff79c6; font-weight: bold; min-width: 100px;">8 bits</span>
+                    <span><strong>El estándar (solo enteros):</strong> lo usan TensorFlow Lite, TensorRT, ESP-DL y casi
+                        todo runtime embebido. Típicamente pierde menos de 1 % frente a FP32.</span>
                 </div>
                 <div style="display: flex; gap: 10px; align-items: flex-start;">
-                    <span style="color: #8be9fd; font-weight: bold; min-width: 100px;">≤ 4 Bits</span>
-                    <span><strong>Ultra-baja precisión:</strong> Aparecen <em>outliers</em> que complican la exactitud.
-                        Requieren esquemas de precisión mixta (ej. HAWQ, HAQ).</span>
+                    <span style="color: #8be9fd; font-weight: bold; min-width: 100px;">≤ 4 bits</span>
+                    <span><strong>Ultra baja precisión:</strong> los <em>outliers</em> complican la exactitud y suele
+                        hacer falta precisión mixta (ej. HAWQ, HAQ). Para ahorrar memoria de verdad hay que
+                        <em>empaquetar</em> varios valores por byte.</span>
                 </div>
                 <div style="display: flex; gap: 10px; align-items: flex-start;">
                     <span style="color: #50fa7b; font-weight: bold; min-width: 100px;">Ternarias</span>
-                    <span><strong>Redes ternarias:</strong> Valores en {-1, 0, 1}. Permiten "apagar" conexiones para
-                        ahorrar muchísimas operaciones.</span>
+                    <span><strong>Redes ternarias:</strong> pesos en {−1, 0, +1}. El 0 permite "apagar" conexiones y
+                        ahorrar operaciones.</span>
                 </div>
                 <div style="display: flex; gap: 10px; align-items: flex-start;">
                     <span style="color: #bd93f9; font-weight: bold; min-width: 100px;">Binarias</span>
-                    <span><strong>Redes binarizadas:</strong> Pesos en {-1, +1}. Reemplaza multiplicaciones con
-                        compuertas XNOR (XNOR-Net). Gran degradación pero una inmensa aceleración en hardware
-                        genérico.</span>
+                    <span><strong>Redes binarizadas:</strong> pesos en {−1, +1}. Las multiplicaciones se reemplazan
+                        por XNOR y conteo de bits (XNOR-Net). Mucha degradación, pero una aceleración enorme en FPGAs y
+                        hardware dedicado.</span>
                 </div>
             </div>
         </div>
+        <aside class="notes">
+            <p>8 bits: el punto dulce. Casi cualquier hardware embebido tiene aritmética de 8 bits, y la pérdida es chica.</p>
+            <p>Por debajo de 8 bits hay una trampa: si no se hace nada especial, cada valor se sigue guardando en una variable de 8 bits (int8_t), así que no se ahorra memoria. Hay que empaquetar (dos valores de 4 bits por byte) y desempaquetar al operar, y eso requiere soporte del runtime.</p>
+            <p>A 4 bits o menos ya nada funciona "directo": hay que elegir bits por capa a mano o con herramientas (HAWQ usa la sensibilidad de cada capa; HAQ, búsqueda con el costo de hardware en el lazo).</p>
+            <p>Binarias: si los pesos son ±1, un MAC es sumar o restar. Si además las activaciones son ±1, es un XNOR y un conteo de unos. En FPGAs y ASICs eso es muchísimo más barato (FINN, de AMD/Xilinx); en una CPU genérica el beneficio es mucho menor.</p>
+            <p>Un compromiso posible: como la red quedó tan barata, se le pueden agregar capas o canales para recuperar precisión.</p>
+        </aside>
     </section>
 
-    <!-- Slide added about CNN specifics based on the previous conversation about this file -->
+    <section>
+        <h3>Cuantización en LLMs</h3>
+        <div style="font-size: 0.68em; text-align: left;">
+            <ul>
+                <li style="margin-bottom: 0.5rem;"><strong>Solo pesos (weight-only):</strong> pesos en 8 o 4 bits,
+                    activaciones en FP16. Generar texto está limitado por el ancho de banda de memoria (cada token lee
+                    todos los pesos), así que achicar los pesos acelera aunque las cuentas sigan en FP16.</li>
+                <li style="margin-bottom: 0.5rem;"><strong>Métodos PTQ específicos:</strong> GPTQ y AWQ cuantizan a
+                    4 bits capa por capa, compensando el error con pocos datos de calibración.</li>
+                <li style="margin-bottom: 0.5rem;"><strong>Outliers en las activaciones:</strong> unas pocas
+                    dimensiones con valores enormes rompen INT8 ingenuo; LLM.int8() las separa y las calcula en FP16.</li>
+                <li><strong>En una PC o en el edge:</strong> llama.cpp (formato GGUF, Q4/Q8) es lo que permite correr
+                    un modelo de 7 B parámetros en una laptop: ~14 GB en FP16, ~4 GB en 4 bits.</li>
+            </ul>
+        </div>
+        <aside class="notes">
+            <p>Lo mismo que vimos, a otra escala. La diferencia es qué limita: en un LLM generando texto, el cuello de botella es leer los pesos de memoria para cada token, no hacer las cuentas. Por eso cuantizar solo los pesos ya da casi toda la ganancia.</p>
+            <p>GPTQ (Frantar et al., 2022) y AWQ (Lin et al., 2023) son PTQ: no reentrenan, usan unas pocas muestras de calibración. Son los que se ven en los modelos "-GPTQ" o "-AWQ" de Hugging Face.</p>
+            <p>LLM.int8() (Dettmers et al., 2022) mostró que a partir de cierto tamaño aparecen dimensiones de activación con valores enormes; cuantizarlas en INT8 con todo el resto destruye el modelo, así que se tratan aparte.</p>
+            <p>Para el TP: si alguien quiere un SLM en una Raspberry o una mini-PC, llama.cpp con un modelo en 4 bits es el camino directo.</p>
+        </aside>
+    </section>
+
     <section>
         <h3>Consideraciones en CNNs</h3>
         <div style="font-size: 0.7em; text-align: left;">
             <ul style="line-height: 1.5;">
-                <li style="margin-bottom: 0.8rem;"><strong style="color: #8be9fd;">Precisión Mixta /
-                        Sensibilidad:</strong> La primera capa (extracción de features iniciales) y la última
-                    (clasificación), son típicamente las más sensibles (usualmente cuantizadas a 8-bit). Las capas
-                    ocultas centrales toleran cuantización más agresiva (ej. 4-bit).</li>
-                <li style="margin-bottom: 0.8rem;"><strong style="color: #50fa7b;">Conv2D vs Dense:</strong>
+                <li style="margin-bottom: 0.8rem;"><strong style="color: #8be9fd;">Sensibilidad por capa:</strong> la
+                    primera capa (extrae las features iniciales) y la última (clasifica) son típicamente las más
+                    sensibles, y se dejan en 8 bits. Las capas intermedias toleran cuantización más agresiva (ej. 4 bits).</li>
+                <li style="margin-bottom: 0.8rem;"><strong style="color: #50fa7b;">Convoluciones vs. densas:</strong>
                     <ul style="font-size: 0.9em; margin-top:0.3rem;">
-                        <li><strong>Conv2D:</strong> Dominan el <em>throughput</em> debido a la inmensa cantidad de
-                            operaciones por parámetro. Prioritarias para optimizar en aceleradores.</li>
-                        <li><strong>Dense (Fully Connected):</strong> Acaparan la mayor parte del tamaño de
-                            almacenamiento y ancho de banda de la red pero aportan pocas operaciones.</li>
+                        <li><strong>Convoluciones:</strong> pocos parámetros pero muchas operaciones por parámetro.
+                            Bajar sus bits es lo que más acelera.</li>
+                        <li><strong>Densas:</strong> en redes como LeNet o VGG concentran la mayoría de los parámetros,
+                            así que bajar sus bits es lo que más ahorra memoria. En CNNs modernas con <em>global average
+                            pooling</em> (como las de la demo) son una parte chica.</li>
                     </ul>
                 </li>
             </ul>
         </div>
+        <aside class="notes">
+            <p>Sensibilidad: un error en la primera capa se propaga por toda la red, y la última decide directamente la clase. En el ejemplo que viene, el paso 3 deja justamente esas dos en más bits.</p>
+            <p>Convoluciones vs. densas: lo que vimos en la intro de IA embebida. En el LeNet del ejemplo, las densas tienen la mayoría de los parámetros. En el modelo grande de la demo, la densa es 1 k de 60 k parámetros: ahí la memoria también está en las convoluciones.</p>
+            <p>Conclusión: no hay regla fija; hay que mirar dónde están los parámetros y los MACs de cada red concreta.</p>
+        </aside>
     </section>
 
-    <!-- Paso 1: Cuantización Uniforme -->
     <section>
-        <h3>Ejemplo: Paso 1 — Cuantización Uniforme</h3>
-        <div style="font-size: 0.72em; text-align: left;">
-            <p><strong>Mismos bits totales</strong> Y <strong>mismos bits enteros</strong> para todas las capas: se toma
-                el peor caso global (máximo de todos los rangos de pesos y activaciones) y se aplica uniformemente.</p>
-            <div style="display: flex; gap: 1rem; margin-top: 0.8rem;">
-                <div style="flex: 1; background: rgba(255,255,255,0.07); padding: 0.7rem; border-radius: 0.5rem;">
-                    <p style="color: #8be9fd; margin: 0 0 0.3rem;"><strong>Ventaja</strong></p>
-                    <p style="margin: 0; font-size: 0.95em;">Configuración trivial: un solo parámetro global de escala.
-                        Sin calibración por capa.</p>
+        <h3>Cuantizar no siempre acelera</h3>
+        <div style="font-size: 0.66em; text-align: left;">
+            <p>Reducir bits achica el modelo, pero el tiempo depende de la plataforma:</p>
+            <ul style="margin-top: 0.4rem;">
+                <li style="margin-bottom: 0.4rem;">Si el runtime no tiene kernels enteros para una capa, la
+                    <strong>de-cuantiza</strong> y la calcula en flotante: se suma una conversión.</li>
+                <li style="margin-bottom: 0.4rem;">Entre capas con aritmética distinta hay que <strong>re-escalar</strong>
+                    (shifts, multiplicaciones enteras).</li>
+                <li style="margin-bottom: 0.4rem;">Por debajo de 8 bits, sin empaquetado ni instrucciones dedicadas, no
+                    se gana ni memoria ni tiempo.</li>
+            </ul>
+            <div style="display: flex; gap: 1rem; margin-top: 0.6rem;">
+                <div style="flex: 1; background: rgba(255,85,85,0.1); padding: 0.7rem; border-radius: 0.5rem;">
+                    <p style="color: #ff5555; margin: 0 0 0.3rem;"><strong>TP de la edición pasada</strong></p>
+                    <p style="margin: 0;">CNN de audio en CPU: la versión INT8 ocupó mucho menos, pero tuvo
+                        <strong>más latencia y más memoria pico</strong> que FP32.</p>
                 </div>
-                <div style="flex: 1; background: rgba(255,255,255,0.07); padding: 0.7rem; border-radius: 0.5rem;">
-                    <p style="color: #ff5555; margin: 0 0 0.3rem;"><strong>Desventaja</strong></p>
-                    <p style="margin: 0; font-size: 0.95em;">Las capas con rangos pequeños "desperdician" bits enteros
-                        en valores que nunca ocurren → menos resolución fraccionaria.</p>
+                <div style="flex: 1; background: rgba(80,250,123,0.1); padding: 0.7rem; border-radius: 0.5rem;">
+                    <p style="color: #50fa7b; margin: 0 0 0.3rem;"><strong>La demo</strong></p>
+                    <p style="margin: 0;">En el ESP32, ESP-DL tiene kernels INT8 (y SIMD en el S3): ahí INT8 sí es
+                        mucho más rápido.</p>
                 </div>
             </div>
-            <div
-                style="background: rgba(255,255,255,0.1); padding: 0.7rem; border-radius: 0.5rem; margin-top: 0.8rem; font-size: 0.9em;">
-                <code>w_int = ceil(log₂(max_global_weight))  ← igual para todas las capas</code>
-            </div>
-            <div style="text-align: center; margin-top: 0.6rem;">
-                <img src="outputs/cnn_3pasos_comparacion.png" style="max-height: 190px; border-radius: 0.4rem;"
-                    onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
-                <p style="display:none; color: #ffb86c; font-style: italic; font-size: 0.9em;">⚠️ Ejecutar
-                    <code>script02.py</code> para generar la figura
-                </p>
-            </div>
+            <p style="margin-top: 0.7rem; color: #ffb86c;">Moraleja: medir siempre en la plataforma de destino.</p>
         </div>
+        <aside class="notes">
+            <p>Un error común es suponer que menos bits implica automáticamente menos tiempo. Pasa solo si la plataforma tiene operaciones enteras para esas capas y el runtime las usa.</p>
+            <p>El caso del TP de la edición pasada: en una PC, la versión INT8 de una CNN de audio ocupó mucho menos, pero tardó más y usó más memoria pico que FP32; la cuantización dinámica fue la más balanceada. Probable causa: conversiones entre INT8 y flotante en capas sin kernel entero.</p>
+            <p>Cómo medir bien: varias corridas, descartar las primeras (warm-up), medir solo el modelo (sin preprocesamiento ni E/S), y reportar media y dispersión.</p>
+        </aside>
     </section>
 
-    <!-- Paso 2: Precisión Mixta en Bits Enteros -->
-    <section>
-        <h3>Ejemplo: Paso 2 — Precisión Mixta en Bits Enteros</h3>
-        <div style="font-size: 0.72em; text-align: left;">
-            <p><strong>Mismos bits totales</strong> para todas las capas, pero <strong>bits enteros per-capa</strong>
-                derivados de la distribución real de cada capa. Se puede usar el rango máximo (max), el percentil 95
-                (p95) o el 75 (p75).</p>
-            <div style="display: flex; gap: 1rem; margin-top: 0.8rem;">
-                <div style="flex: 1; background: rgba(80,250,123,0.08); padding: 0.7rem; border-radius: 0.5rem;">
-                    <p style="color: #50fa7b; margin: 0 0 0.3rem;"><strong>Clip max</strong></p>
-                    <p style="margin: 0; font-size: 0.95em;">Cero saturación garantizada. Puede desperdiciar resolución
-                        si hay pocos outliers grandes.</p>
-                </div>
-                <div style="flex: 1; background: rgba(139,233,253,0.08); padding: 0.7rem; border-radius: 0.5rem;">
-                    <p style="color: #8be9fd; margin: 0 0 0.3rem;"><strong>Clip p95 / p75</strong></p>
-                    <p style="margin: 0; font-size: 0.95em;">Acepta saturar el 5–25% de outliers para ganar resolución
-                        en el 75–95% del rango más denso.</p>
-                </div>
-            </div>
-            <div
-                style="background: rgba(255,255,255,0.1); padding: 0.7rem; border-radius: 0.5rem; margin-top: 0.8rem; font-size: 0.9em;">
-                <code>w_int[capa] = ceil(log₂(rango_capa))  ← diferente por capa, mismo total de bits</code>
-            </div>
-            <div style="text-align: center; margin-top: 0.6rem;">
-                <img src="outputs/cnn_3pasos_comparacion.png" style="max-height: 190px; border-radius: 0.4rem;"
-                    onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
-                <p style="display:none; color: #ffb86c; font-style: italic; font-size: 0.9em;">⚠️ Ejecutar
-                    <code>script02.py</code> para generar la figura
-                </p>
-            </div>
-        </div>
-    </section>
+    <!-- ===================== EJEMPLO EN CÓDIGO ===================== -->
 
-    <!-- Paso 3: Precisión Mixta Completa -->
     <section>
-        <h3>Ejemplo: Paso 3 — Precisión Mixta Completa</h3>
-        <div style="font-size: 0.72em; text-align: left;">
-            <p><strong>Diferente número total de bits por capa.</strong> Las capas primera y última (más sensibles a la
-                degradación) reciben más bits; las capas intermedias, menos.</p>
-            <div style="display: flex; gap: 1rem; margin-top: 0.8rem;">
-                <div style="flex: 2; background: rgba(255,255,255,0.07); padding: 0.7rem; border-radius: 0.5rem;">
-                    <p style="color: #bd93f9; margin: 0 0 0.3rem;"><strong>Asignación por defecto (script02.py)</strong>
-                    </p>
-                    <p style="margin: 0; font-size: 0.95em;">Primera capa = 8b, última = 8b, capas intermedias = 4b.<br>
-                        Los bits enteros siguen siendo per-capa (clip p95).</p>
-                </div>
-                <div style="flex: 1; background: rgba(255,255,255,0.07); padding: 0.7rem; border-radius: 0.5rem;">
-                    <p style="color: #ffb86c; margin: 0 0 0.3rem;"><strong>Ganancia</strong></p>
-                    <p style="margin: 0; font-size: 0.95em;">Menor tamaño total en memoria sin sacrificar la precisión
-                        en las capas críticas.</p>
-                </div>
-            </div>
-            <div
-                style="background: rgba(255,255,255,0.1); padding: 0.7rem; border-radius: 0.5rem; margin-top: 0.8rem; font-size: 0.9em;">
-                <code>conv1=8b · conv2=4b · dense1=4b · dense2=4b · output=8b</code>
-            </div>
-            <div style="text-align: center; margin-top: 0.6rem;">
-                <img src="outputs/cnn_3pasos_comparacion.png" style="max-height: 190px; border-radius: 0.4rem;"
-                    onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
-                <p style="display:none; color: #ffb86c; font-style: italic; font-size: 0.9em;">⚠️ Ejecutar
-                    <code>script02.py</code> para generar la figura
-                </p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Calibración de Clipping -->
-    <section>
-        <h3>Calibración de Clipping: Max vs Percentil</h3>
-        <div style="font-size: 0.72em; text-align: left;">
-            <p>El rango de cuantización define cuántos niveles caen dentro de la distribución real de pesos. Recortar
-                outliers permite pasos más finos donde hay más densidad.</p>
-            <div style="display: flex; gap: 1rem; margin-top: 0.8rem;">
-                <div style="flex: 1; background: rgba(76,114,176,0.12); padding: 0.7rem; border-radius: 0.5rem;">
-                    <p style="color: #8be9fd; margin: 0 0 0.3rem;"><strong>Rango completo ±max</strong></p>
-                    <p style="margin: 0; font-size: 0.95em;">Pasos amplios → poca resolución en la zona densa central.
-                        Ningún valor satura.</p>
-                </div>
-                <div style="flex: 1; background: rgba(85,168,104,0.12); padding: 0.7rem; border-radius: 0.5rem;">
-                    <p style="color: #50fa7b; margin: 0 0 0.3rem;"><strong>Recortado p95 ±p95</strong></p>
-                    <p style="margin: 0; font-size: 0.95em;">Pasos finos → alta resolución en el 90% central. El 5% de
-                        outliers se satura pero el impacto es menor.</p>
-                </div>
-            </div>
-            <div style="text-align: center; margin-top: 0.6rem;">
-                <img src="outputs/calibracion_clipping.png" style="max-height: 190px; border-radius: 0.4rem;"
-                    onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
-                <p style="display:none; color: #ffb86c; font-style: italic; font-size: 0.9em;">⚠️ Ejecutar
-                    <code>script02.py</code> para generar la figura
-                </p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Ejemplo: script01.py — Baseline -->
-    <section>
-        <h3>Ejemplo en Código: Entrenamiento del modelo base</h3>
+        <h3>Ejemplo en código: el modelo base</h3>
         <div style="font-size: 0.72em; text-align: left;">
             <p style="margin-bottom: 0.8rem;">El script <code>examples/quantization/script01.py</code> entrena los
-                modelos base que servirán de referencia para todos los experimentos de cuantización:</p>
+                modelos base que sirven de referencia para todos los experimentos de cuantización:</p>
             <div style="display: flex; gap: 1rem; margin-bottom: 0.8rem;">
                 <div style="flex: 1; background: rgba(139,233,253,0.1); padding: 0.7rem; border-radius: 0.5rem;">
-                    <p style="color: #8be9fd; margin: 0 0 0.3rem;"><strong>CNN — LeNet-5</strong></p>
-                    <p style="margin: 0; font-size: 0.95em;">Conv(1→6, 5×5) → Pool → Conv(6→16, 5×5) → Pool →
-                        FC(400→120→84→10)<br>Entrenado en Fashion MNIST, guardado en <code>models/cnn_baseline.h5</code>
+                    <p style="color: #8be9fd; margin: 0 0 0.3rem;"><strong>CNN (LeNet-5)</strong></p>
+                    <p style="margin: 0; font-size: 0.95em;">Conv(1→6, 5×5) → pool → conv(6→16, 5×5) → pool →
+                        densas(400→120→84→10)<br>61.7 k parámetros, 89.1 % en Fashion MNIST.<br>Se guarda en
+                        <code>models/cnn_baseline.h5</code>.
                     </p>
                 </div>
                 <div style="flex: 1; background: rgba(189,147,249,0.1); padding: 0.7rem; border-radius: 0.5rem;">
                     <p style="color: #bd93f9; margin: 0 0 0.3rem;"><strong>MLP</strong></p>
-                    <p style="margin: 0; font-size: 0.95em;">Dense(784→256→128→64→10) con ReLU<br>Guardado en
-                        <code>models/mlp_baseline.h5</code><br>Punto de comparación para cuantización en capas densas.
+                    <p style="margin: 0; font-size: 0.95em;">Densas(784→256→128→64→10) con ReLU<br>Se guarda en
+                        <code>models/mlp_baseline.h5</code>.<br>Punto de comparación para cuantización en capas densas.
                     </p>
                 </div>
             </div>
             <div style="background: rgba(255,255,255,0.07); padding: 0.6rem; border-radius: 0.5rem; font-size: 0.9em;">
-                <p style="margin: 0;"><strong style="color: #50fa7b;">Flujo:</strong> script01 entrena y guarda →
-                    script02/03 cargan los modelos y aplican cuantización → script04 visualiza los resultados del
-                    barrido.</p>
+                <p style="margin: 0;"><strong style="color: #50fa7b;">Flujo:</strong> <code>script01</code> entrena y
+                    guarda → <code>script02</code> cuantiza en 3 pasos a un número de bits fijo →
+                    <code>script03</code> barre los bits → <code>script04</code> grafica el barrido.</p>
             </div>
         </div>
+        <aside class="notes">
+            <p>Modelos simples a propósito, para que todo corra en minutos en una CPU. Para el TP conviene algo más realista.</p>
+            <p>La cuantización se hace con QKeras: reemplaza cada Conv2D y Dense por QConv2D y QDense, que aplican fake quantization a pesos, sesgos y activaciones. Se ve en el summary del modelo cuantizado.</p>
+            <p>Comandos: <code>cd examples/quantization &amp;&amp; uv run python script01.py cnn</code> y después <code>uv run python script02.py cnn</code>.</p>
+        </aside>
     </section>
 
-    <!-- Ejemplo avanzado: script03.py — Barrido de bits -->
     <section>
-        <h3>Avanzado: Barrido de bits [2, 4, 6, 8]</h3>
-        <div style="font-size: 0.72em; text-align: left;">
-            <p style="margin-bottom: 0.6rem;">El script <code>examples/quantization/script03.py</code> automatiza el
-                experimento de script02 para distintos niveles de precisión:</p>
-            <div style="display: flex; gap: 1rem; margin-bottom: 0.7rem;">
-                <div style="flex: 1; background: rgba(255,255,255,0.07); padding: 0.7rem; border-radius: 0.5rem;">
-                    <p style="color: #ff79c6; margin: 0 0 0.3rem;"><strong>Qué barre</strong></p>
-                    <ul style="padding-left: 1rem; line-height: 1.4; margin: 0; font-size: 0.95em;">
-                        <li>Bits ∈ {2, 4, 6, 8} (o 1–16 con <code>--full</code>)</li>
-                        <li>Los 3 pasos de cuantización para cada bitwidth</li>
-                        <li>PTQ vs QAT en cada configuración</li>
-                    </ul>
+        <h3>Clipping: máximo vs. percentil</h3>
+        <div style="font-size: 0.7em; text-align: left;">
+            <p>El rango define cuántos niveles caen donde realmente hay valores. Recortar los extremos da pasos más finos
+                donde la distribución es más densa.</p>
+            <div style="display: flex; gap: 1rem; margin-top: 0.6rem;">
+                <div style="flex: 1; background: rgba(139,233,253,0.1); padding: 0.6rem; border-radius: 0.5rem;">
+                    <p style="color: #8be9fd; margin: 0 0 0.3rem;"><strong>Rango completo (±máx.)</strong></p>
+                    <p style="margin: 0; font-size: 0.95em;">Ningún valor satura, pero los pasos son anchos en la zona
+                        central.</p>
                 </div>
-                <div style="flex: 1; background: rgba(255,255,255,0.07); padding: 0.7rem; border-radius: 0.5rem;">
-                    <p style="color: #50fa7b; margin: 0 0 0.3rem;"><strong>Salidas</strong></p>
-                    <p style="margin: 0; font-size: 0.95em;">JSON con todos los resultados → leído por
-                        <code>script04.py</code> para graficar curvas de accuracy vs bits para cada paso (Uniforme,
-                        Mixto bits enteros, Mixto completo).
-                    </p>
+                <div style="flex: 1; background: rgba(80,250,123,0.1); padding: 0.6rem; border-radius: 0.5rem;">
+                    <p style="color: #50fa7b; margin: 0 0 0.3rem;"><strong>Recortado (p95)</strong></p>
+                    <p style="margin: 0; font-size: 0.95em;">El rango va del percentil 5 al 95: el 90 % central tiene
+                        pasos finos y el ~10 % de los extremos satura.</p>
                 </div>
             </div>
-            <div style="text-align: center;">
-                <img src="outputs/cnn_barrido_resumen.png" style="max-height: 190px; border-radius: 0.4rem;"
-                    onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
-                <p style="display:none; color: #ffb86c; font-style: italic;">⚠️ Ejecutar <code>script03.py</code> +
-                    <code>script04.py</code> para generar la figura (script avanzado)
-                </p>
+            <div style="text-align: center; margin-top: 0.6rem;">
+                <img src="outputs/quantization_calibracion_clipping.png"
+                    style="max-height: 230px; border-radius: 0.4rem; background: white;">
             </div>
         </div>
+        <aside class="notes">
+            <p>Pesos de la primera convolución del ejemplo, a 8 bits. Las líneas rojas son los niveles de cuantización.</p>
+            <p>Intuición: un error de 0.05 en un peso de 1.5 importa poco; en un peso de 0.1 es enorme. Recortar sacrifica los extremos (pocos) para ganar resolución donde están la mayoría.</p>
+            <p>Detalle en punto fijo: el rango se redondea a una potencia de 2, así que recortar solo ayuda si cruza una. En esta capa, ±0.373 y ±0.277 caen los dos en el rango ±0.5: con potencias de 2 no cambiaría nada. La figura ilustra la idea con una escala arbitraria.</p>
+            <p>Y recortar de más (p75) es contraproducente: se pierde demasiado en los valores grandes. Lo van a ver en los resultados.</p>
+        </aside>
+    </section>
+
+    <section>
+        <h3>Ejemplo: cuantización en 3 pasos</h3>
+        <div style="font-size: 0.6em; text-align: left;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
+                <div style="background: rgba(139,233,253,0.08); padding: 0.7rem; border-radius: 0.5rem; border-left: 3px solid #8be9fd;">
+                    <p style="color: #8be9fd; margin: 0 0 0.3rem;"><strong>Paso 1: uniforme</strong></p>
+                    <p style="margin: 0;">Mismos bits totales y mismos bits enteros en toda la red, tomados del peor
+                        caso global (el máximo de todas las capas).</p>
+                    <p style="margin: 0.4rem 0 0;"><code>i = ceil(log₂(máx. global))</code></p>
+                </div>
+                <div style="background: rgba(80,250,123,0.08); padding: 0.7rem; border-radius: 0.5rem; border-left: 3px solid #50fa7b;">
+                    <p style="color: #50fa7b; margin: 0 0 0.3rem;"><strong>Paso 2: bits enteros por capa</strong></p>
+                    <p style="margin: 0;">Mismos bits totales, pero los bits enteros de cada capa salen de su propio
+                        rango (máx., p95 o p75).</p>
+                    <p style="margin: 0.4rem 0 0;"><code>i[capa] = ceil(log₂(rango[capa]))</code></p>
+                </div>
+                <div style="background: rgba(189,147,249,0.08); padding: 0.7rem; border-radius: 0.5rem; border-left: 3px solid #bd93f9;">
+                    <p style="color: #bd93f9; margin: 0 0 0.3rem;"><strong>Paso 3: bits por capa</strong></p>
+                    <p style="margin: 0;">Además, distinto total de bits: primera y última capa con N bits, las
+                        intermedias con N/2 (bits enteros por capa, p95).</p>
+                    <p style="margin: 0.4rem 0 0;">Con N = 8: <code>8 · 4 · 4 · 4 · 8</code></p>
+                </div>
+            </div>
+            <p style="margin-top: 0.8rem;">Cada paso agrega granularidad: global → por capa (bits enteros) → por capa
+                (bits totales). Se evalúa con PTQ y con QAT (3 épocas).</p>
+        </div>
+        <aside class="notes">
+            <p>Paso 1: la forma más ingenua. Si una capa tiene pesos hasta 0.9 y otra hasta 0.1, las dos usan el rango de 0.9: la segunda desperdicia bits enteros que nunca usa y pierde resolución.</p>
+            <p>Paso 2: cada capa ajusta su coma a su propio rango. Mismo tamaño en memoria que el paso 1 (mismos bits totales), solo cambia dónde está la coma. En un micro esto no cuesta nada: los bits fraccionarios distintos por capa se resuelven con shifts.</p>
+            <p>Paso 3: además, menos bits en las capas intermedias, que son las menos sensibles. Acá sí cambia el tamaño. El ejemplo de la diapo es para N = 8.</p>
+            <p>Pregunta antes de mostrar los resultados: ¿en cuál de los tres pasos esperan mejor accuracy a 8 bits? ¿Y a 4?</p>
+        </aside>
+    </section>
+
+    <section>
+        <h3>Resultados: 8 bits vs. 4 bits</h3>
+        <img src="./figures/cuantizacion-3pasos_8vs4.png" style="max-height: 400px; margin: 0;">
+        <p style="font-size: 0.6em; margin-top: 0.4rem;">LeNet-5 en Fashion MNIST (FP32: 89.1 %, 241 KB). A 8 bits
+            los pasos 1 y 2 ocupan 60 KB; a 4 bits, 30 KB; el paso 3 a 4 bits, 15 KB.</p>
+        <aside class="notes">
+            <p>Mensaje: a 8 bits casi no importa cómo se cuantiza; a 4 bits, sí.</p>
+            <p>8 bits: todo da prácticamente igual que FP32. Hay resolución de sobra, así que recortar o ajustar la coma por capa no gana nada (en <code>script02</code>, a 8 bits, p95 da incluso un poco peor que el máximo, y p75 cae a 81 %).</p>
+            <p>4 bits: ahí aparecen las diferencias. Con PTQ, el paso 1 cae a 71 % y el paso 2 (coma por capa, p95) recupera hasta 87 %. Con pocos bits, no desperdiciar rango es crucial.</p>
+            <p>El paso 3 a 4 bits usa 2 bits en las capas intermedias: ocupa la mitad (15 KB) y con PTQ cae a 70 %, pero QAT lo recupera a 85 %.</p>
+            <p>QAT siempre mejora, y a 8 bits incluso supera al FP32 (89.8 % vs. 89.1 %): el efecto de regularización.</p>
+            <p>Para comparar a igual tamaño: el paso 3 a 8 bits (8/4) y el paso 2 a 4 bits ocupan casi lo mismo (~30 KB) y con QAT dan lo mismo (89.2 %).</p>
+        </aside>
+    </section>
+
+    <section>
+        <h3>Avanzado: barrido de bits [2, 4, 6, 8]</h3>
+        <div style="font-size: 0.68em; text-align: left;">
+            <p style="margin-bottom: 0.5rem;"><code>examples/quantization/script03.py</code> repite los 3 pasos para
+                cada cantidad de bits (o de 1 a 16 con <code>--full</code>), con PTQ y QAT; <code>script04.py</code>
+                grafica el JSON resultante.</p>
+            <div style="text-align: center;">
+                <img src="outputs/quantization_barrido_3pasos.png"
+                    style="max-height: 300px; border-radius: 0.4rem; background: white;">
+            </div>
+        </div>
+        <aside class="notes">
+            <p>Script avanzado: tarda bastante (QAT para cada combinación), así que está pre-corrido y el resultado commiteado.</p>
+            <p>Qué mirar: a 6 y 8 bits los tres pasos dan lo mismo. A 4 bits, el paso 1 con PTQ se cae. A 2 bits, el paso 1 queda al azar (10 %) incluso con QAT, mientras que ajustar la coma por capa (pasos 2 y 3) llega a 83 % con QAT.</p>
+            <p>Con 2 bits por peso, el modelo ocupa 15 KB, 16 veces menos que en FP32, y sigue clasificando razonablemente.</p>
+        </aside>
+    </section>
+
+    <section>
+        <h3>Ejercicio en clase: bits por capa</h3>
+        <div style="font-size: 0.68em; text-align: left;">
+            <p><strong>Objetivo:</strong> el modelo más chico posible que no pierda más de 5 puntos frente a FP32
+                (accuracy ≥ 84 %).</p>
+            <ol style="margin-top: 0.5rem;">
+                <li style="margin-bottom: 0.4rem;">En <code>examples/quantization/script02.py</code>, cambiar
+                    <code>BITS</code>, <code>HIGH_BITS</code> y <code>LOW_BITS</code> (dejar <code>RUN_QAT = False</code>
+                    para que corra rápido).</li>
+                <li style="margin-bottom: 0.4rem;">Para elegir bits capa por capa: reemplazar
+                    <code>make_default_full_mixed_bits_map(...)</code> por un diccionario
+                    <code>{"conv2d_1": 8, "conv2d_2": 4, ...}</code>.</li>
+                <li>Correr <code>uv run python script02.py cnn</code> y anotar <code>Acc PTQ</code> y
+                    <code>Mem KB</code>.</li>
+            </ol>
+            <p style="margin-top: 0.8rem; color: #ffb86c;">Pistas: la primera y la última capa son las más sensibles;
+                con menos bits, los bits enteros de cada capa importan más.</p>
+        </div>
+        <aside class="notes">
+            <p>Hacerlo en grupos de 2 o 3, mezclando CEIA y CESE, unos 15 minutos. Al final, cada grupo dice su mejor configuración (accuracy y KB) y armamos una tabla en el pizarrón: es una frontera de Pareto como la de la demo.</p>
+            <p>Antes de correr, que cada grupo prediga qué capa van a dejar con más bits y por qué.</p>
+            <p>Los nombres de las capas son <code>conv2d_1</code>, <code>conv2d_2</code>, <code>dense_1</code>, <code>dense_2</code> y <code>output</code>. Hace falta haber corrido antes <code>script01.py cnn</code>.</p>
+            <p>Referencia: el paso 3 con 4/2 bits da 15 KB y 70 % con PTQ (no cumple); con QAT llega a 85 %. Probar si alcanza con subir alguna capa intermedia.</p>
+        </aside>
     </section>
 
     <section>
         <h3>Eficiencia en hardware real</h3>
-        <div style="font-size: 0.7em; text-align: left;">
+        <div style="font-size: 0.68em; text-align: left;">
             <div
                 style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 0.5rem; font-size: 0.9em;">
                 <div style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px;">
-                    <strong style="color: #50fa7b;">CPUs/GPUs</strong>
-                    <p style="margin: 0.3rem 0 0;">INT8 2× throughput vs FP16. Suma INT8 gasta 30× menos energía que una
-                        suma FP32.</p>
+                    <strong style="color: #50fa7b;">CPUs y GPUs</strong>
+                    <p style="margin: 0.3rem 0 0;">INT8 da ~2× el throughput de FP16. Una suma INT8 gasta ~30× menos
+                        energía que una suma FP32.</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px;">
+                    <strong style="color: #ffb86c;">Microcontroladores</strong>
+                    <p style="margin: 0.3rem 0 0;">Sin FPU rápida, INT8 es casi obligatorio. Con instrucciones SIMD
+                        (ESP32-S3, Cortex-M con DSP) se hacen varios MACs de 8 bits por ciclo.</p>
                 </div>
                 <div style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px;">
                     <strong style="color: #ff79c6;">FPGAs</strong>
-                    <p style="margin: 0.3rem 0 0;">FINN: redes binarizadas sumamente veloces y energéticamente
-                        eficientes. Flexibilidad para mixed-precision.</p>
+                    <p style="margin: 0.3rem 0 0;">Total flexibilidad de bits por capa; FINN genera aceleradores para
+                        redes binarizadas, muy rápidos y eficientes.</p>
                 </div>
                 <div style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px;">
-                    <strong style="color: #8be9fd;">ASICs / TPUs</strong>
-                    <p style="margin: 0.3rem 0 0;">Google Edge TPU por ejemplo sólo soporta INT8 para la inferencia,
-                        dando máxima eficiencia pero baja flexibilidad.</p>
+                    <strong style="color: #8be9fd;">ASICs y NPUs</strong>
+                    <p style="margin: 0.3rem 0 0;">El Google Edge TPU, por ejemplo, solo ejecuta INT8: máxima eficiencia,
+                        poca flexibilidad.</p>
                 </div>
             </div>
         </div>
+        <aside class="notes">
+            <p>El 30× de energía es de las mediciones de Horowitz (2014): suma de 8 bits ≈ 0.03 pJ vs. suma FP32 ≈ 0.9 pJ, en 45 nm.</p>
+            <p>Microcontroladores: es el caso de la demo. El ESP32-S3 hace varios MACs de 8 bits por instrucción con su SIMD; el ESP32 de la ESP32-CAM no tiene SIMD, y por eso la misma red tarda mucho más ahí.</p>
+            <p>FPGAs: se puede elegir cualquier ancho de bits por capa, porque el hardware se arma a medida; ahí la precisión mixta rinde de verdad. FINN (AMD/Xilinx) genera aceleradores para redes binarizadas o de pocos bits.</p>
+            <p>ASICs y NPUs: muy eficientes, pero aceptan pocos formatos. Hay que elegir el hardware desde el principio del proyecto, porque condiciona qué cuantización se puede usar.</p>
+        </aside>
+    </section>
+
+    <section>
+        <h3>Resumen: cuantización</h3>
+        <ul style="font-size: 0.65em; text-align: left; max-width: 820px; margin: 1rem auto;">
+            <li style="margin-bottom: 0.4rem;">Cuantizar es redondear con paso Δ: con bits fijos, <strong>resolución y
+                    rango compiten</strong>. En punto fijo, Δ = 2<sup>−f</sup> y se elige con los bits enteros.</li>
+            <li style="margin-bottom: 0.4rem;">Se cuantizan pesos, sesgos y activaciones; la granularidad va de global a
+                por canal.</li>
+            <li style="margin-bottom: 0.4rem;"><strong>PTQ</strong> es casi gratis y anda bien a 8 bits;
+                <strong>QAT</strong> recupera la precisión con un fine-tuning corto y hace falta con pocos bits.</li>
+            <li style="margin-bottom: 0.4rem;">A 8 bits casi todo funciona; a 4 bits o menos importa ajustar el rango
+                por capa, recortar outliers con criterio y dar más bits a las capas sensibles.</li>
+            <li style="margin-bottom: 0.4rem;">Menos bits no garantiza menos tiempo: depende de los kernels y del
+                hardware. Hay que medir en la plataforma.</li>
+        </ul>
+        <aside class="notes">
+            <p>Cerrar con la conexión al TP: cuantizar a INT8 con PTQ es el primer paso casi obligatorio; a partir de ahí, la pregunta es si hace falta bajar más y con qué herramienta.</p>
+            <p>Próxima sección: pruning.</p>
+        </aside>
     </section>
 
 </section>
