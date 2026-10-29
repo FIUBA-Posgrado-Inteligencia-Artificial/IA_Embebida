@@ -5,19 +5,23 @@
     <h2 class="gradient-text">7. Introducción a IA embebida</h2>
     <p>Compresión y despliegue de modelos de IA</p>
     <ul style="font-size: 0.8em; text-align: left; max-width: 750px; margin: 1.5rem auto;">
-      <li style="margin-bottom: 0.4rem;">Las 5 capas de la IA</li>
-      <li style="margin-bottom: 0.4rem;">Etapas del proyecto: dónde entra la compresión</li>
-      <li style="margin-bottom: 0.4rem;">Complejidad computacional: notación Big O</li>
-      <li style="margin-bottom: 0.4rem;">Métodos de compresión de redes neuronales</li>
-      <ul>
-        <li style="margin-bottom: 0.4rem;">Cuantización: conceptos, PTQ y QAT</li>
-        <li style="margin-bottom: 0.4rem;">Poda</li>
-        <li style="margin-bottom: 0.4rem;">Destilación</li>
-        <li style="margin-bottom: 0.4rem;">Factorización</li>
-        <li style="margin-bottom: 0.4rem;">Neural Architecture Search (NAS)</li>
-      </ul>
-      <li>Estado del arte y direcciones futuras</li>
+      <li style="margin-bottom: 0.4rem;">Las 5 capas de la IA y la compresión como tema transversal</li>
+      <li style="margin-bottom: 0.4rem;">Complejidad computacional: notación Big O, parámetros y MACs</li>
+      <li style="margin-bottom: 0.4rem;">Estrategias para atacar la complejidad</li>
+      <li style="margin-bottom: 0.4rem;">Métodos de compresión: panorama</li>
+      <li>Etapas del proyecto: dónde entra la IA embebida</li>
     </ul>
+    <aside class="notes">
+      <p>Comienzo de la clase 2. En la clase 1 vimos la demo y la desarmamos: qué cambió entre el modelo grande y el chico y cuánto impactó. Hoy empezamos a formalizar.</p>
+      <p>Recorrido de esta sección:</p>
+      <ul>
+        <li>el contexto: dónde está la IA embebida dentro del ecosistema de IA;</li>
+        <li>cómo medir el costo de una red (parámetros y MACs), con los números de la demo;</li>
+        <li>qué estrategias hay para bajarlo, y un panorama de los métodos de compresión;</li>
+        <li>en qué parte del proyecto entran esos pasos.</li>
+      </ul>
+      <p>Cada método de compresión tiene después su propia sección.</p>
+    </aside>
   </section>
 
   <!-- ===================== LAS 5 CAPAS DE LA IA ===================== -->
@@ -26,7 +30,7 @@
     <h3>Las 5 capas de la IA</h3>
     <div style="display: flex; gap: 2rem; align-items: center;">
       <div style="flex: 1;">
-        <img src="./figures/04-capas_de_la_ia.jpeg" style="width: 100%; border-radius: 0.5rem;" id="img-capas">
+        <img src="./figures/04-capas_de_la_ia.jpeg" style="width: 100%; border-radius: 0.5rem;" data-id="img-capas">
         <p style="font-size: 0.6em; font-style: italic; margin-top: 0.8rem;">Una visión estructural (Jensen
           Huang)</p>
       </div>
@@ -40,13 +44,18 @@
         </ul>
       </div>
     </div>
+    <aside class="notes">
+      <p>Una visión estructural de la IA, de Jensen Huang (CEO de NVIDIA): la IA como una pila de 5 capas, donde cada una depende de la de abajo.</p>
+      <p>Sirve para ubicarnos: casi todo lo que se habla de IA (modelos, aplicaciones) está arriba de todo, pero se apoya en energía, chips y data centers.</p>
+      <p>Para los de CESE en particular: las capas de abajo son ingeniería pura (potencia, hardware, térmica), y ahí también hay mucho trabajo.</p>
+    </aside>
   </section>
 
   <section data-auto-animate>
     <h3>Capa 1: Energía</h3>
     <div style="display: flex; gap: 2rem; align-items: center;">
       <div style="flex: 0.7;">
-        <img src="./figures/04-capas_de_la_ia.jpeg" style="width: 100%; border-radius: 0.5rem;" id="img-capas">
+        <img src="./figures/04-capas_de_la_ia.jpeg" style="width: 100%; border-radius: 0.5rem;" data-id="img-capas">
       </div>
       <div style="flex: 1.3; text-align: left;">
         <p style="font-size: 0.8em; font-style: italic;">El insumo fundacional de la IA</p>
@@ -61,13 +70,19 @@
         </ul>
       </div>
     </div>
+    <aside class="notes">
+      <p>La energía es el insumo base: un data center de IA consume como una ciudad chica, y necesita potencia continua, sin cortes.</p>
+      <p>El cuello de botella no es solo generar: es transmitir y distribuir esa energía hasta donde está el data center.</p>
+      <p>Por eso la IA hoy mueve obras civiles, infraestructura eléctrica y contratos de energía a largo plazo.</p>
+      <p>Conexión con la materia: cada operación que ahorramos con compresión es energía que no se consume, en la nube y en una batería.</p>
+    </aside>
   </section>
 
   <section data-auto-animate>
     <h3>Capa 2: Chips e infraestructura</h3>
     <div style="display: flex; gap: 2rem; align-items: center;">
       <div style="flex: 0.7;">
-        <img src="./figures/04-capas_de_la_ia.jpeg" style="width: 100%; border-radius: 0.5rem;" id="img-capas">
+        <img src="./figures/04-capas_de_la_ia.jpeg" style="width: 100%; border-radius: 0.5rem;" data-id="img-capas">
       </div>
       <div style="flex: 1.3; text-align: left;">
         <p style="font-size: 0.8em; font-style: italic;">Donde la energía se transforma en capacidad de cálculo</p>
@@ -80,13 +95,18 @@
         </ul>
       </div>
     </div>
+    <aside class="notes">
+      <p>Acá la energía se convierte en cómputo: GPUs, redes de alta velocidad entre servidores, y sistemas de refrigeración (casi toda la energía termina en calor).</p>
+      <p>Es una cadena industrial compleja y global: fabricación de chips, racks, logística.</p>
+      <p>Para CESE: es la misma lógica que en un embebido (consumo, disipación, ancho de banda), a otra escala.</p>
+    </aside>
   </section>
 
   <section data-auto-animate>
     <h3>Capas 3, 4 y 5</h3>
     <div style="display: flex; gap: 2rem; align-items: center;">
       <div style="flex: 0.7;">
-        <img src="./figures/04-capas_de_la_ia.jpeg" style="width: 100%; border-radius: 0.5rem;" id="img-capas">
+        <img src="./figures/04-capas_de_la_ia.jpeg" style="width: 100%; border-radius: 0.5rem;" data-id="img-capas">
       </div>
       <div style="flex: 1.3; text-align: left;">
         <ul style="font-size: 0.7em;">
@@ -97,8 +117,16 @@
           <li><strong>5. Aplicaciones:</strong> el punto de impacto directo para aumentar la productividad sectorial,
             apoyándose en la economía del conocimiento.</li>
         </ul>
+        <p class="fragment" style="font-size: 0.65em; margin-top: 1rem; color: #ffb86c;">La IA embebida corre la capa 4
+          en el propio dispositivo: sin data center, pero con energía, memoria y cómputo muy acotados.</p>
       </div>
     </div>
+    <aside class="notes">
+      <p>Capa 3: los data centers son las "fábricas" donde se entrena y se sirve la IA; necesitan terreno, clima favorable (refrigeración) y mucha conectividad.</p>
+      <p>Capa 4: los modelos. Además de los grandes modelos generales, hay lugar para modelos especializados en sectores fuertes de cada región (agro, energía, sector público).</p>
+      <p>Capa 5: las aplicaciones, donde la IA se traduce en productividad.</p>
+      <p>Cierre (fragmento): la IA embebida toma la capa 4 y la saca del data center. Se evita el costo de las capas 1 a 3 (y la latencia, la conectividad y la privacidad de mandar datos a la nube), a cambio de recursos muy limitados. Eso es lo que obliga a comprimir.</p>
+    </aside>
   </section>
 
   <section>
@@ -109,13 +137,13 @@
       <div style="display: flex; gap: 1.5rem; margin-top: 1.5rem;">
         <div
           style="flex: 1; background: rgba(80,250,123,0.1); border-radius: 0.5rem; padding: 1.2rem; border-left: 3px solid #50fa7b;">
-          <h4 style="color: #50fa7b; margin-top: 0; font-size: 1.1em;">📱 IA Embebida (Edge)</h4>
+          <h4 style="color: #50fa7b; margin-top: 0; font-size: 1.1em;">📱 IA embebida (edge)</h4>
           <p style="margin: 0; font-size: 0.9em;">Permite que modelos entren en microcontroladores, celulares o FPGAs
             con recursos estrictamente limitados de memoria y cómputo.</p>
         </div>
         <div
           style="flex: 1; background: rgba(189,147,249,0.1); border-radius: 0.5rem; padding: 1.2rem; border-left: 3px solid #bd93f9;">
-          <h4 style="color: #bd93f9; margin-top: 0; font-size: 1.1em;">☁️ Grandes Modelos (Cloud)</h4>
+          <h4 style="color: #bd93f9; margin-top: 0; font-size: 1.1em;">☁️ Grandes modelos (nube)</h4>
           <p style="margin: 0; font-size: 0.9em;">La compresión reduce el costo y consumo energético en data centers,
             haciendo técnica y económicamente viable servir grandes modelos (ej. LLMs).</p>
         </div>
@@ -124,6 +152,11 @@
         💡 Dominar la compresión de modelos es una habilidad valiosa en todo el espectro de hardware.
       </p>
     </div>
+    <aside class="notes">
+      <p>Esta materia se centra en IA embebida, pero las mismas técnicas se usan en la nube.</p>
+      <p>En embebidos, comprimir es condición para que el modelo entre y corra. En la nube, es lo que hace rentable servir un LLM a millones de usuarios: menos memoria por GPU, más pedidos por segundo, menos energía.</p>
+      <p>Por ejemplo, la cuantización de LLMs a 8 o 4 bits es hoy práctica estándar para servirlos o correrlos en una PC.</p>
+    </aside>
   </section>
 
   <!-- ===================== COMPLEJIDAD COMPUTACIONAL ===================== -->
@@ -146,6 +179,11 @@
         <img src="./figures/general_bigo.png" style="width: 100%; background: white; border-radius: 0.5rem;">
       </div>
     </div>
+    <aside class="notes">
+      <p>Dos recursos: tiempo y memoria, en función del tamaño de la entrada.</p>
+      <p>La notación Big O describe cómo crece el costo cuando crece la entrada, sin importar las constantes: sirve para comparar algoritmos y ver si escalan.</p>
+      <p>El gráfico muestra las curvas típicas: constante, logarítmica, lineal, cuadrática, exponencial.</p>
+    </aside>
   </section>
 
   <section>
@@ -169,20 +207,26 @@
       <ul style="font-size: 0.9em;">
         <li style="margin-bottom: 0.3rem;">Constantes se desprecian: O(2n·m) → O(n·m)</li>
         <li style="margin-bottom: 0.3rem;">Solo importa el término dominante: O(n² + n·log n) → O(n²)</li>
-        <li>En redes neuronales:
+        <li>En una red concreta no alcanza con el crecimiento: se cuenta exacto.
           <ul>
-            <li>Complejidad temporal: MACs - Multiplaciones y sumas</li>
-            <li>Complejidad espacial: Parámetros - Pesos y sesgos</li>
+            <li>Tiempo → MACs: multiplicaciones-acumulaciones por inferencia</li>
+            <li>Memoria → parámetros: pesos y sesgos</li>
           </ul>
         </li>
       </ul>
     </div>
+    <aside class="notes">
+      <p>Ejemplos: acceder a un elemento de un arreglo es O(1); recorrerlo, O(n); comparar todos contra todos, O(n²).</p>
+      <p>Simplificaciones: se descartan las constantes y los términos que crecen más lento.</p>
+      <p>Pero en IA embebida no comparamos cómo escala un algoritmo: tenemos una red fija y una placa fija, y la pregunta es "¿entra y llega a tiempo?". Ahí las constantes importan (2× más MACs es 2× más tiempo), así que contamos exacto.</p>
+      <p>MACs como proxy del tiempo y parámetros como proxy de la memoria. Ojo: la memoria también incluye las activaciones intermedias, que en una CNN pueden pesar más que los parámetros.</p>
+    </aside>
   </section>
 
   <section>
     <h3>Ejercicio en clase: capa densa</h3>
     <div style="font-size: 0.75em; text-align: left;">
-      <p>Supongamos una capa densa (Fully Connected) con:</p>
+      <p>Supongamos una capa densa (fully connected) con:</p>
       <ul>
         <li><strong>N</strong> entradas.</li>
         <li><strong>M</strong> neuronas (salidas).</li>
@@ -203,6 +247,12 @@
         </ul>
       </div>
     </div>
+    <aside class="notes">
+      <p>Dejarlos pensar un minuto antes de mostrar la respuesta.</p>
+      <p>Parámetros: la matriz W es de M×N, más un sesgo por neurona: N·M + M.</p>
+      <p>MACs: cada una de las M salidas es un producto escalar de N términos, o sea N multiplicaciones-acumulaciones: N·M en total. La suma del sesgo y la activación son despreciables frente a eso.</p>
+      <p>Observación: en una capa densa, cada peso se usa una sola vez por inferencia (MACs ≈ parámetros).</p>
+    </aside>
   </section>
 
   <section>
@@ -235,6 +285,79 @@
         </ul>
       </div>
     </div>
+    <aside class="notes">
+      <p>Dejarlos pensar antes de mostrar la respuesta.</p>
+      <p>Parámetros: cada filtro tiene H<sub>K</sub>·W<sub>K</sub>·C<sub>in</sub> pesos, y hay C<sub>out</sub> filtros, más un sesgo por filtro. No dependen de la resolución de la entrada.</p>
+      <p>MACs: cada valor de salida es un producto escalar de H<sub>K</sub>·W<sub>K</sub>·C<sub>in</sub> términos, y hay H<sub>out</sub>·W<sub>out</sub>·C<sub>out</sub> valores de salida.</p>
+      <p>Diferencia clave con la densa: los mismos pesos se reusan en cada posición de la imagen. Por eso una convolución tiene pocos parámetros pero muchos MACs, y los MACs crecen con la resolución.</p>
+    </aside>
+  </section>
+
+  <section>
+    <h3>Aplicado a la demo: el modelo grande</h3>
+    <table style="font-size: 0.55em; width: 100%; border-collapse: collapse; margin-top: 0.5rem;">
+      <thead>
+        <tr style="border-bottom: 2px solid #fff;">
+          <th style="padding: 6px;">Capa</th>
+          <th style="padding: 6px;">Resolución</th>
+          <th style="padding: 6px;">Canales</th>
+          <th style="padding: 6px;">Parámetros</th>
+          <th style="padding: 6px;">MACs</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+            <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">Conv 1</td>
+            <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">96×96</td>
+            <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">3 → 25</td>
+            <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">700</td>
+            <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">6.2 M</td>
+          </tr>
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+            <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">Conv 2</td>
+            <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">48×48</td>
+            <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">25 → 51</td>
+            <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">11.5 k</td>
+            <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">26.4 M</td>
+          </tr>
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+            <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">Conv 3</td>
+            <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">24×24</td>
+            <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">51 → 102</td>
+            <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">46.9 k</td>
+            <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">27.0 M</td>
+          </tr>
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+            <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">Densa</td>
+            <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">—</td>
+            <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">102 → 10</td>
+            <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">1.0 k</td>
+            <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">1.0 k</td>
+          </tr>
+          <tr style="border-top: 2px solid #fff; font-weight: bold;">
+            <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">Total</td>
+            <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);"></td>
+            <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);"></td>
+            <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">60.2 k</td>
+            <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2); color: #8be9fd;">60 M</td>
+          </tr>
+      </tbody>
+    </table>
+    <p style="font-size: 0.6em; margin-top: 0.8rem;">Filtros de 3×3, con <em>padding</em> (la salida tiene la misma
+      resolución que la entrada) y un <em>pooling</em> que divide la resolución por 2 después de cada convolución.</p>
+    <p class="fragment" style="font-size: 0.65em; color: #ffb86c;">La última convolución tiene 46 veces más parámetros
+      que la primera, pero solo 4 veces más MACs.</p>
+    <aside class="notes">
+      <p>Los "60 M de MACs" y "61 k parámetros" de la clase pasada salen de aplicar las fórmulas del ejercicio capa por capa.</p>
+      <p>Ejemplo, conv 1: parámetros = 3·3·3·25 + 25 = 700; MACs = 3·3·3 · 96·96 · 25 ≈ 6.2 M.</p>
+      <p>Lo que hay que ver:</p>
+      <ul>
+        <li>Los parámetros se concentran al final (muchos canales); los MACs se reparten, porque las primeras capas trabajan sobre imágenes grandes.</li>
+        <li>La densa es despreciable en MACs.</li>
+        <li>El chico usa 32×32 en lugar de 96×96: 9 veces menos píxeles, y por lo tanto 9 veces menos MACs en cada convolución, sin tocar un solo parámetro. Lo demás lo hacen las convoluciones depthwise y la poda.</li>
+      </ul>
+      <p>Si preguntan por qué la tabla da 60.2 k y la clase pasada dijimos 61 k: faltan los 356 parámetros de BatchNorm (60.5 k en total). En la placa desaparecen, porque se fusionan en la convolución; eso es optimización algorítmica, su propia sección.</p>
+    </aside>
   </section>
 
   <section>
@@ -255,7 +378,7 @@
         </div>
         <div
           style="flex: 1; background: rgba(80,250,123,0.1); padding: 1rem; border-radius: 0.5rem; border: 1px solid rgba(80,250,123,0.3);">
-          <strong style="color: #50fa7b;">Lo vimos en la sección anterior</strong>
+          <strong style="color: #50fa7b;">Lo vimos en la intro para CEIA</strong>
           <ul style="font-size: 0.9em; margin-top: 0.3rem;">
             <li>Suma FxP: O(max(b<sup>A</sup>, b<sup>B</sup>))</li>
             <li>Mult FxP: O(b<sup>A</sup> · b<sup>B</sup>)</li>
@@ -267,6 +390,12 @@
         ⚡ Por eso reducir bits y elegir formato tiene impacto directo en HW, energía y velocidad.
       </p>
     </div>
+    <aside class="notes">
+      <p>Contar MACs no alcanza: no todas las operaciones cuestan lo mismo en hardware.</p>
+      <p>Una multiplicación es mucho más cara que una suma; en punto fijo, la suma crece lineal con los bits y la multiplicación, con el producto de los bits. Pasar de 32 a 8 bits no ahorra 4 veces sino bastante más en la multiplicación.</p>
+      <p>Punto flotante es todavía más caro: hay que alinear exponentes, normalizar, redondear.</p>
+      <p>Esto es lo que hay detrás del INT8 de la demo: no solo ocupa 4 veces menos memoria, también hace cada MAC más barato.</p>
+    </aside>
   </section>
 
   <section>
@@ -275,8 +404,8 @@
       <div
         style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 15px; border-left: 3px solid #8be9fd;">
         <strong style="color: #8be9fd;">Optimización algorítmica</strong>
-        <p style="margin: 0.3rem 0 0;">Algoritmos más eficientes (ej. SGD en vez de optimización exacta),
-          reducción de dimensionalidad.</p>
+        <p style="margin: 0.3rem 0 0;">Calcular lo mismo con menos operaciones o menos accesos a memoria (ej.
+          fusionar BatchNorm en la convolución, Winograd).</p>
       </div>
       <div
         style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 15px; border-left: 3px solid #50fa7b;">
@@ -292,6 +421,14 @@
             materia.</strong></p>
       </div>
     </div>
+    <aside class="notes">
+      <p>Tres caminos, que se combinan:</p>
+      <ul>
+        <li>Optimización algorítmica: el mismo modelo y el mismo resultado, pero calculado de forma más eficiente. Ejemplo: fusionar BatchNorm en la convolución anterior, o Winograd para convoluciones 3×3. Tiene su propia sección.</li>
+        <li>Hardware especializado: hace cada operación más rápida (o muchas en paralelo), pero no cambia cuántas hay. Ya lo vimos en la demo: la misma red corre mucho más rápido en el ESP32-S3 que en la ESP32-CAM por sus instrucciones vectoriales.</li>
+        <li>Compresión: cambia el modelo para que tenga menos parámetros, menos operaciones u operaciones más baratas (menos bits). Es el foco de la materia.</li>
+      </ul>
+    </aside>
   </section>
 
   <!-- ===================== MÉTODOS DE COMPRESIÓN ===================== -->
@@ -299,9 +436,8 @@
   <section>
     <h3>Compresión de redes neuronales</h3>
     <p style="font-size: 0.75em; text-align: left;">Reducir tamaño y complejidad sin comprometer significativamente
-      el rendimiento.
-      <strong>Criticidad en la inferencia</strong>: el entrenamiento ocurre una vez, la inferencia se ejecuta
-      continuamente en producción.
+      el rendimiento. <strong>Lo que importa es la inferencia</strong>: el entrenamiento ocurre una vez, la
+      inferencia se ejecuta continuamente en producción.
     </p>
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 0.55em; margin-top: 0.5rem;">
       <div
@@ -330,17 +466,29 @@
       </div>
       <div
         style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px; border-left: 3px solid #ffb86c;">
-        <strong style="color: #ffb86c;">NAS (Neural Architecture Search)</strong>
+        <strong style="color: #ffb86c;">Búsqueda de arquitectura (NAS)</strong>
         <p style="margin: 0.3rem 0 0;">Búsqueda automatizada de la arquitectura óptima que minimice recursos
           manteniendo rendimiento.</p>
       </div>
       <div
         style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px; border-left: 3px solid #f1fa8c;">
-        <strong style="color: #f1fa8c;">Weight sharing + Codificación</strong>
+        <strong style="color: #f1fa8c;">Weight sharing + codificación</strong>
         <p style="margin: 0.3rem 0 0;">Técnicas genéricas de compresión de datos aplicadas a los parámetros del
           modelo (Huffman, etc.).</p>
       </div>
     </div>
+    <aside class="notes">
+      <p>Panorama rápido: cada uno tiene su sección, acá solo la idea.</p>
+      <ul>
+        <li>Poda: sacar lo que no aporta. Estructurada (filtros enteros, achica de verdad el cómputo) o no estructurada (pesos sueltos, necesita soporte de hardware o de formato para ganar algo).</li>
+        <li>Cuantización: menos bits por número. Es la que más se usa; en la demo, FP32 → INT8.</li>
+        <li>Factorización: aproximar una matriz grande por el producto de dos chicas (SVD, Tucker, CP).</li>
+        <li>Destilación: una red chica aprende imitando las salidas de una grande.</li>
+        <li>NAS: buscar automáticamente la arquitectura, con el costo en hardware como parte del objetivo.</li>
+        <li>Weight sharing y codificación: agrupar pesos parecidos y codificarlos (como Huffman); comprime el almacenamiento.</li>
+      </ul>
+      <p>En la demo se combinaron varias: resolución menor, convoluciones depthwise (diseño de arquitectura), poda e INT8. Y la frontera de Pareto de la clase pasada salió de combinarlas de distintas formas.</p>
+    </aside>
   </section>
 
   <!-- ===================== ETAPAS DEL PROYECTO ===================== -->
@@ -355,11 +503,15 @@
       <p style="font-size: 0.75em; text-align: center; max-width: 800px; margin: 0 auto;">Después del diseño y
         entrenamiento del modelo, aparecen etapas críticas para adaptar la red a hardware con recursos limitados.</p>
     </div>
+    <aside class="notes">
+      <p>El diagrama de las etapas de un proyecto de IA que vimos en la intro: datos, diseño y entrenamiento del modelo, evaluación, despliegue.</p>
+      <p>Pregunta (fragmento): ¿dónde entra la IA embebida? Después de tener un modelo entrenado, antes de desplegarlo, aparecen etapas nuevas para adaptarlo al hardware.</p>
+    </aside>
   </section>
 
   <section data-auto-animate>
-    <h3>Incorporando IA Embebida</h3>
-    <h4 style="color: #50fa7b; font-size: 0.9em; margin-bottom: 1.5rem;">1. Búsqueda de Arquitectura Neuronal (NAS)</h4>
+    <h3>Incorporando IA embebida</h3>
+    <h4 style="color: #50fa7b; font-size: 0.9em; margin-bottom: 1.5rem;">1. Búsqueda de arquitectura neuronal (NAS)</h4>
     <div class="diagram-header">
       <div data-external-replace="./figures/00_intro-proyecto_ia_diagram_v1.html"></div>
     </div>
@@ -367,11 +519,14 @@
       El proceso se vuelve iterativo desde la <strong style="color: #50fa7b;">Evaluación</strong> hacia la <strong
         style="color: #50fa7b;">Selección de modelo</strong>.
     </p>
+    <aside class="notes">
+      <p>Primera variante: NAS. La evaluación ya no es el final: si el modelo no cumple (accuracy o costo en el hardware), se vuelve a elegir otra arquitectura. El proceso se vuelve un lazo.</p>
+    </aside>
   </section>
 
   <section data-auto-animate>
-    <h3>Incorporando IA Embebida</h3>
-    <h4 style="color: #8be9fd; font-size: 0.9em; margin-bottom: 1.5rem;">2. Métodos de Compresión</h4>
+    <h3>Incorporando IA embebida</h3>
+    <h4 style="color: #8be9fd; font-size: 0.9em; margin-bottom: 1.5rem;">2. Métodos de compresión</h4>
     <div class="diagram-header">
       <div data-external-replace="./figures/00_intro-proyecto_ia_diagram_v2.html"></div>
     </div>
@@ -379,17 +534,23 @@
       Se añaden etapas de <strong style="color: #8be9fd;">Compresión</strong> y <strong
         style="color: #8be9fd;">Evaluación post-compresión</strong> antes del despliegue.
     </p>
+    <aside class="notes">
+      <p>Segunda variante: compresión. Se parte de un modelo ya entrenado, se lo comprime y se lo vuelve a evaluar, porque la compresión puede bajar la accuracy (como vimos en la demo).</p>
+    </aside>
   </section>
 
   <section data-auto-animate>
-    <h3>Incorporando IA Embebida</h3>
-    <h4 style="color: #ff79c6; font-size: 0.9em; margin-bottom: 1.5rem;">3. NAS + Métodos de Compresión</h4>
+    <h3>Incorporando IA embebida</h3>
+    <h4 style="color: #ff79c6; font-size: 0.9em; margin-bottom: 1.5rem;">3. NAS + métodos de compresión</h4>
     <div class="diagram-header">
       <div data-external-replace="./figures/00_intro-proyecto_ia_diagram_v3.html"></div>
     </div>
     <p style="font-size: 0.65em; margin-top: 1.5rem; color: #f8f8f2;">
       El ciclo completo: iteración de arquitectura y optimización del modelo pre-despliegue.
     </p>
+    <aside class="notes">
+      <p>El ciclo completo: buscar arquitectura y comprimir, con evaluación en cada vuelta. En la práctica es lo que hicimos para la demo: cada punto del gráfico de Pareto es una vuelta de este ciclo.</p>
+    </aside>
   </section>
 
   <section>
@@ -415,7 +576,7 @@
       </div>
       <div
         style="flex: 1; min-width: 160px; background: rgba(255,121,198,0.1); border-radius: 0.5rem; padding: 12px; border-left: 3px solid #ff79c6;">
-        <strong style="color: #ff79c6;">④ Evaluac. post-comp.</strong>
+        <strong style="color: #ff79c6;">④ Evaluación post-compresión</strong>
         <p style="margin: 0.3rem 0 0;">Verificar que el modelo comprimido cumple con las métricas de
           rendimiento y restricciones del hardware.</p>
       </div>
@@ -429,6 +590,16 @@
     <p style="font-size: 0.7em; margin-top: 1rem; color: #ffb86c;">
       💡 Estos pasos pueden iterarse: si la evaluación falla, se vuelve a comprimir o a buscar otra arquitectura.
     </p>
+    <aside class="notes">
+      <p>Las etapas nuevas, en orden:</p>
+      <ul>
+        <li>Evaluar la complejidad (parámetros, MACs, memoria) contra lo que tiene la placa: ¿entra?, ¿llega a tiempo? Es lo que hicimos hoy con las fórmulas.</li>
+        <li>NAS y compresión para bajar ese costo.</li>
+        <li>Evaluar de nuevo, ahora el modelo comprimido: accuracy y, si se puede, tiempo medido en la placa (los MACs son solo un proxy, como vimos en la demo).</li>
+        <li>Desplegar en el dispositivo.</li>
+      </ul>
+      <p>Si algo falla, se itera. Es el mismo camino que van a recorrer en el TP.</p>
+    </aside>
   </section>
 
   <!-- ===================== CIERRE ===================== -->
@@ -436,21 +607,25 @@
   <section>
     <h3>Resumen: introducción a IA embebida</h3>
     <ul style="font-size: 0.65em; text-align: left; max-width: 800px; margin: 1rem auto;">
-      <li style="margin-bottom: 0.4rem;">El ecosistema de IA se compone de <strong>5 capas</strong>:
-        energía, chips e infraestructura, data centers, modelos y aplicaciones.</li>
-      <li style="margin-bottom: 0.4rem;">La <strong>IA embebida</strong> (Edge AI) resuelve la inferencia en entornos
-        con memoria y cómputo limitados, aunque los desafíos de eficiencia también aplican a modelos de nube.</li>
-      <li style="margin-bottom: 0.4rem;">Conocer la <strong>complejidad computacional</strong> (parámetros y MACs)
-        es crítico, siendo igual de importante diferenciar el impacto de las operaciones en el hardware de destino.</li>
-      <li style="margin-bottom: 0.4rem;">Frente a esto, existen múltiples estrategias de optimización algorítmica y de
-        hardware, pero la principal en la materia es la <strong>compresión de modelos</strong>.</li>
-      <li style="margin-bottom: 0.4rem;">Por lo tanto, el <strong>ciclo completo del proyecto</strong> suma etapas
-        ineludibles como evaluar la complejidad, aplicar NAS, realizar la compresión y desplegar sobre el hardware
-        objetivo.</li>
+      <li style="margin-bottom: 0.4rem;">El ecosistema de IA se apoya en <strong>5 capas</strong> (energía, chips,
+        data centers, modelos y aplicaciones); la <strong>IA embebida</strong> lleva los modelos al dispositivo, con
+        memoria, cómputo y energía limitados.</li>
+      <li style="margin-bottom: 0.4rem;">La eficiencia no es solo un problema del edge: la compresión también abarata
+        servir modelos en la nube.</li>
+      <li style="margin-bottom: 0.4rem;">El costo de una red se cuenta en <strong>parámetros</strong> (memoria) y
+        <strong>MACs</strong> (tiempo), pero también importa el tipo de operación (bits, FxP o FlP).</li>
+      <li style="margin-bottom: 0.4rem;">Para bajarlo hay optimización algorítmica, hardware especializado y
+        <strong>compresión</strong>, que es el foco de la materia.</li>
+      <li style="margin-bottom: 0.4rem;">El proyecto suma etapas: evaluar la complejidad, NAS, compresión, evaluación
+        post-compresión y despliegue, iterando hasta cumplir.</li>
     </ul>
     <p style="font-size: 0.65em; margin-top: 1.5rem; color: #6272a4; font-style: italic;">
       A continuación: técnicas de compresión en detalle →
     </p>
+    <aside class="notes">
+      <p>Repasar los cinco puntos rápido. El hilo: el contexto (dónde está la IA embebida), cómo medir el costo, cómo bajarlo y dónde entra en el proyecto.</p>
+      <p>A continuación: las técnicas de compresión, una por sección, empezando por la introducción a la compresión.</p>
+    </aside>
   </section>
 
 </section>
