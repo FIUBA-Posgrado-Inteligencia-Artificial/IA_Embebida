@@ -227,23 +227,23 @@
     <h3>Ejercicio en clase: capa densa</h3>
     <div style="font-size: 0.75em; text-align: left;">
       <p>Supongamos una capa densa (fully connected) con:</p>
-      <ul>
-        <li><strong>N</strong> entradas.</li>
-        <li><strong>M</strong> neuronas (salidas).</li>
+      <ul style="font-size: 0.9em;">
+        <li><code>N</code> entradas</li>
+        <li><code>M</code> neuronas (salidas)</li>
       </ul>
-      <p
-        style="margin: 0.8rem 0; font-family: monospace; background: rgba(0,0,0,0.2); display: inline-block; padding: 0.2rem 0.5rem; border-radius: 0.3rem;">
-        y = &phi;(W &middot; x + b)</p>
+      <p style="text-align: center; margin: 0.8rem 0;"><code>y = &phi;(W &middot; x + b)</code></p>
       <p style="margin-top: 1rem; color: #ffb86c;">¿Cuántos <strong>parámetros</strong> y cuántas <strong>operaciones
           (MACs)</strong> tiene esta capa?</p>
       <div class="fragment"
-        style="margin-top: 1.5rem; background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 0.5rem; border-left: 3px solid #50fa7b;">
-        <ul style="list-style-type: none; padding: 0;">
-          <li style="margin-bottom: 0.5rem;"><strong style="color: #50fa7b;">Parámetros:</strong>
-            <code>(N × M) pesos + M sesgos</code>
+        style="margin-top: 1rem; background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 0.5rem; border-left: 3px solid #8be9fd;">
+        <ul style="list-style-type: none; padding: 0; margin: 0; font-size: 0.9em;">
+          <li style="margin-bottom: 0.5rem;"><strong style="color: #8be9fd;">Parámetros:</strong>
+            <code>N × M</code> pesos + <code>M</code> sesgos
           </li>
-          <li><strong style="color: #50fa7b;">MACs:</strong> <code>N × M</code> <br><span
-              style="font-size: 0.85em; opacity: 0.8;">(cada salida acumula N multiplicaciones)</span></li>
+          <li><strong style="color: #8be9fd;">MACs:</strong> <code>N × M</code>
+            <br><span style="font-size: 0.85em; opacity: 0.8;">(cada salida acumula <code>N</code>
+              multiplicaciones)</span>
+          </li>
         </ul>
       </div>
     </div>
@@ -261,26 +261,24 @@
       <p>Supongamos una capa convolucional con:</p>
       <ul style="font-size: 0.9em;">
         <li>Resolución espacial de entrada: <code>H<sub>in</sub> × W<sub>in</sub></code></li>
-        <li>Stride: S = (1,1)</li>
-        <li>Modo: valid</li>
         <li>Canales de entrada: <code>C<sub>in</sub></code></li>
         <li>Tamaño del filtro: <code>H<sub>K</sub> × W<sub>K</sub></code></li>
         <li>Canales de salida: <code>C<sub>out</sub></code></li>
+        <li>Stride <code>1</code>, modo <em>valid</em> (sin padding)</li>
       </ul>
-      <p style="margin-top: 1rem; color: #ffb86c;">¿Cuántos <strong>parámetros</strong> y <strong>MACs</strong> tiene
-        esta capa?</p>
+      <p style="margin-top: 1rem; color: #ffb86c;">¿Cuántos <strong>parámetros</strong> y cuántas <strong>operaciones
+          (MACs)</strong> tiene esta capa?</p>
       <div class="fragment"
         style="margin-top: 1rem; background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 0.5rem; border-left: 3px solid #8be9fd;">
-        <ul style="list-style-type: none; padding: 0; font-size: 0.9em;">
+        <ul style="list-style-type: none; padding: 0; margin: 0; font-size: 0.9em;">
           <li style="margin-bottom: 0.5rem;"><strong style="color: #8be9fd;">Parámetros:</strong>
-            <code>(H<sub>K</sub> × W<sub>K</sub> × C<sub>in</sub>) × C<sub>out</sub> + C<sub>out</sub></code>
+            <code>(H<sub>K</sub> × W<sub>K</sub> × C<sub>in</sub>) × C<sub>out</sub></code> pesos +
+            <code>C<sub>out</sub></code> sesgos
           </li>
           <li><strong style="color: #8be9fd;">MACs:</strong>
             <code>(H<sub>K</sub> × W<sub>K</sub> × C<sub>in</sub>) × H<sub>out</sub> × W<sub>out</sub> × C<sub>out</sub></code>
-            <br><span style="font-size: 0.85em; opacity: 0.8;">(donde
-              <code>H<sub>out</sub> = H<sub>in</sub> - H<sub>K</sub> + 1</code> y
-              <code>W<sub>out</sub> = W<sub>in</sub> - W<sub>K</sub> + 1</code> por ser <em>valid</em> con stride
-              1)</span>
+            <br><span style="font-size: 0.85em; opacity: 0.8;">(con <code>H<sub>out</sub> = H<sub>in</sub> - H<sub>K</sub> + 1</code>
+              y <code>W<sub>out</sub> = W<sub>in</sub> - W<sub>K</sub> + 1</code>, por ser <em>valid</em> con stride 1)</span>
           </li>
         </ul>
       </div>
