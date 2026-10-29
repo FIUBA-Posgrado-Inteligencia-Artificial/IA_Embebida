@@ -79,6 +79,7 @@ clases/figures/demo/gato.png
 clases/figures/demo/mono.png
 clases/figures/demo/pajaro.png
 clases/figures/demo/perro.png
+clases/figures/demo_detalle-pareto-3d.png
 clases/figures/demo_detalle-pareto-macs.png
 clases/figures/demo_detalle-pareto-params.png
 clases/figures/demo_detalle-pareto.png
