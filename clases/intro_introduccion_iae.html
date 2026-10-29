@@ -207,6 +207,8 @@
       <ul style="font-size: 0.9em;">
         <li style="margin-bottom: 0.3rem;">Constantes se desprecian: O(2n·m) → O(n·m)</li>
         <li style="margin-bottom: 0.3rem;">Solo importa el término dominante: O(n² + n·log n) → O(n²)</li>
+        <li style="margin-bottom: 0.3rem;">Sin contar exacto, sirve para ver la <strong>escalabilidad</strong> de una red:
+          cómo crecen tiempo y memoria si aumenta la resolución, los canales o las capas.</li>
         <li>En una red concreta no alcanza con el crecimiento: se cuenta exacto.
           <ul>
             <li>Tiempo → MACs: multiplicaciones-acumulaciones por inferencia</li>
@@ -218,7 +220,8 @@
     <aside class="notes">
       <p>Ejemplos: acceder a un elemento de un arreglo es O(1); recorrerlo, O(n); comparar todos contra todos, O(n²).</p>
       <p>Simplificaciones: se descartan las constantes y los términos que crecen más lento.</p>
-      <p>Pero en IA embebida no comparamos cómo escala un algoritmo: tenemos una red fija y una placa fija, y la pregunta es "¿entra y llega a tiempo?". Ahí las constantes importan (2× más MACs es 2× más tiempo), así que contamos exacto.</p>
+      <p>Para qué sirve en redes: para ver cómo escala una arquitectura antes de elegir los números. Por ejemplo, una convolución es O(H·W) en la resolución: duplicar el lado de la imagen cuadruplica los MACs. Lo vamos a ver comparando la densa y la convolucional después de los ejercicios.</p>
+      <p>Pero cuando ya tenemos una red concreta no alcanza con cómo escala: tenemos una red fija y una placa fija, y la pregunta es "¿entra y llega a tiempo?". Ahí las constantes importan (2× más MACs es 2× más tiempo), así que contamos exacto.</p>
       <p>MACs como proxy del tiempo y parámetros como proxy de la memoria. Ojo: la memoria también incluye las activaciones intermedias, que en una CNN pueden pesar más que los parámetros.</p>
     </aside>
   </section>
@@ -288,6 +291,65 @@
       <p>Parámetros: cada filtro tiene H<sub>K</sub>·W<sub>K</sub>·C<sub>in</sub> pesos, y hay C<sub>out</sub> filtros, más un sesgo por filtro. No dependen de la resolución de la entrada.</p>
       <p>MACs: cada valor de salida es un producto escalar de H<sub>K</sub>·W<sub>K</sub>·C<sub>in</sub> términos, y hay H<sub>out</sub>·W<sub>out</sub>·C<sub>out</sub> valores de salida.</p>
       <p>Diferencia clave con la densa: los mismos pesos se reusan en cada posición de la imagen. Por eso una convolución tiene pocos parámetros pero muchos MACs, y los MACs crecen con la resolución.</p>
+    </aside>
+  </section>
+
+  <section>
+    <h3>Densa vs. convolucional</h3>
+    <table style="font-size: 0.55em; width: 100%; border-collapse: collapse; margin-top: 0.5rem;">
+      <thead>
+        <tr style="border-bottom: 2px solid #fff;">
+          <th style="padding: 6px;"></th>
+          <th style="padding: 6px; color: #8be9fd;">Densa</th>
+          <th style="padding: 6px; color: #ffb86c;">Convolucional</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+          <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);"><strong>Parámetros</strong></td>
+          <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);"><code>N·M + M</code></td>
+          <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);"><code>H<sub>K</sub>·W<sub>K</sub>·C<sub>in</sub>·C<sub>out</sub> + C<sub>out</sub></code></td>
+        </tr>
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+          <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);"><strong>MACs</strong></td>
+          <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);"><code>N·M</code></td>
+          <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);"><code>H<sub>K</sub>·W<sub>K</sub>·C<sub>in</sub>·C<sub>out</sub>·H<sub>out</sub>·W<sub>out</sub></code></td>
+        </tr>
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+          <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);"><strong>Big O</strong> (parámetros / MACs)</td>
+          <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">O(N·M) / O(N·M)</td>
+          <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">O(K²·C<sub>in</sub>·C<sub>out</sub>) / O(K²·C<sub>in</sub>·C<sub>out</sub>·H·W)</td>
+        </tr>
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+          <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);"><strong>Usos de cada peso</strong> por inferencia</td>
+          <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">1 (MACs ≈ parámetros)</td>
+          <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">H<sub>out</sub>·W<sub>out</sub> (uno por posición)</td>
+        </tr>
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+          <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);"><strong>Cuello de botella</strong></td>
+          <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">Memoria</td>
+          <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">Cómputo</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="fragment"
+      style="margin-top: 1rem; font-size: 0.6em; text-align: left; background: rgba(255,255,255,0.05); padding: 0.8rem 1rem; border-radius: 0.5rem; border-left: 3px solid #8be9fd;">
+      <p style="margin: 0 0 0.4rem; color: #ffb86c;">Escalabilidad: ¿qué pasa si duplicamos el lado de la imagen de entrada?</p>
+      <ul style="margin: 0; padding-left: 1.2em;">
+        <li><strong style="color: #8be9fd;">Densa</strong> (con la imagen aplanada como entrada): <code>N</code> ×4, así que
+          parámetros ×4 y MACs ×4.</li>
+        <li><strong style="color: #ffb86c;">Convolucional:</strong> parámetros ×1 y MACs ×4.</li>
+      </ul>
+    </div>
+    <aside class="notes">
+      <p>Las dos respuestas de los ejercicios, una al lado de la otra.</p>
+      <ul>
+        <li>En Big O, K es el lado del filtro (H<sub>K</sub> = W<sub>K</sub> = K) y H·W la resolución, porque con padding la salida tiene la resolución de la entrada. Se desprecian los sesgos y el "+1" del modo valid.</li>
+        <li>La diferencia de fondo es el reuso: en la densa cada peso se usa una vez; en la convolución, una vez por posición de la imagen.</li>
+        <li>Consecuencia práctica: una densa pesa en memoria (hay que traer cada peso para usarlo una sola vez); una convolución pesa en cómputo.</li>
+      </ul>
+      <p>Pregunta de escalabilidad (mostrar el fragmento después de que respondan): duplicar el lado son 4 veces más píxeles. La densa conectada a la imagen crece 4 veces en todo; la convolución no cambia sus parámetros, pero hace 4 veces más MACs. Es justo lo que hace la demo: el chico usa 32×32 en lugar de 96×96 (9 veces menos píxeles) y se ahorra 9 veces los MACs de cada convolución.</p>
+      <p>Por eso las CNN reemplazaron a las densas en imágenes: con una densa sobre una imagen de 96×96×3 y 100 neuronas ya serían 2.8 M de parámetros.</p>
     </aside>
   </section>
 
