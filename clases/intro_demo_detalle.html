@@ -348,6 +348,25 @@
     </section>
 
     <section>
+        <h3>Muchas combinaciones posibles</h3>
+        <img src="figures/demo_detalle-pareto-3d.png"
+            alt="Los 299 modelos con tres objetivos a la vez: en 3D (MACs, parámetros, accuracy) y como mapa de calor de MACs vs. parámetros con la accuracy en color"
+            style="width: 92%; margin: 0;">
+        <p style="font-size: 0.6em; margin-top: 0.3rem;">Tres objetivos a la vez: menos MACs, menos parámetros y
+            más accuracy.</p>
+        <aside class="notes">
+          <p>La frontera de Pareto no está limitada a dos ejes: la definición sirve para cualquier cantidad de objetivos. Acá están los mismos 299 modelos con los tres a la vez.</p>
+          <ul>
+            <li>Izquierda, en 3D: MACs y parámetros en el piso (escala log) y accuracy en altura. En verde, los no dominados con los tres objetivos.</li>
+            <li>Derecha, el mismo dato "aplastado" en 2D: MACs vs. parámetros, con la accuracy como color (amarillo = mejor). Cuando hay más de tres objetivos ya no se puede dibujar en 3D, y se usa este tipo de truco (color, tamaño) o gráficos de a pares.</li>
+          </ul>
+          <p>Las dos diagonales son las dos resoluciones de entrada: 32×32 (arriba a la izquierda) y 96×96 (abajo a la derecha). Con los mismos parámetros, la imagen 9 veces más grande hace 9 veces más MACs. A lo largo de cada diagonal, el pruning va achicando el modelo.</p>
+          <p>Dato para remarcar: con dos objetivos la frontera tenía 21 modelos (MACs) y 17 (parámetros); con tres tiene 33. Cuantos más objetivos, más difícil es que un modelo domine a otro en todos, y la frontera crece: hay más "empates" entre los que elegir.</p>
+          <p>Ni el grande ni el chico están en la frontera ni siquiera con tres objetivos: para cada uno hay otro modelo mejor o igual en todo.</p>
+        </aside>
+    </section>
+
+    <section>
         <h3>Algunos de esos modelos, en la placa</h3>
         <table style="font-size: 0.55em; width: 100%; border-collapse: collapse; margin-top: 0.5rem;">
             <thead>
