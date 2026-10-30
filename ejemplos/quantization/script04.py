@@ -1,9 +1,9 @@
 """
 Sección 6 — Cuantización: Visualización de Resultados
 ======================================================
-Lee el JSON producido por script03.py (formato barrido 3 pasos) y genera:
-  - Una figura con 3 subplots (uno por paso): curvas PTQ y QAT vs. bits.
-  - Una figura resumen con los 3 pasos superpuestos (sólo la mejor métrica).
+Lee el JSON producido por script03.py (barrido de las tres formas de cuantizar) y genera:
+  - Una figura con 3 subplots (uno por forma): curvas PTQ y QAT vs. bits.
+  - Una figura resumen con las 3 formas superpuestas (sólo la mejor métrica).
 
 También es capaz de leer el formato antiguo de script03 (6 estrategias) para
 retrocompatibilidad.
@@ -69,7 +69,7 @@ def plot_new_format(data: dict, output_dir: str):
         ax.legend(fontsize=7)
 
     axes[0].set_ylabel("Accuracy")
-    fig.suptitle(f"Cuantización en 3 Pasos vs Bitwidth — Modelo: {model_type.upper()}", fontsize=11)
+    fig.suptitle(f"Tres formas de cuantizar vs. bits — Modelo: {model_type.upper()}", fontsize=11)
     plt.tight_layout()
 
     plot_path = os.path.join(output_dir, f"{model_type}_barrido_3pasos.png")
@@ -102,7 +102,7 @@ def plot_new_format(data: dict, output_dir: str):
     ax2.set_xlabel("Bits de cuantización")
     ax2.set_ylabel("Accuracy")
     metric_label = "QAT" if run_qat else "PTQ"
-    ax2.set_title(f"Comparación 3 Pasos ({metric_label}) — Modelo: {model_type.upper()}")
+    ax2.set_title(f"Comparación de las tres formas ({metric_label}) — Modelo: {model_type.upper()}")
     ax2.legend(fontsize=8)
     ax2.grid(axis="y", linestyle=":", alpha=0.5)
     all_bits = sorted(set(b for s in steps_meta for b_str, r in results.get(s["id"], {}).items()

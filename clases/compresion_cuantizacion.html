@@ -9,7 +9,7 @@
             <li style="margin-bottom: 0.3rem;">Esquemas: simetría, estática/dinámica, granularidad</li>
             <li style="margin-bottom: 0.3rem;">PTQ y QAT</li>
             <li style="margin-bottom: 0.3rem;">Casos especiales, LLMs y eficiencia en hardware</li>
-            <li>Ejemplo en código: cuantización en 3 pasos, a 8 y a 4 bits</li>
+            <li>Ejemplo en código: tres formas de cuantizar, de 2 a 8 bits</li>
         </ul>
         <aside class="notes">
             <p>La técnica más usada de la materia: casi todo despliegue en embebidos pasa por acá. En la demo, los dos modelos están cuantizados a INT8.</p>
@@ -245,7 +245,8 @@
             <p>Cuantización aplicada <strong>después</strong> del entrenamiento, sin reentrenar el modelo:</p>
             <ol style="margin-top: 0.5rem;">
                 <li style="margin-bottom: 0.4rem;"><strong>Calibración:</strong> pasar un subconjunto pequeño de datos
-                    (reales o sintéticos) por la red para estimar los rangos de las activaciones.</li>
+                    por la red para estimar los rangos de las activaciones: idealmente reales y representativos (con o
+                    sin etiquetas), pero también sirven sintéticos o aleatorios.</li>
                 <li style="margin-bottom: 0.4rem;"><strong>Parámetros:</strong> elegir escala (y zero-point) para cada
                     tensor.</li>
                 <li><strong>Aplicar:</strong> convertir el modelo a la representación de menor precisión.</li>
@@ -271,7 +272,8 @@
         </div>
         <aside class="notes">
             <p>Se toma la red ya entrenada, se miden estadísticas (máximo, mínimo, percentiles) de pesos y activaciones, se elige la aritmética de cada tensor y se cuantiza. Nada de backpropagation.</p>
-            <p>Para los pesos alcanza con mirarlos. Para las activaciones hay que pasar datos. Si no hay dataset (por la razón que sea), sirven imágenes sintéticas o incluso aleatorias: lo que hace falta es una idea razonable de los rangos, no las etiquetas.</p>
+            <p>Para los pesos alcanza con mirarlos. Para las activaciones hay que pasar datos. Lo ideal son datos reales y representativos de lo que va a ver el modelo en producción; las etiquetas no hacen falta, solo las entradas. Si no hay dataset (por la razón que sea), sirven imágenes sintéticas o incluso aleatorias: lo que hace falta es una idea razonable de los rangos.</p>
+            <p>En el ejemplo de código se pueden probar las dos: <code>CALIBRACION = "real"</code> o <code>"aleatoria"</code> en <code>script02.py</code>.</p>
             <p>A 8 bits suele andar muy bien. Por debajo (6, 4 bits) empieza a fallar, y una mala calibración (datos poco representativos) da errores sistemáticos, aunque se pueden detectar y recalibrar.</p>
             <p>Es lo que se usó en la demo: PTQ a INT8 con la herramienta de Espressif (esp-ppq).</p>
         </aside>
@@ -451,9 +453,44 @@
             </ul>
         </div>
         <aside class="notes">
-            <p>Sensibilidad: un error en la primera capa se propaga por toda la red, y la última decide directamente la clase. En el ejemplo que viene, el paso 3 deja justamente esas dos en más bits.</p>
+            <p>Sensibilidad: un error en la primera capa se propaga por toda la red, y la última decide directamente la clase. En el ejemplo que viene, la forma "bits totales por capa" deja justamente esas dos en más bits.</p>
             <p>Convoluciones vs. densas: lo que vimos en la intro de IA embebida. En el LeNet del ejemplo, las densas tienen la mayoría de los parámetros. En el modelo grande de la demo, la densa es 1 k de 60 k parámetros: ahí la memoria también está en las convoluciones.</p>
             <p>Conclusión: no hay regla fija; hay que mirar dónde están los parámetros y los MACs de cada red concreta.</p>
+        </aside>
+    </section>
+
+    <section>
+        <h3>Eficiencia en hardware real</h3>
+        <div style="font-size: 0.68em; text-align: left;">
+            <div
+                style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 0.5rem; font-size: 0.9em;">
+                <div style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px;">
+                    <strong style="color: #50fa7b;">CPUs y GPUs</strong>
+                    <p style="margin: 0.3rem 0 0;">INT8 da ~2× el throughput de FP16. Una suma INT8 gasta ~30× menos
+                        energía que una suma FP32.</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px;">
+                    <strong style="color: #ffb86c;">Microcontroladores</strong>
+                    <p style="margin: 0.3rem 0 0;">Sin FPU rápida, INT8 es casi obligatorio. Con instrucciones SIMD
+                        (ESP32-S3, Cortex-M con DSP) se hacen varios MACs de 8 bits por ciclo.</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px;">
+                    <strong style="color: #ff79c6;">FPGAs</strong>
+                    <p style="margin: 0.3rem 0 0;">Total flexibilidad de bits por capa; FINN genera aceleradores para
+                        redes binarizadas, muy rápidos y eficientes.</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px;">
+                    <strong style="color: #8be9fd;">ASICs y NPUs</strong>
+                    <p style="margin: 0.3rem 0 0;">El Google Edge TPU, por ejemplo, solo ejecuta INT8: máxima eficiencia,
+                        poca flexibilidad.</p>
+                </div>
+            </div>
+        </div>
+        <aside class="notes">
+            <p>El 30× de energía es de las mediciones de Horowitz (2014): suma de 8 bits ≈ 0.03 pJ vs. suma FP32 ≈ 0.9 pJ, en 45 nm.</p>
+            <p>Microcontroladores: es el caso de la demo. El ESP32-S3 hace varios MACs de 8 bits por instrucción con su SIMD; el ESP32 de la ESP32-CAM no tiene SIMD, y por eso la misma red tarda mucho más ahí.</p>
+            <p>FPGAs: se puede elegir cualquier ancho de bits por capa, porque el hardware se arma a medida; ahí la precisión mixta rinde de verdad. FINN (AMD/Xilinx) genera aceleradores para redes binarizadas o de pocos bits.</p>
+            <p>ASICs y NPUs: muy eficientes, pero aceptan pocos formatos. Hay que elegir el hardware desde el principio del proyecto, porque condiciona qué cuantización se puede usar.</p>
         </aside>
     </section>
 
@@ -490,41 +527,6 @@
         </aside>
     </section>
 
-    <!-- ===================== EJEMPLO EN CÓDIGO ===================== -->
-
-    <section>
-        <h3>Ejemplo en código: el modelo base</h3>
-        <div style="font-size: 0.72em; text-align: left;">
-            <p style="margin-bottom: 0.8rem;">El script <code>examples/quantization/script01.py</code> entrena los
-                modelos base que sirven de referencia para todos los experimentos de cuantización:</p>
-            <div style="display: flex; gap: 1rem; margin-bottom: 0.8rem;">
-                <div style="flex: 1; background: rgba(139,233,253,0.1); padding: 0.7rem; border-radius: 0.5rem;">
-                    <p style="color: #8be9fd; margin: 0 0 0.3rem;"><strong>CNN (LeNet-5)</strong></p>
-                    <p style="margin: 0; font-size: 0.95em;">Conv(1→6, 5×5) → pool → conv(6→16, 5×5) → pool →
-                        densas(400→120→84→10)<br>61.7 k parámetros, 89.1 % en Fashion MNIST.<br>Se guarda en
-                        <code>models/cnn_baseline.h5</code>.
-                    </p>
-                </div>
-                <div style="flex: 1; background: rgba(189,147,249,0.1); padding: 0.7rem; border-radius: 0.5rem;">
-                    <p style="color: #bd93f9; margin: 0 0 0.3rem;"><strong>MLP</strong></p>
-                    <p style="margin: 0; font-size: 0.95em;">Densas(784→256→128→64→10) con ReLU<br>Se guarda en
-                        <code>models/mlp_baseline.h5</code>.<br>Punto de comparación para cuantización en capas densas.
-                    </p>
-                </div>
-            </div>
-            <div style="background: rgba(255,255,255,0.07); padding: 0.6rem; border-radius: 0.5rem; font-size: 0.9em;">
-                <p style="margin: 0;"><strong style="color: #50fa7b;">Flujo:</strong> <code>script01</code> entrena y
-                    guarda → <code>script02</code> cuantiza en 3 pasos a un número de bits fijo →
-                    <code>script03</code> barre los bits → <code>script04</code> grafica el barrido.</p>
-            </div>
-        </div>
-        <aside class="notes">
-            <p>Modelos simples a propósito, para que todo corra en minutos en una CPU. Para el TP conviene algo más realista.</p>
-            <p>La cuantización se hace con QKeras: reemplaza cada Conv2D y Dense por QConv2D y QDense, que aplican fake quantization a pesos, sesgos y activaciones. Se ve en el summary del modelo cuantizado.</p>
-            <p>Comandos: <code>cd examples/quantization &amp;&amp; uv run python script01.py cnn</code> y después <code>uv run python script02.py cnn</code>.</p>
-        </aside>
-    </section>
-
     <section>
         <h3>Clipping: máximo vs. percentil</h3>
         <div style="font-size: 0.7em; text-align: left;">
@@ -548,77 +550,158 @@
             </div>
         </div>
         <aside class="notes">
-            <p>Pesos de la primera convolución del ejemplo, a 8 bits. Las líneas rojas son los niveles de cuantización.</p>
+            <p>Pesos de la primera convolución del ejemplo que viene a continuación, a 8 bits. Las líneas rojas son los niveles de cuantización.</p>
             <p>Intuición: un error de 0.05 en un peso de 1.5 importa poco; en un peso de 0.1 es enorme. Recortar sacrifica los extremos (pocos) para ganar resolución donde están la mayoría.</p>
-            <p>Detalle en punto fijo: el rango se redondea a una potencia de 2, así que recortar solo ayuda si cruza una. En esta capa, ±0.373 y ±0.277 caen los dos en el rango ±0.5: con potencias de 2 no cambiaría nada. La figura ilustra la idea con una escala arbitraria.</p>
+            <p>Detalle en punto fijo: el rango se redondea a una potencia de 2, así que recortar solo ayuda si cruza una. En esta capa, ±0.387 y ±0.257 caen los dos en el rango ±0.5: con potencias de 2 no cambiaría nada. La figura ilustra la idea con una escala arbitraria.</p>
             <p>Y recortar de más (p75) es contraproducente: se pierde demasiado en los valores grandes. Lo van a ver en los resultados.</p>
         </aside>
     </section>
 
+    <!-- ===================== EJEMPLO EN CÓDIGO ===================== -->
+
     <section>
-        <h3>Ejemplo: cuantización en 3 pasos</h3>
+        <h3>El ejemplo: tres formas de cuantizar</h3>
         <div style="font-size: 0.6em; text-align: left;">
+            <p style="margin-top: 0;">LeNet-5 sobre Fashion MNIST, cuantizada en punto fijo con QKeras. Las tres formas
+                difieren en cuánto se ajusta a cada capa:</p>
             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
                 <div style="background: rgba(139,233,253,0.08); padding: 0.7rem; border-radius: 0.5rem; border-left: 3px solid #8be9fd;">
-                    <p style="color: #8be9fd; margin: 0 0 0.3rem;"><strong>Paso 1: uniforme</strong></p>
+                    <p style="color: #8be9fd; margin: 0 0 0.3rem;"><strong>Uniforme</strong></p>
                     <p style="margin: 0;">Mismos bits totales y mismos bits enteros en toda la red, tomados del peor
                         caso global (el máximo de todas las capas).</p>
                     <p style="margin: 0.4rem 0 0;"><code>i = ceil(log₂(máx. global))</code></p>
                 </div>
                 <div style="background: rgba(80,250,123,0.08); padding: 0.7rem; border-radius: 0.5rem; border-left: 3px solid #50fa7b;">
-                    <p style="color: #50fa7b; margin: 0 0 0.3rem;"><strong>Paso 2: bits enteros por capa</strong></p>
+                    <p style="color: #50fa7b; margin: 0 0 0.3rem;"><strong>Bits enteros por capa</strong></p>
                     <p style="margin: 0;">Mismos bits totales, pero los bits enteros de cada capa salen de su propio
                         rango (máx., p95 o p75).</p>
                     <p style="margin: 0.4rem 0 0;"><code>i[capa] = ceil(log₂(rango[capa]))</code></p>
                 </div>
                 <div style="background: rgba(189,147,249,0.08); padding: 0.7rem; border-radius: 0.5rem; border-left: 3px solid #bd93f9;">
-                    <p style="color: #bd93f9; margin: 0 0 0.3rem;"><strong>Paso 3: bits por capa</strong></p>
+                    <p style="color: #bd93f9; margin: 0 0 0.3rem;"><strong>Bits totales por capa</strong></p>
                     <p style="margin: 0;">Además, distinto total de bits: primera y última capa con N bits, las
                         intermedias con N/2 (bits enteros por capa, p95).</p>
                     <p style="margin: 0.4rem 0 0;">Con N = 8: <code>8 · 4 · 4 · 4 · 8</code></p>
                 </div>
             </div>
-            <p style="margin-top: 0.8rem;">Cada paso agrega granularidad: global → por capa (bits enteros) → por capa
-                (bits totales). Se evalúa con PTQ y con QAT (3 épocas).</p>
+            <p style="margin-top: 0.8rem;">De izquierda a derecha, más granularidad: global → bits enteros por capa →
+                bits totales por capa. Se comparan a distintos anchos de bits, con PTQ y con QAT.</p>
         </div>
         <aside class="notes">
-            <p>Paso 1: la forma más ingenua. Si una capa tiene pesos hasta 0.9 y otra hasta 0.1, las dos usan el rango de 0.9: la segunda desperdicia bits enteros que nunca usa y pierde resolución.</p>
-            <p>Paso 2: cada capa ajusta su coma a su propio rango. Mismo tamaño en memoria que el paso 1 (mismos bits totales), solo cambia dónde está la coma. En un micro esto no cuesta nada: los bits fraccionarios distintos por capa se resuelven con shifts.</p>
-            <p>Paso 3: además, menos bits en las capas intermedias, que son las menos sensibles. Acá sí cambia el tamaño. El ejemplo de la diapo es para N = 8.</p>
-            <p>Pregunta antes de mostrar los resultados: ¿en cuál de los tres pasos esperan mejor accuracy a 8 bits? ¿Y a 4?</p>
+            <p>Primero qué vamos a comparar; después los scripts que lo hacen y sus resultados.</p>
+            <p>No son pasos sucesivos sino tres formas alternativas de elegir la aritmética de cada capa, de la más simple a la más fina.</p>
+            <ul>
+                <li>Uniforme: la forma más ingenua. Si una capa tiene pesos hasta 0.9 y otra hasta 0.1, las dos usan el rango de 0.9: la segunda desperdicia bits enteros que nunca usa y pierde resolución.</li>
+                <li>Bits enteros por capa: cada capa ajusta su coma a su propio rango. Mismo tamaño en memoria que la uniforme (mismos bits totales), solo cambia dónde está la coma. En un micro esto no cuesta nada: los bits fraccionarios distintos por capa se resuelven con shifts.</li>
+                <li>Bits totales por capa: además, menos bits en las capas intermedias, que son las menos sensibles. Acá sí cambia el tamaño.</li>
+            </ul>
+            <p>Pregunta antes de mostrar resultados: ¿cuál esperan que dé mejor accuracy a 8 bits? ¿Y a 4?</p>
         </aside>
     </section>
 
     <section>
-        <h3>Resultados: 8 bits vs. 4 bits</h3>
-        <img src="./figures/cuantizacion-3pasos_8vs4.png" style="max-height: 400px; margin: 0;">
-        <p style="font-size: 0.6em; margin-top: 0.4rem;">LeNet-5 en Fashion MNIST (FP32: 89.1 %, 241 KB). A 8 bits
-            los pasos 1 y 2 ocupan 60 KB; a 4 bits, 30 KB; el paso 3 a 4 bits, 15 KB.</p>
-        <aside class="notes">
-            <p>Mensaje: a 8 bits casi no importa cómo se cuantiza; a 4 bits, sí.</p>
-            <p>8 bits: todo da prácticamente igual que FP32. Hay resolución de sobra, así que recortar o ajustar la coma por capa no gana nada (en <code>script02</code>, a 8 bits, p95 da incluso un poco peor que el máximo, y p75 cae a 81 %).</p>
-            <p>4 bits: ahí aparecen las diferencias. Con PTQ, el paso 1 cae a 71 % y el paso 2 (coma por capa, p95) recupera hasta 87 %. Con pocos bits, no desperdiciar rango es crucial.</p>
-            <p>El paso 3 a 4 bits usa 2 bits en las capas intermedias: ocupa la mitad (15 KB) y con PTQ cae a 70 %, pero QAT lo recupera a 85 %.</p>
-            <p>QAT siempre mejora, y a 8 bits incluso supera al FP32 (89.8 % vs. 89.1 %): el efecto de regularización.</p>
-            <p>Para comparar a igual tamaño: el paso 3 a 8 bits (8/4) y el paso 2 a 4 bits ocupan casi lo mismo (~30 KB) y con QAT dan lo mismo (89.2 %).</p>
-        </aside>
-    </section>
-
-    <section>
-        <h3>Avanzado: barrido de bits [2, 4, 6, 8]</h3>
-        <div style="font-size: 0.68em; text-align: left;">
-            <p style="margin-bottom: 0.5rem;"><code>examples/quantization/script03.py</code> repite los 3 pasos para
-                cada cantidad de bits (o de 1 a 16 con <code>--full</code>), con PTQ y QAT; <code>script04.py</code>
-                grafica el JSON resultante.</p>
-            <div style="text-align: center;">
-                <img src="outputs/quantization_barrido_3pasos.png"
-                    style="max-height: 300px; border-radius: 0.4rem; background: white;">
+        <h3>Los scripts</h3>
+        <div style="font-size: 0.62em; text-align: left;">
+            <p style="margin-top: 0;">En <code>examples/quantization/</code>:</p>
+            <ul style="list-style-type: none; padding: 0; margin: 0;">
+                <li style="margin-bottom: 0.5rem;"><code>script01.py</code>: entrena el modelo base (CNN o MLP) y lo guarda
+                    en <code>models/</code>.</li>
+                <li style="margin-bottom: 0.5rem;"><code>script02.py</code>: aplica las tres formas a un ancho de bits fijo
+                    (8 por defecto), con PTQ (y QAT, opcional).</li>
+                <li style="margin-bottom: 0.5rem;"><code>script03.py</code> <span style="color: #ffb86c;">(avanzado)</span>:
+                    repite las tres formas a 2, 4, 6 y 8 bits, con PTQ y QAT.</li>
+                <li style="margin-bottom: 0.5rem;"><code>script04.py</code>: grafica el barrido de <code>script03.py</code>.</li>
+                <li><code>script06_utils.py</code>: funciones comunes (estadísticas, calibración, configuración de
+                    QKeras).</li>
+            </ul>
+            <div style="margin-top: 1rem; background: rgba(255,255,255,0.05); padding: 0.7rem 1rem; border-radius: 0.5rem;">
+                <p style="margin: 0;"><code>cd examples/quantization &amp;&amp; uv run python script01.py cnn</code>, y lo
+                    mismo con <code>script02.py cnn</code> y <code>script03.py cnn</code>.</p>
+                <p style="margin: 0.4rem 0 0;">Reproducibles: semilla fija y operaciones deterministas, así que dan siempre
+                    los mismos números.</p>
             </div>
         </div>
         <aside class="notes">
-            <p>Script avanzado: tarda bastante (QAT para cada combinación), así que está pre-corrido y el resultado commiteado.</p>
-            <p>Qué mirar: a 6 y 8 bits los tres pasos dan lo mismo. A 4 bits, el paso 1 con PTQ se cae. A 2 bits, el paso 1 queda al azar (10 %) incluso con QAT, mientras que ajustar la coma por capa (pasos 2 y 3) llega a 83 % con QAT.</p>
+            <p>Mapa de los scripts antes de verlos uno por uno.</p>
+            <ul>
+                <li><code>script01</code> y <code>script02</code> son fundacionales: corren en menos de un minuto en una CPU, se pueden hacer en clase.</li>
+                <li><code>script03</code> es avanzado: hace QAT para cada combinación (unos 3 minutos en una CPU de escritorio; con <code>--full</code> barre de 1 a 16 bits y tarda mucho más). Está pre-corrido y con las salidas commiteadas.</li>
+                <li><code>script04</code> no calcula nada: lee el JSON de <code>script03</code> y grafica.</li>
+            </ul>
+            <p>Reproducibilidad: <code>set_reproducibility()</code> fija la semilla de Python, NumPy y TensorFlow y fuerza operaciones deterministas. Sin eso, cada entrenamiento da un modelo un poco distinto (inicialización y orden de los batches aleatorios) y los números no coinciden con los de las diapos.</p>
+        </aside>
+    </section>
+
+    <section>
+        <h3>script01.py: el modelo base</h3>
+        <div style="font-size: 0.68em; text-align: left;">
+            <div style="display: flex; gap: 1rem; margin-bottom: 0.8rem;">
+                <div style="flex: 1; background: rgba(139,233,253,0.1); padding: 0.7rem; border-radius: 0.5rem;">
+                    <p style="color: #8be9fd; margin: 0 0 0.3rem;"><strong>CNN (LeNet-5)</strong></p>
+                    <p style="margin: 0; font-size: 0.95em;">Conv(1→6, 5×5) → pool → conv(6→16, 5×5) → pool →
+                        densas(400→120→84→10)<br>61.7 k parámetros (241 KB en FP32).<br>Se guarda en
+                        <code>models/modelo_CNN_imagenes_fashion.h5</code>.
+                    </p>
+                </div>
+                <div style="flex: 1; background: rgba(189,147,249,0.1); padding: 0.7rem; border-radius: 0.5rem;">
+                    <p style="color: #bd93f9; margin: 0 0 0.3rem;"><strong>MLP</strong></p>
+                    <p style="margin: 0; font-size: 0.95em;">Densas(784→64→32→16→10) con ReLU<br>53.0 k parámetros.<br>Se
+                        guarda en <code>models/modelo_MLP_imagenes_fashion.h5</code>.
+                    </p>
+                </div>
+            </div>
+            <p style="text-align: center; font-size: 1.1em;">Resultado (CNN): <strong style="color: #50fa7b;">89.3 %</strong>
+                de accuracy en test, en FP32. Es la referencia para todo lo que sigue.</p>
+        </div>
+        <aside class="notes">
+            <p>Modelos simples a propósito, para que todo corra en minutos en una CPU. Para el TP conviene algo más realista.</p>
+            <p>En el resto del ejemplo usamos la CNN; el MLP sirve para comparar cómo se comporta la cuantización cuando todo son capas densas.</p>
+            <p>Además del modelo, el script guarda en <code>figures/</code> las curvas de entrenamiento y la matriz de confusión.</p>
+        </aside>
+    </section>
+
+    <section>
+        <h3>script02.py: las tres formas a 8 bits</h3>
+        <img src="./figures/cuantizacion-script02_8bits.png" style="max-height: 380px; margin: 0;">
+        <p style="font-size: 0.6em; margin-top: 0.3rem;">Solo PTQ. Activaciones calibradas con
+            <code>CALIBRACION = "real"</code> (1000 imágenes de entrenamiento, sin etiquetas) o <code>"aleatoria"</code>
+            (ruido uniforme).</p>
+        <aside class="notes">
+            <p>Con QKeras, cada Conv2D y Dense pasa a QConv2D y QDense, que aplican fake quantization a pesos, sesgos y activaciones.</p>
+            <ul>
+                <li>A 8 bits todas quedan a menos de 2 puntos del FP32, salvo p75: hay resolución de sobra, así que ajustar la coma por capa no gana nada.</li>
+                <li>Recortar ayuda poco o nada a 8 bits (p95 da 87.6 % contra 89.1 % del máximo), y recortar de más (p75) es contraproducente: cae a 83 %.</li>
+                <li>Bits totales por capa (8/4/4/4/8) ocupa la mitad (31 KB) y pierde solo 2 puntos.</li>
+            </ul>
+            <p>Calibración: con datos aleatorios en lugar de reales, a 8 bits la diferencia es de 0.1 a 0.3 puntos. Lo pueden probar cambiando <code>CALIBRACION</code> en <code>script02.py</code>.</p>
+            <p>Este script también genera la figura de clipping que vimos antes (<code>outputs/calibracion_clipping.png</code>).</p>
+        </aside>
+    </section>
+
+    <section>
+        <h3>script03.py: barrido de bits [2, 4, 6, 8]</h3>
+        <img src="./figures/cuantizacion-barrido.png" style="max-height: 360px; margin: 0;">
+        <p style="font-size: 0.6em; margin-top: 0.3rem;">PTQ (línea punteada) y QAT (línea llena).
+            <code>script04.py</code> grafica estos mismos datos en <code>outputs/</code>.</p>
+        <aside class="notes">
+            <p>Script avanzado: tarda unos minutos (QAT para cada combinación), así que está pre-corrido y el resultado commiteado.</p>
+            <p>Qué mirar: a 6 y 8 bits las tres formas dan lo mismo. A 4 bits, la uniforme con PTQ se cae. A 2 bits, la uniforme queda al azar (10 %) incluso con QAT, mientras que ajustar la coma por capa llega a 82 % con QAT.</p>
             <p>Con 2 bits por peso, el modelo ocupa 15 KB, 16 veces menos que en FP32, y sigue clasificando razonablemente.</p>
+        </aside>
+    </section>
+
+    <section>
+        <h3>script03.py: 8 bits vs. 4 bits</h3>
+        <img src="./figures/cuantizacion-formas_8vs4.png" style="max-height: 400px; margin: 0;">
+        <p style="font-size: 0.6em; margin-top: 0.4rem;">FP32: 89.3 %, 241 KB. A 8 bits, uniforme y bits enteros por capa
+            ocupan 60 KB; a 4 bits, 30 KB; bits totales por capa a 4 bits, 15 KB.</p>
+        <aside class="notes">
+            <p>Mensaje: a 8 bits casi no importa cómo se cuantiza; a 4 bits, sí.</p>
+            <p>8 bits: todo queda a menos de 2 puntos del FP32, y con QAT la diferencia desaparece.</p>
+            <p>4 bits: ahí aparecen las diferencias. Con PTQ, la uniforme cae a 71 % y bits enteros por capa (p95) recupera hasta 82 %; con QAT, 80 % contra 89 %. Con pocos bits, no desperdiciar rango es crucial.</p>
+            <p>Bits totales por capa a 4 bits usa 2 bits en las capas intermedias: ocupa la mitad (15 KB) y con PTQ cae a 69 %, pero QAT lo recupera a 84 %.</p>
+            <p>QAT siempre mejora, y a 8 bits incluso supera al FP32 (89.8 % vs. 89.3 %): el efecto de regularización.</p>
+            <p>Para comparar a igual tamaño: bits totales por capa a 8 bits (8/4) y bits enteros por capa a 4 bits ocupan casi lo mismo (~30 KB) y con QAT dan lo mismo (89.1 %).</p>
         </aside>
     </section>
 
@@ -644,42 +727,7 @@
             <p>Hacerlo en grupos de 2 o 3, mezclando CEIA y CESE, unos 15 minutos. Al final, cada grupo dice su mejor configuración (accuracy y KB) y armamos una tabla en el pizarrón: es una frontera de Pareto como la de la demo.</p>
             <p>Antes de correr, que cada grupo prediga qué capa van a dejar con más bits y por qué.</p>
             <p>Los nombres de las capas son <code>conv2d_1</code>, <code>conv2d_2</code>, <code>dense_1</code>, <code>dense_2</code> y <code>output</code>. Hace falta haber corrido antes <code>script01.py cnn</code>.</p>
-            <p>Referencia: el paso 3 con 4/2 bits da 15 KB y 70 % con PTQ (no cumple); con QAT llega a 85 %. Probar si alcanza con subir alguna capa intermedia.</p>
-        </aside>
-    </section>
-
-    <section>
-        <h3>Eficiencia en hardware real</h3>
-        <div style="font-size: 0.68em; text-align: left;">
-            <div
-                style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 0.5rem; font-size: 0.9em;">
-                <div style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px;">
-                    <strong style="color: #50fa7b;">CPUs y GPUs</strong>
-                    <p style="margin: 0.3rem 0 0;">INT8 da ~2× el throughput de FP16. Una suma INT8 gasta ~30× menos
-                        energía que una suma FP32.</p>
-                </div>
-                <div style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px;">
-                    <strong style="color: #ffb86c;">Microcontroladores</strong>
-                    <p style="margin: 0.3rem 0 0;">Sin FPU rápida, INT8 es casi obligatorio. Con instrucciones SIMD
-                        (ESP32-S3, Cortex-M con DSP) se hacen varios MACs de 8 bits por ciclo.</p>
-                </div>
-                <div style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px;">
-                    <strong style="color: #ff79c6;">FPGAs</strong>
-                    <p style="margin: 0.3rem 0 0;">Total flexibilidad de bits por capa; FINN genera aceleradores para
-                        redes binarizadas, muy rápidos y eficientes.</p>
-                </div>
-                <div style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 12px;">
-                    <strong style="color: #8be9fd;">ASICs y NPUs</strong>
-                    <p style="margin: 0.3rem 0 0;">El Google Edge TPU, por ejemplo, solo ejecuta INT8: máxima eficiencia,
-                        poca flexibilidad.</p>
-                </div>
-            </div>
-        </div>
-        <aside class="notes">
-            <p>El 30× de energía es de las mediciones de Horowitz (2014): suma de 8 bits ≈ 0.03 pJ vs. suma FP32 ≈ 0.9 pJ, en 45 nm.</p>
-            <p>Microcontroladores: es el caso de la demo. El ESP32-S3 hace varios MACs de 8 bits por instrucción con su SIMD; el ESP32 de la ESP32-CAM no tiene SIMD, y por eso la misma red tarda mucho más ahí.</p>
-            <p>FPGAs: se puede elegir cualquier ancho de bits por capa, porque el hardware se arma a medida; ahí la precisión mixta rinde de verdad. FINN (AMD/Xilinx) genera aceleradores para redes binarizadas o de pocos bits.</p>
-            <p>ASICs y NPUs: muy eficientes, pero aceptan pocos formatos. Hay que elegir el hardware desde el principio del proyecto, porque condiciona qué cuantización se puede usar.</p>
+            <p>Referencia: bits totales por capa con 4/2 bits da 15 KB y 69 % con PTQ (no cumple); con QAT llega a 84 %. Probar si alcanza con subir alguna capa intermedia.</p>
         </aside>
     </section>
 

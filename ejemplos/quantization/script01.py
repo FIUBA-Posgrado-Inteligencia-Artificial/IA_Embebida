@@ -13,7 +13,7 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 from sklearn.metrics import classification_report, confusion_matrix, ConfusionMatrixDisplay
 
-from script06_utils import load_and_preprocess_data
+from script06_utils import load_and_preprocess_data, set_reproducibility
 
 def get_model(model_type, input_shape, n_classes=10):
     """
@@ -48,6 +48,7 @@ def get_model(model_type, input_shape, n_classes=10):
 
 
 def main():
+    set_reproducibility()  # misma semilla → mismo modelo en cada corrida
     print("Python version:", sys.version.split(' ')[0])
     print("TensorFlow version:", tf.__version__)
     print("Keras version:", keras.__version__)

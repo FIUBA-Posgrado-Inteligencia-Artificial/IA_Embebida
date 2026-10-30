@@ -69,9 +69,11 @@ clases/figures/aceleradores-systolic_2.png
 clases/figures/aceleradores-systolic_3.png
 clases/figures/aceleradores-systolic_4.png
 clases/figures/costo.png
-clases/figures/cuantizacion-3pasos_8vs4.png
+clases/figures/cuantizacion-barrido.png
+clases/figures/cuantizacion-formas_8vs4.png
 clases/figures/cuantizacion-funcion_no_uniforme.png
 clases/figures/cuantizacion-funcion_uniforme.png
+clases/figures/cuantizacion-script02_8bits.png
 clases/figures/cuantizacion-soft.png
 clases/figures/cuantizacion-ste.png
 clases/figures/darts_paper.png
@@ -88,7 +90,6 @@ clases/figures/demo/perro.png
 clases/figures/demo_detalle-pareto-3d.png
 clases/figures/demo_detalle-pareto-macs.png
 clases/figures/demo_detalle-pareto-params.png
-clases/figures/demo_detalle-pareto.png
 clases/figures/fit_datos_reales.png
 clases/figures/fit_models_1d.png
 clases/figures/general_bigo.png
@@ -103,11 +104,7 @@ clases/figures/specific_fp64_fp32_fp16.png
 clases/figures/specific_iterative.png
 clases/figures/specific_ma_block.png
 clases/figures/specific_multiplier.png
-clases/figures/specific_quantization_function_nonuniform.png
-clases/figures/specific_quantization_function_uniform.png
 clases/figures/specific_signed_integer.png
-clases/figures/specific_soft_quantization.png
-clases/figures/specific_ste.png
 clases/figures/specific_unrolled.png
 clases/figures/specific_unsigned_integer.png
 clases/figures/timeline.png
@@ -143,7 +140,6 @@ clases/outputs/pruning_log_script01.txt
 clases/outputs/pruning_log_script02.txt
 clases/outputs/pruning_log_script03.txt
 clases/outputs/pruning_magnitud.png
-clases/outputs/quantization_barrido_3pasos.png
 clases/outputs/quantization_calibracion_clipping.png
 clases/reveal.js-master/.codespellrc
 clases/reveal.js-master/.github/CONTRIBUTING.md
@@ -973,6 +969,7 @@ ejemplos/esp32-pipelines/firmware_test_webserver/main/idf_component.yml
 ejemplos/esp32-pipelines/firmware_test_webserver/partitions.csv
 ejemplos/esp32-pipelines/firmware_test_webserver/sdkconfig.defaults
 ejemplos/esp32-pipelines/main.py
+ejemplos/esp32-pipelines/metricas_modelos.csv
 ejemplos/esp32-pipelines/models.json
 ejemplos/esp32-pipelines/pipelib/esp32cam_utils.py
 ejemplos/esp32-pipelines/pipelib/model_registry.py
@@ -1004,6 +1001,7 @@ ejemplos/esp32-pipelines/tests/test_script05_build.py
 ejemplos/esp32-pipelines/tests/test_static_frame.py
 ejemplos/esp32-pipelines/tests/test_utils.py
 ejemplos/esp32-pipelines/tools/build_matrix.sh
+ejemplos/esp32-pipelines/tools/export_metricas.py
 ejemplos/esp32-pipelines/tools/rt_export/executorch/.gitignore
 ejemplos/esp32-pipelines/tools/rt_export/executorch/export_executorch.py
 ejemplos/esp32-pipelines/tools/rt_export/executorch/pyproject.toml
@@ -1077,6 +1075,8 @@ ejemplos/quantization/.gitignore
 ejemplos/quantization/docker/Dockerfile.cpu
 ejemplos/quantization/docker/Dockerfile.cuda
 ejemplos/quantization/docker/docker-compose.yaml
+ejemplos/quantization/figures/confusion_matrix_cnn.png
+ejemplos/quantization/figures/training_loss_accuracy_cnn.png
 ejemplos/quantization/outputs/bkp20260313-modelo_MLP_imagenes_fashion_grafico_accuracy_evolucion.png
 ejemplos/quantization/outputs/bkp20260313-modelo_MLP_imagenes_fashion_resultados_cuantizacion.json
 ejemplos/quantization/outputs/calibracion_clipping.png

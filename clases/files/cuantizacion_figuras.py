@@ -4,9 +4,11 @@ Genera, con el estilo oscuro de las diapos:
   - función de cuantización uniforme y no uniforme;
   - straight-through estimator (STE): forward vs. lo que usa el backward;
   - soft quantization (aproximación suave con distintas temperaturas);
-  - resultados del ejemplo de 3 pasos a 8 y a 4 bits (PTQ y QAT), leídos de
-    examples/quantization/outputs/cnn_barrido_resultados.json (lo genera
-    script03.py).
+  - resultados del ejemplo con las tres formas de cuantizar:
+      · script02.py a 8 bits (PTQ), leídos de
+        examples/quantization/outputs/cnn_3pasos_resultados.json;
+      · script03.py de 2 a 8 bits, y a 8 y a 4 bits (PTQ y QAT), leídos de
+        examples/quantization/outputs/cnn_barrido_resultados.json.
 
 Uso (desde presentations/):
     uv run --no-project --with matplotlib --with numpy python scripts/cuantizacion_figuras.py
@@ -20,7 +22,9 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[2]
 FIGURAS = ROOT / "presentations" / "figures"
-BARRIDO = ROOT / "examples" / "quantization" / "outputs" / "cnn_barrido_resultados.json"
+SALIDAS = ROOT / "examples" / "quantization" / "outputs"
+BARRIDO = SALIDAS / "cnn_barrido_resultados.json"
+FIJO = SALIDAS / "cnn_3pasos_resultados.json"
 
 BG = "#282a36"
 GRID = "#44475a"
@@ -121,10 +125,57 @@ def soft():
     guardar(fig, "cuantizacion-soft.png")
 
 
-def tres_pasos():
+def script02_8bits():
+    d = json.loads(FIJO.read_text())
+    nombres = {"Paso1-Uniforme": "Uniforme",
+               "Paso2a-Mixta/max": "Bits enteros\npor capa\n(máx.)",
+               "Paso2b-Mixta/p95": "Bits enteros\npor capa\n(p95)",
+               "Paso2c-Mixta/p75": "Bits enteros\npor capa\n(p75)",
+               "Paso3-Completa/p95": "Bits totales\npor capa\n(8 / 4, p95)"}
+    colores = [CIAN, VERDE, VERDE, VERDE, VIOLETA]
+    pasos = d["steps"]
+    fig, ax = plt.subplots(figsize=(10, 4.2), facecolor=BG)
+    ejes(ax, "", "Accuracy PTQ (%)", ceros=False)
+    x = np.arange(len(pasos))
+    barras = ax.bar(x, [p["ptq_acc"] * 100 for p in pasos], 0.6, color=colores)
+    for b, p in zip(barras, pasos):
+        ax.text(b.get_x() + b.get_width() / 2, b.get_height() - 0.5,
+                f"{b.get_height():.1f} %\n{p['mem_bytes'] / 1024:.0f} KB", ha="center", va="top",
+                color=BG, fontsize=10, fontweight="bold")
+    ax.axhline(d["float_acc"] * 100, color=ROSA, linestyle="--", linewidth=1.2,
+               label=f"FP32 ({d['float_acc'] * 100:.1f} %, {d['fp32_mem_kb']:.0f} KB)")
+    ax.set_xticks(x, [nombres[p["tag"]] for p in pasos], color=FG, fontsize=9)
+    ax.set_ylim(75, 92)
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper right", fontsize=10, facecolor=GRID, edgecolor=GRID, labelcolor=FG)
+    guardar(fig, "cuantizacion-script02_8bits.png")
+
+
+def barrido():
     d = json.loads(BARRIDO.read_text())
-    pasos = [("paso1", "Paso 1\nuniforme"), ("paso2", "Paso 2\nbits enteros\npor capa (p95)"),
-             ("paso3", "Paso 3\nbits por capa\n(N b extremos, N/2 resto)")]
+    formas = [("paso1", "Uniforme", CIAN), ("paso2", "Bits enteros por capa (p95)", VERDE),
+              ("paso3", "Bits totales por capa (p95)", VIOLETA)]
+    fig, axs = plt.subplots(1, 3, figsize=(12, 4), facecolor=BG, sharey=True)
+    for ax, (clave, nombre, color) in zip(axs, formas):
+        ejes(ax, "Bits", "Accuracy (%)" if clave == "paso1" else "", ceros=False)
+        r = d["results"][clave]
+        bits = sorted(int(b) for b in r)
+        ax.plot(bits, [r[str(b)]["ptq_acc"] * 100 for b in bits], "x--", color=color, alpha=0.7,
+                linewidth=1.8, markersize=8, label="PTQ")
+        ax.plot(bits, [r[str(b)]["qat_acc"] * 100 for b in bits], "o-", color=color, linewidth=2.5,
+                markersize=7, label="QAT")
+        ax.axhline(d["float_acc"] * 100, color=ROSA, linestyle=":", linewidth=1.5, label="FP32")
+        ax.set_xticks(bits)
+        ax.set_ylim(0, 100)
+        ax.set_title(nombre, color=FG, fontsize=12)
+        ax.legend(loc="lower right", fontsize=9, facecolor=GRID, edgecolor=GRID, labelcolor=FG)
+    guardar(fig, "cuantizacion-barrido.png")
+
+
+def formas_8vs4():
+    d = json.loads(BARRIDO.read_text())
+    pasos = [("paso1", "Uniforme"), ("paso2", "Bits enteros\npor capa (p95)"),
+             ("paso3", "Bits totales\npor capa\n(N extremos, N/2 resto)")]
     fig, axs = plt.subplots(1, 2, figsize=(10, 4.4), facecolor=BG, sharey=True)
     x = np.arange(len(pasos))
     for ax, bits in zip(axs, ["8", "4"]):
@@ -145,9 +196,9 @@ def tres_pasos():
     fig.legend(h, l, loc="upper center", ncol=3, fontsize=10, facecolor=GRID, edgecolor=GRID,
                labelcolor=FG)
     fig.tight_layout(rect=(0, 0, 1, 0.9))
-    fig.savefig(FIGURAS / "cuantizacion-3pasos_8vs4.png", dpi=150, facecolor=BG)
+    fig.savefig(FIGURAS / "cuantizacion-formas_8vs4.png", dpi=150, facecolor=BG)
     plt.close(fig)
-    print("Figura guardada en: presentations/figures/cuantizacion-3pasos_8vs4.png")
+    print("Figura guardada en: presentations/figures/cuantizacion-formas_8vs4.png")
 
 
 if __name__ == "__main__":
@@ -155,4 +206,6 @@ if __name__ == "__main__":
     funcion_no_uniforme()
     ste()
     soft()
-    tres_pasos()
+    script02_8bits()
+    barrido()
+    formas_8vs4()

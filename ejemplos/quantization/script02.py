@@ -1,14 +1,14 @@
 """
-Sección 6 — Cuantización: 3 Pasos de Precisión Mixta
+Sección 9 — Cuantización: tres formas de cuantizar a un ancho de bits fijo
 ======================================================
-Aplica las tres estrategias de cuantización progresivas sobre un modelo entrenado
+Aplica tres formas de cuantizar (de la más simple a la más fina) sobre un modelo entrenado
 (CNN o MLP), a un ancho de bits fijo (por defecto 8 bits):
 
-  Paso 1 — Uniforme:            mismos bits totales Y mismos bits enteros globalmente.
-  Paso 2a — Mixta/max:          mismos bits totales, bits enteros per-capa (rango max).
-  Paso 2b — Mixta/p95:          mismos bits totales, bits enteros per-capa (rango p95).
-  Paso 2c — Mixta/p75:          mismos bits totales, bits enteros per-capa (rango p75).
-  Paso 3  — Mixta completa/p95: bits totales distintos por capa (primera/última=8, resto=4),
+  Uniforme:                     mismos bits totales Y mismos bits enteros globalmente.
+  Bits enteros por capa / max:  mismos bits totales, bits enteros por capa (rango max).
+  Bits enteros por capa / p95:  mismos bits totales, bits enteros por capa (rango p95).
+  Bits enteros por capa / p75:  mismos bits totales, bits enteros por capa (rango p75).
+  Bits totales por capa / p95:  bits totales distintos por capa (primera/última=8, resto=4),
                                   bits enteros per-capa (rango p95).
 
 Para cada configuración se evalúa PTQ (calibración) y, si run_qat=True, también QAT.
@@ -32,6 +32,7 @@ from tensorflow.keras.models import load_model
 from qkeras.utils import model_quantize
 
 from script06_utils import (
+    set_reproducibility,
     calculate_network_statistics,
     calculate_complexity,
     load_and_preprocess_data,
@@ -58,6 +59,10 @@ RUN_QAT    = False   # poner True para incluir QAT en la comparativa
 QAT_EPOCHS = 3
 BATCH_SIZE = 4096
 OUTPUT_DIR = "outputs"
+# Datos para calibrar los rangos de las activaciones (PTQ):
+#   "real":      1000 imágenes de x_train (solo las entradas, sin etiquetas)
+#   "aleatoria": 1000 entradas de ruido uniforme (si no hay datos representativos)
+CALIBRACION = "real"
 
 
 # ---------------------------------------------------------------------------
@@ -99,6 +104,7 @@ def _run_step(tag, original_model, config, bits_for_qkeras,
 
 
 def main():
+    set_reproducibility()  # misma semilla → mismos resultados en cada corrida
     print("Python :", sys.version.split(" ")[0])
     print("TF     :", tf.__version__)
     print("Keras  :", keras.__version__)
@@ -144,7 +150,8 @@ def main():
     # Estadísticas de la red
     # ---------------------------------------------------------------
     print("\n[INFO] Calculando estadísticas de pesos y activaciones...")
-    layer_metrics, global_metrics = calculate_network_statistics(original_model)
+    layer_metrics, global_metrics = calculate_network_statistics(
+        original_model, calib_data=x_train if CALIBRACION == "real" else None)
 
     # Detectar una capa representativa para calibración de clipping
     # (primera capa con pesos que no sea la capa de salida)
@@ -164,7 +171,7 @@ def main():
             "clip": "max",
             "config": build_uniform_config(original_model, BITS, layer_metrics, global_metrics),
             "bits_for_qkeras": BITS,
-            "label": f"Paso 1 — Uniforme ({BITS}b global)",
+            "label": f"Uniforme ({BITS}b global)",
         },
         {
             "tag":  "Paso2a-Mixta/max",
@@ -172,7 +179,7 @@ def main():
             "clip": "max",
             "config": build_mixed_intbits_config(original_model, BITS, layer_metrics, "max"),
             "bits_for_qkeras": BITS,
-            "label": f"Paso 2a — Mixta int-bits / max ({BITS}b)",
+            "label": f"Bits enteros por capa / max ({BITS}b)",
         },
         {
             "tag":  "Paso2b-Mixta/p95",
@@ -180,7 +187,7 @@ def main():
             "clip": "p95",
             "config": build_mixed_intbits_config(original_model, BITS, layer_metrics, "p95"),
             "bits_for_qkeras": BITS,
-            "label": f"Paso 2b — Mixta int-bits / p95 ({BITS}b)",
+            "label": f"Bits enteros por capa / p95 ({BITS}b)",
         },
         {
             "tag":  "Paso2c-Mixta/p75",
@@ -188,7 +195,7 @@ def main():
             "clip": "p75",
             "config": build_mixed_intbits_config(original_model, BITS, layer_metrics, "p75"),
             "bits_for_qkeras": BITS,
-            "label": f"Paso 2c — Mixta int-bits / p75 ({BITS}b)",
+            "label": f"Bits enteros por capa / p75 ({BITS}b)",
         },
         {
             "tag":   "Paso3-Completa/p95",
@@ -201,14 +208,14 @@ def main():
                 "p95",
             ),
             "bits_for_qkeras": HIGH_BITS,
-            "label": f"Paso 3 — Mixta completa / p95 ({HIGH_BITS}b/{LOW_BITS}b)",
+            "label": f"Bits totales por capa / p95 ({HIGH_BITS}b/{LOW_BITS}b)",
         },
     ]
 
     print(f"\n{'='*75}")
     print(f"CUANTIZACIÓN EN 3 PASOS  (baseline float32 acc = {float_acc:.4f})")
     print(f"{'='*75}")
-    hdr = f"{'Paso/Clip':<30} {'Acc PTQ':>8}"
+    hdr = f"{'Forma/Clip':<30} {'Acc PTQ':>8}"
     if RUN_QAT:
         hdr += f" {'Acc QAT':>8}"
     hdr += f" {'ΔFLT':>7} {'Mem KB':>8} {'MACs':>12}"
@@ -270,7 +277,7 @@ def main():
     ax.set_xticks(x)
     ax.set_xticklabels(labels, fontsize=7)
     ax.set_ylabel("Accuracy")
-    ax.set_title(f"Cuantización en 3 Pasos — {BITS} bits fijos, Paso 3 = {HIGH_BITS}b/{LOW_BITS}b\n"
+    ax.set_title(f"Tres formas de cuantizar — {BITS} bits fijos, bits totales por capa = {HIGH_BITS}b/{LOW_BITS}b\n"
                  f"Modelo: {model_type.upper()}")
     ax.legend(fontsize=8)
     ax.grid(axis="y", linestyle=":", alpha=0.5)

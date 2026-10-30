@@ -1,11 +1,11 @@
 """
-Sección 6 — Cuantización: Barrido de Bits en 3 Pasos
+Sección 9 — Cuantización: barrido de bits con las tres formas de cuantizar
 ======================================================
-Barre un rango de bitwidths sobre los tres pasos de cuantización:
+Barre un rango de bitwidths sobre las tres formas de cuantizar:
 
-  Paso 1 — Uniforme
-  Paso 2 — Mixta int-bits (clip p95)
-  Paso 3 — Mixta completa (primera/última = bits, interior = bits//2 mínimo 2)
+  Uniforme
+  Bits enteros por capa (clip p95)
+  Bits totales por capa (primera/última = bits, interior = bits//2 mínimo 2)
 
 Genera una tabla PTQ+QAT para cada (bits, paso) y guarda los resultados en JSON.
 El script04.py los visualiza después.
@@ -29,6 +29,7 @@ from tensorflow.keras.models import load_model
 from qkeras.utils import model_quantize
 
 from script06_utils import (
+    set_reproducibility,
     calculate_network_statistics,
     calculate_complexity,
     load_and_preprocess_data,
@@ -44,6 +45,10 @@ warnings.filterwarnings("ignore", category=UserWarning, module="keras.initialize
 
 BATCH_SIZE = 512
 OUTPUT_DIR = "outputs"
+# Datos para calibrar los rangos de las activaciones (PTQ):
+#   "real":      1000 imágenes de x_train (solo las entradas, sin etiquetas)
+#   "aleatoria": 1000 entradas de ruido uniforme (si no hay datos representativos)
+CALIBRACION = "real"
 
 
 def _quantize_and_eval(original_model, config, bits_for_qkeras,
@@ -68,6 +73,7 @@ def _quantize_and_eval(original_model, config, bits_for_qkeras,
 
 
 def main():
+    set_reproducibility()  # misma semilla → mismos resultados en cada corrida
     print("Python :", sys.version.split(" ")[0])
     print("TF     :", tf.__version__)
     print("Keras  :", keras.__version__)
@@ -110,15 +116,16 @@ def main():
     print(f"\n[Float32] acc={float_acc:.4f}")
 
     print("[INFO] Calculando estadísticas de pesos y activaciones...")
-    layer_metrics, global_metrics = calculate_network_statistics(original_model)
+    layer_metrics, global_metrics = calculate_network_statistics(
+        original_model, calib_data=x_train if CALIBRACION == "real" else None)
 
     # ------------------------------------------------------------------
     # Definición de los 3 pasos de cuantización
     # ------------------------------------------------------------------
     STEP_DEFS = [
-        {"id": "paso1", "label": "Paso 1 — Uniforme",      "clip": "max"},
-        {"id": "paso2", "label": "Paso 2 — Mixta/p95",     "clip": "p95"},
-        {"id": "paso3", "label": "Paso 3 — Completa/p95",  "clip": "p95"},
+        {"id": "paso1", "label": "Uniforme",                    "clip": "max"},
+        {"id": "paso2", "label": "Bits enteros por capa (p95)", "clip": "p95"},
+        {"id": "paso3", "label": "Bits totales por capa (p95)", "clip": "p95"},
     ]
 
     results = {s["id"]: {} for s in STEP_DEFS}
@@ -126,7 +133,7 @@ def main():
     print(f"\n{'='*70}")
     print(f"BARRIDO DE BITS: {bits_list}  |  QAT={run_qat}  |  Modelo={model_type.upper()}")
     print(f"{'='*70}")
-    print(f"  {'Bits':>4} | {'Paso':<25} | {'PTQ':>8} | {'QAT':>8} | {'ΔFLT':>7}")
+    print(f"  {'Bits':>4} | {'Forma':<27} | {'PTQ':>8} | {'QAT':>8} | {'ΔFLT':>7}")
     print("  " + "-" * 60)
 
     try:
@@ -170,9 +177,9 @@ def main():
                         "bits": bits, "ptq_acc": ptq, "qat_acc": qat,
                         "mem_bytes": mem, "macs": macs,
                     }
-                    print(f"  {bits:4d} | {label:<25} | {ptq:8.4f} | {qat:8.4f} | {best-float_acc:+7.4f}")
+                    print(f"  {bits:4d} | {label:<27} | {ptq:8.4f} | {qat:8.4f} | {best-float_acc:+7.4f}")
                 except Exception as e:
-                    print(f"  {bits:4d} | {label:<25} | ERROR: {e}")
+                    print(f"  {bits:4d} | {label:<27} | ERROR: {e}")
                     results[paso_id][str(bits)] = {"bits": bits, "error": str(e)}
 
     except KeyboardInterrupt:

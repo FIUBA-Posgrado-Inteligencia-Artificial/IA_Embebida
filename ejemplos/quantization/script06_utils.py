@@ -14,6 +14,16 @@ _DATASETS_ROOT = Path(__file__).resolve().parent.parent / "datasets"
 _DATASETS_ROOT.mkdir(parents=True, exist_ok=True)
 _FMNIST_NPZ = _DATASETS_ROOT / "fashion_mnist.npz"
 
+def set_reproducibility(seed=42):
+    """
+    Fija la semilla de Python, NumPy y TensorFlow, y obliga a TF a usar operaciones
+    deterministas. Con esto, volver a correr un script da exactamente los mismos números
+    (en la misma máquina y versión de TF). El costo: el entrenamiento es algo más lento.
+    """
+    tf.keras.utils.set_random_seed(seed)
+    tf.config.experimental.enable_op_determinism()
+
+
 def load_and_preprocess_data():
     """
     Carga el dataset Fashion MNIST y lo escala a [0, 1].
@@ -71,7 +81,7 @@ def get_integer_bits(value):
         return 0
     return math.ceil(math.log2(value))
 
-def calculate_network_statistics(model, n_samples=1000, batch_size=32768, seed=42):
+def calculate_network_statistics(model, n_samples=1000, batch_size=32768, seed=42, calib_data=None):
     """
     Calcula estadísticas detalladas (min, max, media, desvío, percentiles, skewness, kurtosis)
     de los pesos (kernels), biases y activaciones para cada capa del modelo.
@@ -79,6 +89,11 @@ def calculate_network_statistics(model, n_samples=1000, batch_size=32768, seed=4
     Estos parámetros permiten comprender cuán "dispersos" están los valores, facilitando
     luego la elección de la escala en una estrategia de cuantización.
     
+    Las activaciones se miden pasando datos de calibración por la red:
+        - calib_data=None: ruido uniforme en [0, 1) (sirve si no hay datos a mano).
+        - calib_data=x_train (u otro array): n_samples imágenes elegidas al azar.
+          Solo se usan las entradas: no hacen falta etiquetas.
+
     Retorna:
         - layer_metrics: estadísticas separadas capa por capa.
         - global_metrics: métricas consolidadas de manera global a lo largo de toda la red.
@@ -89,9 +104,15 @@ def calculate_network_statistics(model, n_samples=1000, batch_size=32768, seed=4
     
     input_shape = model.input_shape[1:]
     
-    # Generamos datos aleatorios como "estímulo" para calcular el estado de las activaciones
-    np.random.seed(seed)
-    random_data = np.random.rand(n_samples, *input_shape).astype('float32')
+    # Datos de calibración: "estímulo" para medir los rangos de las activaciones
+    rng = np.random.default_rng(seed)
+    if calib_data is None:
+        print(f"[INFO] Calibración con {n_samples} entradas aleatorias (ruido uniforme)")
+        random_data = rng.random((n_samples, *input_shape)).astype('float32')
+    else:
+        print(f"[INFO] Calibración con {n_samples} entradas reales (sin etiquetas)")
+        idx = rng.choice(len(calib_data), size=min(n_samples, len(calib_data)), replace=False)
+        random_data = np.asarray(calib_data[idx], dtype='float32')
     
     print(f"{'Capa':<15s} | {'Tipo':<10s} | {'Min':>9s} | {'Max':>9s} | {'Media':>9s} | {'Std':>9s} | {'P5':>9s} | {'P95':>9s} | {'P25':>9s} | {'P75':>9s} | {'Skew':>9s} | {'Kurt':>9s}")
     print("-" * 155)
