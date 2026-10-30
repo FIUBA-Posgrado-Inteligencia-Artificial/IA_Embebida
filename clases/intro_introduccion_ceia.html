@@ -862,6 +862,50 @@
         </aside>
     </section>
 
+    <section>
+        <h3>Formatos de 4 bits: MXFP4 y NVFP4</h3>
+        <div style="font-size: 0.6em; text-align: left;">
+            <div style="background: rgba(255,255,255,0.05); border-radius: 0.5rem; padding: 0.8rem 1rem;">
+                <strong style="color: #ffb86c;">Elemento: FP4 (E2M1)</strong>, 1 signo + 2 exp + 1 mantisa: solo 16
+                combinaciones.
+                <p style="text-align: center; margin: 0.4rem 0 0;"><code>±{ 0, 0.5, 1, 1.5, 2, 3, 4, 6 }</code></p>
+            </div>
+            <p style="margin: 0.8rem 0;">Solo, no alcanza: el rango es mínimo. Por eso se suma una
+                <strong>escala compartida por bloque</strong> (block floating point):</p>
+            <p style="text-align: center; margin: 0 0 0.8rem;"><code>valor = elemento E2M1 × escala del bloque</code></p>
+            <div style="display: flex; gap: 1.5rem;">
+                <div style="flex: 1; background: rgba(139,233,253,0.1); border-radius: 0.5rem; padding: 0.8rem; border: 1px solid rgba(139,233,253,0.3);">
+                    <strong style="color: #8be9fd;">MXFP4</strong> (estándar OCP Microscaling)
+                    <ul style="margin: 0.4rem 0 0; padding-left: 1.2em;">
+                        <li>Bloques de 32 valores.</li>
+                        <li>Escala E8M0: solo una potencia de 2.</li>
+                    </ul>
+                </div>
+                <div style="flex: 1; background: rgba(80,250,123,0.1); border-radius: 0.5rem; padding: 0.8rem; border: 1px solid rgba(80,250,123,0.3);">
+                    <strong style="color: #50fa7b;">NVFP4</strong> (NVIDIA, desde Blackwell)
+                    <ul style="margin: 0.4rem 0 0; padding-left: 1.2em;">
+                        <li>Bloques de 16 valores.</li>
+                        <li>Escala FP8 (E4M3): más fina.</li>
+                        <li>Más una escala FP32 por tensor.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <aside class="notes">
+            <p>El extremo de la tendencia "cada vez menos bits", y el ejemplo más actual de block floating point.</p>
+            <ul>
+                <li>E2M1: con 2 bits de exponente y 1 de mantisa hay 16 combinaciones (15 valores distintos, porque +0 y −0 coinciden). Los valores positivos son 0, 0.5, 1, 1.5, 2, 3, 4 y 6: no son equiespaciados, como todo punto flotante.</li>
+                <li>Con eso solo no se puede representar casi nada. La escala por bloque hace el trabajo de ubicar el rango: cada bloque de 16 o 32 valores se ajusta a sus propios valores, y E2M1 solo resuelve "dónde cae cada uno dentro del bloque".</li>
+            </ul>
+            <p>La diferencia entre los dos está en la escala:</p>
+            <ul>
+                <li>MXFP4: bloques de 32 con una escala que es solo un exponente (E8M0, una potencia de 2). Barata en hardware (multiplicar por 2^k es correr bits), pero gruesa. Es parte del estándar abierto MX de OCP, que también define MXFP8, MXFP6 y MXINT8.</li>
+                <li>NVFP4: bloques más chicos (16) y escala en FP8 E4M3, que puede valer cualquier cosa, no solo potencias de 2. Más precisión a cambio de un poco más de memoria por escala. Tiene además una escala FP32 global por tensor, para que las escalas de bloque entren en el rango de E4M3.</li>
+            </ul>
+            <p>Uso: inferencia (y cada vez más entrenamiento) de LLMs en GPUs de datacenter. Conecta con la sección de cuantización: la escala por bloque es la granularidad "por grupo", entre "por tensor" y "por canal".</p>
+        </aside>
+    </section>
+
     <!-- ===================== EJEMPLO CONCRETO ===================== -->
 
     <section>
