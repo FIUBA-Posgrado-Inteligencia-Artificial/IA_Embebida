@@ -195,6 +195,151 @@
     </section>
 
     <section>
+        <h3>La plataforma importa: familias de ESP32</h3>
+        <table style="font-size: 0.48em; width: 100%; border-collapse: collapse; margin-top: 0.5rem;">
+            <thead>
+                <tr style="border-bottom: 2px solid #fff;">
+                    <th style="padding: 6px;">Chip</th>
+                    <th style="padding: 6px;">CPU</th>
+                    <th style="padding: 6px;">SRAM</th>
+                    <th style="padding: 6px;">Radio</th>
+                    <th style="padding: 6px;">Para IA</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 6px;">ESP32</td>
+                    <td style="padding: 6px;">2× Xtensa LX6, 240 MHz</td>
+                    <td style="padding: 6px;">520 KB</td>
+                    <td style="padding: 6px;">Wi-Fi 4, Bluetooth 4.2</td>
+                    <td style="padding: 6px;">Sin instrucciones vectoriales (ESP32-CAM de la demo)</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 6px;">ESP32-S2</td>
+                    <td style="padding: 6px;">1× Xtensa LX7, 240 MHz</td>
+                    <td style="padding: 6px;">320 KB</td>
+                    <td style="padding: 6px;">Wi-Fi 4</td>
+                    <td style="padding: 6px;">Sin instrucciones vectoriales</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2); color: #50fa7b;">
+                    <td style="padding: 6px;"><strong>ESP32-S3</strong></td>
+                    <td style="padding: 6px;">2× Xtensa LX7, 240 MHz</td>
+                    <td style="padding: 6px;">512 KB</td>
+                    <td style="padding: 6px;">Wi-Fi 4, BLE 5</td>
+                    <td style="padding: 6px;">Instrucciones vectoriales (SIMD) para 8 y 16 bits</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 6px;">ESP32-C3</td>
+                    <td style="padding: 6px;">1× RISC-V, 160 MHz</td>
+                    <td style="padding: 6px;">400 KB</td>
+                    <td style="padding: 6px;">Wi-Fi 4, BLE 5</td>
+                    <td style="padding: 6px;">Bajo costo, modelos muy chicos</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 6px;">ESP32-C6</td>
+                    <td style="padding: 6px;">1× RISC-V, 160 MHz</td>
+                    <td style="padding: 6px;">512 KB</td>
+                    <td style="padding: 6px;">Wi-Fi 6, BLE 5, Thread/Zigbee</td>
+                    <td style="padding: 6px;">Conectividad, modelos muy chicos</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 6px;">ESP32-H2</td>
+                    <td style="padding: 6px;">1× RISC-V, 96 MHz</td>
+                    <td style="padding: 6px;">320 KB</td>
+                    <td style="padding: 6px;">BLE 5, Thread/Zigbee (sin Wi-Fi)</td>
+                    <td style="padding: 6px;">Bajo consumo, sensores</td>
+                </tr>
+                <tr style="color: #8be9fd;">
+                    <td style="padding: 6px;"><strong>ESP32-P4</strong></td>
+                    <td style="padding: 6px;">2× RISC-V, 400 MHz</td>
+                    <td style="padding: 6px;">768 KB</td>
+                    <td style="padding: 6px;">Sin radio (se combina con un C6)</td>
+                    <td style="padding: 6px;">Instrucciones vectoriales, cámara MIPI-CSI, ISP</td>
+                </tr>
+            </tbody>
+        </table>
+        <p style="font-size: 0.6em; margin-top: 0.8rem; color: #ffb86c;">
+            Mismo fabricante, mismo ecosistema (ESP-IDF), pero para IA importan sobre todo las instrucciones
+            vectoriales y la memoria (SRAM interna + PSRAM externa).
+        </p>
+        <aside class="notes">
+          <p>Espressif tiene varias familias con el mismo entorno de desarrollo (ESP-IDF); se elige según el problema.</p>
+          <p>Para IA las relevantes son el S3 (el más usado hoy: instrucciones vectoriales, cámara, PSRAM) y el P4 (el más potente, pensado para visión y pantallas, pero sin radio propia).</p>
+          <p>Las familias C y H están pensadas para conectividad y bajo consumo; pueden correr modelos muy chicos (ej. detección de palabras clave, anomalías en sensores), sin aceleración.</p>
+          <p>La SRAM interna no alcanza para modelos medianos: por eso las placas para IA suelen traer PSRAM externa (4–16 MB). Es más lenta que la SRAM, y eso también pesa en el tiempo de inferencia.</p>
+          <p>En el pipeline del curso, el .espdl del ESP32 clásico usa kernels genéricos en C; el del S3 usa los kernels SIMD. No son intercambiables.</p>
+        </aside>
+    </section>
+
+    <section>
+        <h3>La plataforma importa: kits de desarrollo</h3>
+        <table style="font-size: 0.5em; width: 100%; border-collapse: collapse; margin-top: 0.5rem;">
+            <thead>
+                <tr style="border-bottom: 2px solid #fff;">
+                    <th style="padding: 6px;">Kit</th>
+                    <th style="padding: 6px;">Chip</th>
+                    <th style="padding: 6px;">Qué trae</th>
+                    <th style="padding: 6px;">Para qué</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 6px;">ESP32-DevKitC</td>
+                    <td style="padding: 6px;">ESP32</td>
+                    <td style="padding: 6px;">USB, pines expuestos</td>
+                    <td style="padding: 6px;">Desarrollo general</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2); color: #50fa7b;">
+                    <td style="padding: 6px;">ESP32-CAM (AI-Thinker)</td>
+                    <td style="padding: 6px;">ESP32</td>
+                    <td style="padding: 6px;">Cámara, PSRAM, microSD; sin USB (programador aparte)</td>
+                    <td style="padding: 6px;">Visión de bajo costo (la demo)</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2); color: #50fa7b;">
+                    <td style="padding: 6px;">ESP32-S3-DevKitC-1</td>
+                    <td style="padding: 6px;">ESP32-S3</td>
+                    <td style="padding: 6px;">USB, hasta 16 MB flash + 8 MB PSRAM</td>
+                    <td style="padding: 6px;">Desarrollo general, benchmarks del curso</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 6px;">ESP32-S3-EYE</td>
+                    <td style="padding: 6px;">ESP32-S3</td>
+                    <td style="padding: 6px;">Cámara, pantalla LCD, micrófono, PSRAM</td>
+                    <td style="padding: 6px;">Visión (ej. reconocimiento facial con ESP-WHO)</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 6px;">ESP32-S3-BOX-3</td>
+                    <td style="padding: 6px;">ESP32-S3</td>
+                    <td style="padding: 6px;">Pantalla táctil, dos micrófonos, parlante</td>
+                    <td style="padding: 6px;">Voz (ej. palabra de activación con ESP-SR)</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 6px;">XIAO ESP32S3 Sense (Seeed)</td>
+                    <td style="padding: 6px;">ESP32-S3</td>
+                    <td style="padding: 6px;">Cámara, micrófono, microSD, PSRAM; muy chica</td>
+                    <td style="padding: 6px;">Visión y audio en dispositivos portátiles</td>
+                </tr>
+                <tr>
+                    <td style="padding: 6px;">ESP32-P4-Function-EV-Board</td>
+                    <td style="padding: 6px;">ESP32-P4 + C6</td>
+                    <td style="padding: 6px;">Cámara MIPI-CSI, pantalla MIPI-DSI, Wi-Fi vía el C6</td>
+                    <td style="padding: 6px;">Visión con más resolución y cuadros por segundo</td>
+                </tr>
+            </tbody>
+        </table>
+        <p style="font-size: 0.6em; margin-top: 0.8rem;">
+            En verde, las que usamos en el curso. El chip define el cómputo; el kit define los sensores,
+            la memoria externa y qué tan fácil es programarlo.
+        </p>
+        <aside class="notes">
+          <p>El mismo chip aparece en kits muy distintos: lo que cambia es qué sensores trae, cuánta PSRAM y flash, y cómo se programa.</p>
+          <p>La ESP32-CAM es la más barata para visión, pero no tiene USB: se programa con un adaptador (ESP32-CAM-MB) y hay que entrar a modo descarga a mano con BOOT + RST.</p>
+          <p>Los kits de Espressif para IA (S3-EYE, S3-BOX-3) vienen con ejemplos listos: ESP-WHO para visión y ESP-SR para voz, ambos sobre ESP-DL.</p>
+          <p>Al elegir kit para un proyecto, mirar: chip (¿tiene instrucciones vectoriales?), PSRAM (¿entra el modelo y los buffers?), sensores y forma de programarlo.</p>
+        </aside>
+    </section>
+
+    <section>
         <h3>El runtime importa</h3>
         <p style="font-size: 0.7em; text-align: left;">El mismo modelo grande, la misma placa (ESP32-S3), distintos runtimes:</p>
         <table style="font-size: 0.6em; width: 100%; border-collapse: collapse; margin-top: 0.5rem;">
