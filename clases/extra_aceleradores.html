@@ -1,0 +1,440 @@
+<!-- 21. Aceleradores en FPGA y ASIC -->
+<section>
+    <section>
+        <h2 class="gradient-text">21. Aceleradores en FPGA y ASIC</h2>
+        <p>Tema extra: hardware dedicado para redes neuronales</p>
+        <ul style="font-size: 0.75em; text-align: left; max-width: 750px; margin: 1.2rem auto;">
+            <li style="margin-bottom: 0.3rem;">Por qué hardware dedicado: mover datos cuesta más que calcular</li>
+            <li style="margin-bottom: 0.3rem;">FPGA por dentro y cómo se mapea una red</li>
+            <li style="margin-bottom: 0.3rem;">ASIC: flujo, costos y cuándo conviene</li>
+            <li style="margin-bottom: 0.3rem;">Systolic arrays</li>
+            <li style="margin-bottom: 0.3rem;">FPGAs con bloques para IA</li>
+            <li>Ejemplos: del edge al datacenter</li>
+        </ul>
+        <aside class="notes">
+            <p>Sección extra, para profundizar: no es parte del recorrido obligatorio. Amplía lo que vimos en las plataformas digitales (sección 5) y en plataformas de hardware (sección 16).</p>
+            <p>Hilo conductor: todo acelerador de IA intenta lo mismo, hacer muchas MACs por ciclo sin ir a buscar cada dato a memoria. Cambia cuánto se fija en el silicio (ASIC) y cuánto queda reconfigurable (FPGA).</p>
+        </aside>
+    </section>
+
+    <section>
+        <h3>Por qué hardware dedicado</h3>
+        <div style="display: flex; gap: 1.5rem; align-items: flex-start;">
+            <table style="font-size: 0.55em; width: 55%; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 2px solid #fff;">
+                        <th style="padding: 6px;">Operación (45 nm)</th>
+                        <th style="padding: 6px;">Energía</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                        <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">Suma INT8</td>
+                        <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">0.03 pJ</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                        <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">Multiplicación INT8</td>
+                        <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">0.2 pJ</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                        <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">Multiplicación FP32</td>
+                        <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">3.7 pJ</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                        <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">Lectura de 32 bits de SRAM (on-chip)</td>
+                        <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">5 pJ</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                        <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">Lectura de 32 bits de DRAM (externa)</td>
+                        <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2); color: #ff5555;"><strong style="color: #ff5555;">640 pJ</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div style="flex: 1; font-size: 0.6em; text-align: left;">
+                <p style="margin-top: 0;">Traer un dato de DRAM cuesta <strong>~3000 veces</strong> más que multiplicarlo en INT8.</p>
+                <p class="fragment" style="color: #8be9fd;">Estrategia de todo acelerador:</p>
+                <ul class="fragment">
+                    <li>muchas MACs en paralelo,</li>
+                    <li>datos guardados cerca de cada MAC,</li>
+                    <li>cada dato leído una vez y <strong>reusado</strong> muchas.</li>
+                </ul>
+            </div>
+        </div>
+        <p style="font-size: 0.45em; opacity: 0.7; margin-top: 1rem;">Fuente: M. Horowitz, ISSCC 2014, tabla
+            reproducida en Han et al., <em>Deep Compression</em>, ICLR 2016.</p>
+        <aside class="notes">
+            <p>La tabla más citada de la arquitectura para IA. Los números son de un proceso de 45 nm; en nodos modernos todo baja, pero la proporción se mantiene: mover datos fuera del chip es órdenes de magnitud más caro que operar.</p>
+            <p>Conexión con la sección 7 ("Densa vs. convolucional"): el reuso de pesos. Una convolución reusa cada peso en cada posición de la imagen; un acelerador está diseñado para aprovechar ese reuso sin volver a memoria.</p>
+            <p>Conexión con compresión: cuantizar a INT8 no solo abarata la multiplicación (0.2 vs. 3.7 pJ), sino que reduce 4 veces los bytes que hay que mover, que es lo caro.</p>
+        </aside>
+    </section>
+
+    <section>
+        <h3>FPGA por dentro</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 0.6em; text-align: left;">
+            <div style="background: rgba(139,233,253,0.1); border-radius: 0.5rem; padding: 0.8rem;">
+                <strong style="color: #8be9fd;">LUTs y flip-flops</strong>
+                <p style="margin: 0.3rem 0 0;">Tablas de verdad configurables: cualquier función lógica chica. Con ellas se arma
+                    la lógica de control y aritmética de pocos bits (ej. binaria o INT2).</p>
+            </div>
+            <div style="background: rgba(80,250,123,0.1); border-radius: 0.5rem; padding: 0.8rem;">
+                <strong style="color: #50fa7b;">Bloques DSP</strong>
+                <p style="margin: 0.3rem 0 0;">Multiplicadores-acumuladores fijos en el silicio. Son los que hacen las MACs de
+                    la red: su cantidad suele limitar el paralelismo.</p>
+            </div>
+            <div style="background: rgba(255,184,108,0.1); border-radius: 0.5rem; padding: 0.8rem;">
+                <strong style="color: #ffb86c;">BRAM / URAM</strong>
+                <p style="margin: 0.3rem 0 0;">Bloques de SRAM distribuidos por todo el chip: guardan pesos y activaciones
+                    al lado de los DSPs.</p>
+            </div>
+            <div style="background: rgba(189,147,249,0.1); border-radius: 0.5rem; padding: 0.8rem;">
+                <strong style="color: #bd93f9;">Interconexión programable</strong>
+                <p style="margin: 0.3rem 0 0;">Une todo lo anterior. Es lo que da la flexibilidad, y también lo que cuesta
+                    área, energía y frecuencia frente a un ASIC.</p>
+            </div>
+        </div>
+        <p style="font-size: 0.6em; margin-top: 0.8rem;">Las FPGA SoC (ej. AMD Zynq, Intel Agilex 5) suman procesadores ARM en
+            el mismo chip: el software corre en el ARM y la red en la lógica.</p>
+        <aside class="notes">
+            <p>Para los de CEIA: una FPGA es un chip "en blanco" cuyo circuito se define al configurarlo. No ejecuta instrucciones: el diseño es el circuito.</p>
+            <p>Para la IA importan sobre todo los DSPs (dónde se hacen las MACs) y las BRAMs (dónde viven los datos). Que haya memoria distribuida al lado de cada DSP es justo lo que pide la tabla de energía de la diapo anterior.</p>
+            <p>La flexibilidad tiene precio: la interconexión programable hace que el mismo circuito en FPGA sea varias veces más grande, lento y consumidor que en un ASIC.</p>
+        </aside>
+    </section>
+
+    <section>
+        <h3>Redes en FPGA: dos estrategias</h3>
+        <div style="display: flex; gap: 1.5rem; font-size: 0.6em; text-align: left;">
+            <div style="flex: 1; background: rgba(255,121,198,0.1); border-radius: 0.5rem; padding: 1rem; border: 1px solid rgba(255,121,198,0.3);">
+                <strong style="color: #ff79c6; font-size: 1.15em;">Dataflow (desenrollada)</strong>
+                <ul style="margin-top: 0.5rem;">
+                    <li>Un bloque de hardware por capa, en pipeline.</li>
+                    <li>Latencia mínima (µs o menos).</li>
+                    <li>El hardware depende de la red: si cambia la red, se vuelve a sintetizar.</li>
+                    <li>Herramientas: <strong>hls4ml</strong> (toma modelos de QKeras) y <strong>FINN</strong> (toma modelos de Brevitas).</li>
+                </ul>
+            </div>
+            <div style="flex: 1; background: rgba(80,250,123,0.1); border-radius: 0.5rem; padding: 1rem; border: 1px solid rgba(80,250,123,0.3);">
+                <strong style="color: #50fa7b; font-size: 1.15em;">Overlay (iterativa)</strong>
+                <ul style="margin-top: 0.5rem;">
+                    <li>Un procesador de redes genérico sintetizado una vez.</li>
+                    <li>La red se compila a instrucciones para ese procesador.</li>
+                    <li>Cambiar de red no requiere volver a sintetizar.</li>
+                    <li>Ejemplo: la DPU de AMD Vitis AI.</li>
+                </ul>
+            </div>
+        </div>
+        <p class="fragment" style="font-size: 0.6em; margin-top: 1rem; color: #ffb86c;">Es el mismo compromiso de la sección 5
+            (iterativa vs. desenrollada), aplicado a una red entera.</p>
+        <aside class="notes">
+            <p>Dataflow: cada capa tiene su propio circuito, y los datos fluyen de una a la siguiente sin pasar por memoria externa. Se usa cuando la red es chica y la latencia es crítica: el caso emblemático es el trigger del CERN, donde hls4ml decide en microsegundos qué eventos guardar.</p>
+            <p>hls4ml toma justamente modelos de QKeras, como los de la sección de cuantización; FINN toma modelos de Brevitas, que usamos en el pipeline de la ESP32. La cuantización a pocos bits es lo que hace que la red entre en la FPGA.</p>
+            <p>Overlay: se sintetiza una sola vez un "procesador de redes", y la red pasa a ser software para ese procesador. Más flexible, menos eficiente. Es lo más parecido a una NPU, pero en lógica programable.</p>
+        </aside>
+    </section>
+
+    <section>
+        <h3>ASIC: diseñar el chip</h3>
+        <div style="font-size: 0.6em; text-align: left;">
+            <p style="text-align: center; background: rgba(255,255,255,0.05); padding: 0.6rem; border-radius: 0.5rem;">
+                RTL → verificación → síntesis → place &amp; route → <strong>tape-out</strong> → fabricación → prueba</p>
+            <div style="display: flex; gap: 1.5rem; margin-top: 0.8rem;">
+                <div style="flex: 1;">
+                    <p style="color: #50fa7b; margin-bottom: 0.3rem;"><strong>A favor</strong></p>
+                    <ul>
+                        <li>Máxima eficiencia: solo el hardware necesario, sin interconexión programable.</li>
+                        <li>Costo por unidad muy bajo a gran volumen.</li>
+                        <li>Puede integrar memoria, sensores y radio en el mismo chip.</li>
+                    </ul>
+                </div>
+                <div style="flex: 1;">
+                    <p style="color: #ff5555; margin-bottom: 0.3rem;"><strong>En contra</strong></p>
+                    <ul>
+                        <li>Costo inicial (NRE) alto: desde cientos de USD en nodos viejos con chips compartidos (ej. Tiny Tapeout) hasta cientos de millones en nodos de punta.</li>
+                        <li>Meses o años de desarrollo.</li>
+                        <li>Un error de diseño se paga con otra fabricación.</li>
+                        <li>Lo que no se previó (un tipo de capa nuevo) no se puede agregar.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <aside class="notes">
+            <p>Un ASIC (circuito integrado de aplicación específica) se fabrica para una tarea. El flujo empieza igual que en FPGA (RTL en Verilog/VHDL, verificación, síntesis), pero termina en máscaras de fabricación en vez de un archivo de configuración.</p>
+            <p>NRE (non-recurring engineering): todo lo que se paga una sola vez, diseño, verificación, herramientas y máscaras. En nodos de punta, solo las máscaras ya son millones.</p>
+            <p>Para los de CESE: hoy hay formas baratas de fabricar un chip propio para aprender (Tiny Tapeout, shuttles multiproyecto), en nodos viejos y con áreas chicas.</p>
+            <p>El riesgo de diseño en IA: los modelos cambian más rápido que los chips. Un acelerador diseñado en 2020 puede no soportar bien una capa de 2026. Por eso los aceleradores reales suelen ser programables en alguna medida.</p>
+        </aside>
+    </section>
+
+    <section>
+        <h3>FPGA vs. ASIC</h3>
+        <table style="font-size: 0.55em; width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 2px solid #fff;">
+                    <th style="padding: 6px;"></th>
+                    <th style="padding: 6px; color: #8be9fd;">FPGA</th>
+                    <th style="padding: 6px; color: #ffb86c;">ASIC</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);"><strong>Costo inicial (NRE)</strong></td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">Bajo (placa y herramientas)</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">Alto a muy alto</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);"><strong>Costo por unidad</strong></td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">Alto</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">Bajo a gran volumen</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);"><strong>Tiempo de desarrollo</strong></td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">Semanas a meses</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">Meses a años</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);"><strong>Cambiar el diseño</strong></td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">Reconfigurar (incluso en campo)</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">Fabricar de nuevo</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);"><strong>Eficiencia (energía, área, frecuencia)</strong></td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">Buena</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">La mejor</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);"><strong>Cuándo conviene</strong></td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">Prototipos, bajo volumen, latencia crítica, red que cambia</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">Alto volumen, red estable, energía crítica</td>
+                </tr>
+            </tbody>
+        </table>
+        <p class="fragment" style="font-size: 0.6em; margin-top: 1rem; color: #ffb86c;">Flujo típico: se prototipa en FPGA y, si el
+            volumen lo justifica, se pasa a ASIC.</p>
+        <aside class="notes">
+            <p>Repasar fila por fila. La pregunta de fondo no es "cuál es mejor", sino cuántas unidades se van a fabricar y cuánto va a cambiar la red.</p>
+            <p>Ejemplos de cada lado: FPGA en equipos de telecomunicaciones, instrumentación científica (CERN), defensa, prototipos de chips. ASIC en celulares, parlantes inteligentes, autos, datacenters de los grandes.</p>
+            <p>El prototipo en FPGA no se tira: el mismo RTL verificado en FPGA es el punto de partida del ASIC.</p>
+        </aside>
+    </section>
+
+    <section>
+        <h3>El cruce por volumen</h3>
+        <img src="figures/aceleradores-costo_volumen.png" alt="Costo por unidad en función del volumen para FPGA y ASIC"
+            style="width: 72%; margin: 0;">
+        <p style="font-size: 0.6em; margin-top: 0.3rem;"><code>costo por unidad = NRE / unidades + costo de fabricar una</code></p>
+        <aside class="notes">
+            <p>Los números son ilustrativos; lo que importa es la forma. El NRE se reparte entre todas las unidades: a poco volumen domina, a mucho volumen desaparece y queda el costo de fabricar cada chip.</p>
+            <p>Con estos valores, el ASIC conviene a partir de ~50 mil unidades. Con NRE de nodo de punta (cientos de millones), el cruce se va a millones de unidades: por eso solo los que venden muchísimos chips (o los usan a escala de datacenter) diseñan en esos nodos.</p>
+            <p>Preguntar: ¿qué pasa con el cruce si la FPGA se abarata? ¿Y si la red cambia cada 6 meses y hay que re-fabricar el ASIC?</p>
+        </aside>
+    </section>
+
+    <section>
+        <h3>Systolic arrays: la idea</h3>
+        <div style="font-size: 0.65em; text-align: left;">
+            <ul>
+                <li style="margin-bottom: 0.4rem;">Una grilla de elementos de procesamiento (PE), cada uno con una MAC y unos registros.</li>
+                <li style="margin-bottom: 0.4rem;">Cada PE solo habla con sus vecinos: recibe datos, opera y los pasa al siguiente en el
+                    próximo ciclo.</li>
+                <li style="margin-bottom: 0.4rem;">Los datos entran por los bordes y "laten" a través de la grilla, como la sangre
+                    bombeada por el corazón (de ahí <em>sistólico</em>).</li>
+                <li>Cada valor se lee <strong>una vez</strong> de memoria y se reusa en toda una fila o columna de PEs.</li>
+            </ul>
+            <div class="fragment"
+                style="margin-top: 1rem; background: rgba(255,255,255,0.05); padding: 0.8rem 1rem; border-radius: 0.5rem; border-left: 3px solid #8be9fd;">
+                Calza justo con la multiplicación de matrices, que es casi todo el cómputo de una red: densas
+                directamente, y convoluciones reescritas como matrices (<em>im2col</em>).
+            </div>
+        </div>
+        <p style="font-size: 0.45em; opacity: 0.7; margin-top: 1rem;">H. T. Kung y C. Leiserson, 1978; H. T. Kung, <em>Why
+                systolic architectures?</em>, IEEE Computer, 1982.</p>
+        <aside class="notes">
+            <p>Idea de fines de los 70, que volvió con fuerza con la IA: el TPU de Google (2015) es esencialmente un systolic array gigante.</p>
+            <p>Lo clave es el reuso: un array de N×N hace N² MACs por ciclo, pero solo lee 2N valores nuevos de memoria por ciclo (una fila y una columna en los bordes). Cuanto más grande el array, más MACs por cada dato leído.</p>
+            <p>im2col: se "despliegan" los parches de la imagen como columnas de una matriz, y la convolución pasa a ser una multiplicación de matrices. Gasta más memoria, pero permite usar el mismo hardware.</p>
+        </aside>
+    </section>
+
+    <section>
+        <h3>Systolic array: paso a paso</h3>
+        <div class="r-stack">
+            <img src="figures/aceleradores-systolic_1.png" alt="Ciclo 1" style="width: 78%; margin: 0 auto;">
+            <img class="fragment" src="figures/aceleradores-systolic_2.png" alt="Ciclo 2" style="width: 78%; margin: 0 auto;">
+            <img class="fragment" src="figures/aceleradores-systolic_3.png" alt="Ciclo 3" style="width: 78%; margin: 0 auto;">
+            <img class="fragment" src="figures/aceleradores-systolic_4.png" alt="Ciclo 4" style="width: 78%; margin: 0 auto;">
+        </div>
+        <p style="font-size: 0.6em; margin-top: 0.3rem;">Cada PE acumula un elemento de C. Las entradas entran escalonadas
+            para que cada par llegue al PE correcto en el ciclo correcto.</p>
+        <aside class="notes">
+            <p>Ejemplo mínimo: C = A·B con matrices de 2×2, en un array de 2×2 donde cada PE se queda con un elemento de C (output-stationary).</p>
+            <ul>
+                <li>Ciclo 1: solo el PE 00 tiene datos: 1·5.</li>
+                <li>Ciclo 2: el 1 pasó del PE 00 al 01, y el 5 del 00 al 10. El PE 00 termina (5 + 2·7 = 19).</li>
+                <li>Ciclo 3: los de la antidiagonal terminan (22 y 43); el PE 11 arranca.</li>
+                <li>Ciclo 4: termina el PE 11 (50).</li>
+            </ul>
+            <p>Mostrar el escalonamiento (skew): la fila 1 de A entra un ciclo después que la fila 0, y lo mismo con las columnas de B. Sin eso, los pares no se encontrarían.</p>
+            <p>Ningún PE lee memoria: solo los bordes. Cada valor de A se usó en 2 PEs, y cada valor de B también. En un array de 256×256, cada valor se reusa 256 veces.</p>
+        </aside>
+    </section>
+
+    <section>
+        <h3>¿Qué se queda quieto en cada PE?</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; font-size: 0.58em; text-align: left;">
+            <div style="background: rgba(255,184,108,0.1); border-radius: 0.5rem; padding: 0.8rem;">
+                <strong style="color: #ffb86c;">Weight-stationary</strong>
+                <p style="margin: 0.3rem 0 0;">Los pesos se cargan una vez en los PEs; fluyen activaciones y sumas
+                    parciales.</p>
+                <p style="margin: 0.3rem 0 0; opacity: 0.8;">Ej.: TPU de Google.</p>
+            </div>
+            <div style="background: rgba(80,250,123,0.1); border-radius: 0.5rem; padding: 0.8rem;">
+                <strong style="color: #50fa7b;">Output-stationary</strong>
+                <p style="margin: 0.3rem 0 0;">Cada PE acumula una salida; fluyen pesos y activaciones.</p>
+                <p style="margin: 0.3rem 0 0; opacity: 0.8;">Ej.: el de la diapo anterior.</p>
+            </div>
+            <div style="background: rgba(139,233,253,0.1); border-radius: 0.5rem; padding: 0.8rem;">
+                <strong style="color: #8be9fd;">Row-stationary</strong>
+                <p style="margin: 0.3rem 0 0;">Mezcla pensada para convoluciones: cada PE procesa una fila del filtro
+                    contra una fila de la imagen.</p>
+                <p style="margin: 0.3rem 0 0; opacity: 0.8;">Ej.: Eyeriss (MIT).</p>
+            </div>
+        </div>
+        <p class="fragment" style="font-size: 0.6em; margin-top: 1rem; color: #ffb86c;">El dataflow se elige según qué dato se
+            reusa más en la red: pesos, activaciones o sumas parciales.</p>
+        <aside class="notes">
+            <p>Mismo hardware de base (grilla de MACs), distinta decisión sobre qué dato vive en el PE y cuáles se mueven.</p>
+            <p>Weight-stationary conviene cuando el mismo peso se aplica a muchas entradas (batch grande, convoluciones). Output-stationary evita mover sumas parciales, que suelen tener más bits que las entradas (ej. acumuladores de 32 bits para MACs INT8). Row-stationary (Eyeriss, Chen et al. 2016) busca minimizar el movimiento total para convoluciones.</p>
+            <p>Esto conecta con la tabla de energía: elegir el dataflow es elegir qué movimiento de datos se ahorra.</p>
+        </aside>
+    </section>
+
+    <section>
+        <h3>FPGAs con bloques para IA</h3>
+        <table style="font-size: 0.52em; width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 2px solid #fff;">
+                    <th style="padding: 6px;">Familia</th>
+                    <th style="padding: 6px;">Bloque</th>
+                    <th style="padding: 6px;">Qué es</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">AMD Versal (AI Core, AI Edge)</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">AI Engines</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">Grilla 2D de procesadores vectoriales (VLIW/SIMD) con memoria local, conectados
+                        a sus vecinos. AIE-ML: 256 MACs INT8 por ciclo y por tile.</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">Intel/Altera Agilex 5</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">AI Tensor Block</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">Modo del bloque DSP con 20 multiplicadores INT8 (dos productos escalares de 10
+                        elementos), encadenables en cascada.</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">Achronix Speedster7t</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">MLP (Machine Learning Processor)</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">Hasta 32 multiplicadores INT4 (16 INT8) con árbol de sumas y acumulador, con
+                        BRAM acoplada. Soporta block floating point.</td>
+                </tr>
+            </tbody>
+        </table>
+        <p class="fragment" style="font-size: 0.6em; margin-top: 1rem; color: #ffb86c;">No son systolic arrays clásicos, pero
+            usan la misma receta: muchas MACs de pocos bits, memoria local y datos que pasan de vecino a vecino.</p>
+        <aside class="notes">
+            <p>La tendencia de la última década: las FPGAs dejan de ser solo lógica configurable y suman bloques fijos pensados para IA. Es un punto intermedio entre FPGA y ASIC: la parte que más se repite (las MACs) queda fija en silicio, y lo demás sigue siendo programable.</p>
+            <ul>
+                <li>Versal: es el caso más radical. Los AI Engines son procesadores que se programan en C++, no lógica; la parte programable queda para el resto del sistema. Hay que ser precisos: no es un systolic array, es una grilla de procesadores, pero el movimiento de datos entre vecinos (cascadas) sigue la misma idea.</li>
+                <li>Agilex 5: el bloque DSP clásico con un modo extra para productos escalares de INT8.</li>
+                <li>Achronix: bloques de MACs con memoria al lado; es el ejemplo más directo de "acercar la memoria a la MAC".</li>
+            </ul>
+            <p>En el extremo chico, Lattice ofrece sensAI: FPGAs de muy bajo consumo (mW) con aceleradores de redes para detección de presencia o palabras clave.</p>
+        </aside>
+    </section>
+
+    <section>
+        <h3>Ejemplos: ASICs para IA en el edge</h3>
+        <table style="font-size: 0.55em; width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 2px solid #fff;">
+                    <th style="padding: 6px;">Chip</th>
+                    <th style="padding: 6px;">Qué es</th>
+                    <th style="padding: 6px;">Escala</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">ESP32-S3 (la de la demo)</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">Sin acelerador: instrucciones vectoriales (SIMD) en la CPU</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">Hasta 16 MACs INT8 por instrucción</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">Arm Ethos-U55</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">microNPU que se acopla a un Cortex-M</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">32 a 256 MACs por ciclo</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">STM32N6</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">Microcontrolador con NPU propia (Neural-ART)</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">288 MACs por ciclo, 600 GOPS</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">Google Edge TPU (Coral)</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">Coprocesador por USB o PCIe</td>
+                    <td style="padding: 6px; border-bottom-color: rgba(255,255,255,0.2);">4 TOPS en ~2 W</td>
+                </tr>
+            </tbody>
+        </table>
+        <aside class="notes">
+            <p>De menor a mayor. La ESP32-S3 que usamos no tiene NPU: ESP-DL aprovecha instrucciones vectoriales de la CPU (registros de 128 bits: 16 MACs de INT8 por instrucción). Por eso cuantizar a INT8 la acelera tanto.</p>
+            <p>El paso siguiente son los microcontroladores con NPU: el Ethos-U55 es un bloque que Arm licencia a los fabricantes, y el STM32N6 es el primer STM32 con NPU propia (288 MACs por ciclo).</p>
+            <p>Edge TPU: la versión chica del TPU, como coprocesador externo; solo corre modelos INT8 compilados para él.</p>
+            <p>Todos comparten la receta: MACs de INT8 en paralelo y memoria local. Ninguno corre FP32 rápido: por eso la cuantización es el paso obligado del despliegue.</p>
+        </aside>
+    </section>
+
+    <section>
+        <h3>Ejemplos: ASICs para IA en el datacenter</h3>
+        <div style="font-size: 0.6em; text-align: left;">
+            <ul>
+                <li style="margin-bottom: 0.5rem;"><strong style="color: #50fa7b;">Google TPU</strong> (desde 2015): el primero fue un systolic
+                    array de 256×256 MACs INT8 (65 536 MACs por ciclo), weight-stationary, solo para inferencia.</li>
+                <li style="margin-bottom: 0.5rem;"><strong style="color: #8be9fd;">AWS Inferentia y Trainium</strong>: chips propios de Amazon
+                    para inferencia y entrenamiento.</li>
+                <li style="margin-bottom: 0.5rem;"><strong style="color: #bd93f9;">Meta MTIA</strong>: acelerador propio para los modelos de
+                    recomendación y ranking de Meta.</li>
+                <li><strong style="color: #ffb86c;">OpenAI Jalapeño</strong> (2026): primer chip propio de OpenAI, diseñado con
+                    Broadcom. ASIC de inferencia para LLMs, de uso interno, con memoria HBM al lado del chip.</li>
+            </ul>
+            <p class="fragment" style="margin-top: 1rem; color: #ffb86c;">La tendencia: quien corre IA a escala suficiente diseña su
+                propio ASIC, porque el volumen paga el NRE (el cruce por volumen, a escala datacenter).</p>
+        </div>
+        <aside class="notes">
+            <p>TPU v1 (Jouppi et al., ISCA 2017): un array de 256×256 MACs de 8 bits a 700 MHz, unos 92 TOPS. Es el ejemplo de manual de systolic array weight-stationary.</p>
+            <p>Jalapeño: OpenAI y Broadcom lo presentaron en junio de 2026, y mostraron los primeros resultados en Hot Chips en agosto. Es un chip muy grande, casi del tamaño máximo que permite la litografía, rodeado de memoria HBM. Está enfocado en las etapas que más limitan la inferencia de LLMs (el prefill y la comunicación entre chips), y va a usarse en la infraestructura propia de OpenAI. No hay detalles públicos de su arquitectura interna: no afirmar que sea un systolic array.</p>
+            <p>El punto para la materia: los mismos principios que vimos para un microcontrolador (INT8 o menos, memoria cerca del cómputo, reuso) son los que guían el diseño de los chips más grandes de la industria.</p>
+        </aside>
+    </section>
+
+    <section>
+        <h3>Resumen: aceleradores en FPGA y ASIC</h3>
+        <div style="font-size: 0.65em; text-align: left;">
+            <ul>
+                <li style="margin-bottom: 0.4rem;">Mover datos cuesta mucho más que calcular: los aceleradores ganan por <strong>reuso</strong> y
+                    memoria local, no solo por tener más MACs.</li>
+                <li style="margin-bottom: 0.4rem;">FPGA: reconfigurable, NRE bajo; la red se mapea como dataflow (una capa, un bloque) u overlay
+                    (un procesador de redes).</li>
+                <li style="margin-bottom: 0.4rem;">ASIC: máxima eficiencia, NRE alto; conviene con volumen alto y red estable.</li>
+                <li style="margin-bottom: 0.4rem;">Systolic arrays: grilla de MACs donde los datos pasan de vecino a vecino; el dataflow decide
+                    qué dato se queda quieto.</li>
+                <li style="margin-bottom: 0.4rem;">Las FPGAs nuevas suman bloques fijos para IA: un punto intermedio entre FPGA y ASIC.</li>
+                <li>Del microcontrolador al datacenter, la receta es la misma, y la compresión (sobre todo la cuantización) es lo que
+                    permite aprovecharla.</li>
+            </ul>
+        </div>
+        <aside class="notes">
+            <p>Cerrar con el hilo de la materia: comprimir no es solo "que entre": es lo que deja usar el hardware dedicado. Un acelerador INT8 no sirve de nada con un modelo FP32.</p>
+        </aside>
+    </section>
+</section>

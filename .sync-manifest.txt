@@ -12,6 +12,7 @@ clases/deploy_despliegue.html
 clases/deploy_frameworks.html
 clases/deploy_ia_embebida.html
 clases/deploy_plataformas.html
+clases/extra_aceleradores.html
 clases/figures/00_intro-binary_classification.svg
 clases/figures/00_intro-ia_ml_ann_dl.png
 clases/figures/00_intro-logistic_regression.png
@@ -62,6 +63,11 @@ clases/figures/03-flp_sum.png
 clases/figures/04-capas_de_la_ia.jpeg
 clases/figures/Turing_Test_version_3.png
 clases/figures/_old_ia_ml_ann_dl.png
+clases/figures/aceleradores-costo_volumen.png
+clases/figures/aceleradores-systolic_1.png
+clases/figures/aceleradores-systolic_2.png
+clases/figures/aceleradores-systolic_3.png
+clases/figures/aceleradores-systolic_4.png
 clases/figures/costo.png
 clases/figures/cuantizacion-3pasos_8vs4.png
 clases/figures/cuantizacion-funcion_no_uniforme.png
@@ -105,6 +111,7 @@ clases/figures/specific_ste.png
 clases/figures/specific_unrolled.png
 clases/figures/specific_unsigned_integer.png
 clases/figures/timeline.png
+clases/files/aceleradores_figuras.py
 clases/files/activation_functions.py
 clases/files/big_o_visualization.py
 clases/files/cuantizacion_figuras.py

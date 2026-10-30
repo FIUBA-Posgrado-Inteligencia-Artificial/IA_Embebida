@@ -347,6 +347,7 @@
         <li>En Big O, K es el lado del filtro (H<sub>K</sub> = W<sub>K</sub> = K) y H·W la resolución, porque con padding la salida tiene la resolución de la entrada. Se desprecian los sesgos y el "+1" del modo valid.</li>
         <li>La diferencia de fondo es el reuso: en la densa cada peso se usa una vez; en la convolución, una vez por posición de la imagen.</li>
         <li>Consecuencia práctica: una densa pesa en memoria (hay que traer cada peso para usarlo una sola vez); una convolución pesa en cómputo.</li>
+        <li>Ese reuso es justo lo que explotan los aceleradores (systolic arrays, NPUs): ver la sección extra "Aceleradores en FPGA y ASIC".</li>
       </ul>
       <p>Pregunta de escalabilidad (mostrar el fragmento después de que respondan): duplicar el lado son 4 veces más píxeles. La densa conectada a la imagen crece 4 veces en todo; la convolución no cambia sus parámetros, pero hace 4 veces más MACs. Es justo lo que hace la demo: el chico usa 32×32 en lugar de 96×96 (9 veces menos píxeles) y se ahorra 9 veces los MACs de cada convolución.</p>
       <p>Por eso las CNN reemplazaron a las densas en imágenes: con una densa sobre una imagen de 96×96×3 y 100 neuronas ya serían 2.8 M de parámetros.</p>
