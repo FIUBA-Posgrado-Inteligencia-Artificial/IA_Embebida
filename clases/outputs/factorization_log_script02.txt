@@ -1,41 +1,73 @@
 [INFO] Usando dispositivo: cpu
 
-============================================================
-PASO 1 — Entrenando CNN baseline
-============================================================
-  Epoch  1/10  loss=0.6321  train_acc=0.7815  test_acc=0.8215  (6.4s)
-  Epoch  2/10  loss=0.3811  train_acc=0.8635  test_acc=0.8661  (5.9s)
-  Epoch  3/10  loss=0.3294  train_acc=0.8814  test_acc=0.8745  (6.4s)
-  Epoch  4/10  loss=0.3012  train_acc=0.8915  test_acc=0.8845  (6.6s)
-  Epoch  5/10  loss=0.2786  train_acc=0.8997  test_acc=0.8908  (6.5s)
-  Epoch  6/10  loss=0.2580  train_acc=0.9059  test_acc=0.8953  (6.8s)
-  Epoch  7/10  loss=0.2447  train_acc=0.9109  test_acc=0.8935  (7.6s)
-  Epoch  8/10  loss=0.2313  train_acc=0.9158  test_acc=0.9000  (6.4s)
-  Epoch  9/10  loss=0.2202  train_acc=0.9185  test_acc=0.9001  (7.0s)
-  Epoch 10/10  loss=0.2087  train_acc=0.9234  test_acc=0.9049  (6.3s)
+======================================================================
+PASO 1 — CNN estándar (baseline)
+======================================================================
+  Epoch  1/10  loss=0.7076  train_acc=0.7504  test_acc=0.8240  (12.6s)
+  Epoch  2/10  loss=0.4257  train_acc=0.8469  test_acc=0.8509  (23.5s)
+  Epoch  3/10  loss=0.3649  train_acc=0.8697  test_acc=0.8695  (31.5s)
+  Epoch  4/10  loss=0.3291  train_acc=0.8810  test_acc=0.8725  (26.5s)
+  Epoch  5/10  loss=0.3060  train_acc=0.8898  test_acc=0.8691  (21.8s)
+  Epoch  6/10  loss=0.2876  train_acc=0.8962  test_acc=0.8860  (25.1s)
+  Epoch  7/10  loss=0.2696  train_acc=0.9034  test_acc=0.8915  (19.2s)
+  Epoch  8/10  loss=0.2611  train_acc=0.9050  test_acc=0.8914  (9.1s)
+  Epoch  9/10  loss=0.2468  train_acc=0.9101  test_acc=0.8931  (10.0s)
+  Epoch 10/10  loss=0.2382  train_acc=0.9127  test_acc=0.8944  (9.7s)
 
-Baseline  acc=0.9049
-  [Baseline] Parámetros: 206,922  |  MACs: 1,218,048  |  Tamaño: 808.3 KB
+======================================================================
+PASO 2 — Tucker-2 en conv2 y conv3, sin FT y con 3 épocas de FT
+======================================================================
+  ratio=25%  (R_in, R_out) conv2=(4, 8) conv3=(8, 16)  acc sin FT=0.8160  con FT=0.8917
+  ratio=50%  (R_in, R_out) conv2=(8, 16) conv3=(16, 32)  acc sin FT=0.8863  con FT=0.9028
+  ratio=75%  (R_in, R_out) conv2=(12, 24) conv3=(24, 48)  acc sin FT=0.8917  con FT=0.9067
 
-============================================================
-PASO 2 — Tucker-2 Decomposition para distintos rangos
-  Rank ratio = fracción de canales conservados (R/C)
-============================================================
+======================================================================
+PASO 3 — Depthwise separable (al diseñar): 10 épocas + 3 de FT
+======================================================================
+  Epoch  1/10  loss=1.0737  train_acc=0.6528  test_acc=0.7866  (8.4s)
+  Epoch  2/10  loss=0.4917  train_acc=0.8229  test_acc=0.8218  (8.2s)
+  Epoch  3/10  loss=0.4239  train_acc=0.8484  test_acc=0.8475  (8.6s)
+  Epoch  4/10  loss=0.3880  train_acc=0.8605  test_acc=0.8578  (8.4s)
+  Epoch  5/10  loss=0.3646  train_acc=0.8686  test_acc=0.8570  (9.0s)
+  Epoch  6/10  loss=0.3484  train_acc=0.8744  test_acc=0.8693  (8.7s)
+  Epoch  7/10  loss=0.3289  train_acc=0.8814  test_acc=0.8666  (8.8s)
+  Epoch  8/10  loss=0.3160  train_acc=0.8860  test_acc=0.8760  (8.4s)
+  Epoch  9/10  loss=0.3044  train_acc=0.8905  test_acc=0.8696  (8.5s)
+  Epoch 10/10  loss=0.2987  train_acc=0.8927  test_acc=0.8817  (7.8s)
 
-   Ratio |  R_out   R_in |  Acc PTQ |   Acc FT |         MACs |  Reducción |  Diff logits
-  -------------------------------------------------------------------------------------
-    0.25 |      4      1 |   0.5701 |   0.8918 |      400,336 |      67.1% |     7.24e+00
-    0.50 |      8      1 |   0.8924 |   0.9077 |      710,800 |      41.6% |     4.15e+00
-    0.75 |      9      1 |   0.8977 |   0.9063 |    1,075,360 |      11.7% |     9.33e-01
+======================================================================
+PASO 3 — Espacial 3×1 + 1×3 (al diseñar): 10 épocas + 3 de FT
+======================================================================
+  Epoch  1/10  loss=0.8007  train_acc=0.7165  test_acc=0.8126  (9.7s)
+  Epoch  2/10  loss=0.4356  train_acc=0.8432  test_acc=0.8558  (9.7s)
+  Epoch  3/10  loss=0.3712  train_acc=0.8665  test_acc=0.8703  (9.0s)
+  Epoch  4/10  loss=0.3393  train_acc=0.8767  test_acc=0.8775  (9.3s)
+  Epoch  5/10  loss=0.3136  train_acc=0.8866  test_acc=0.8780  (9.2s)
+  Epoch  6/10  loss=0.3013  train_acc=0.8902  test_acc=0.8817  (8.9s)
+  Epoch  7/10  loss=0.2867  train_acc=0.8962  test_acc=0.8819  (9.2s)
+  Epoch  8/10  loss=0.2731  train_acc=0.9013  test_acc=0.8882  (8.9s)
+  Epoch  9/10  loss=0.2672  train_acc=0.9032  test_acc=0.8895  (10.1s)
+  Epoch 10/10  loss=0.2589  train_acc=0.9064  test_acc=0.8968  (9.3s)
 
-[INFO] Gráfico guardado en 'outputs/tucker_resultados.png'
-[INFO] Resultados guardados en 'outputs/tucker_resultados.json'
+============================================================================================
+TABLA COMPARATIVA
+============================================================================================
+Modelo                 Cuándo                 Paráms        MACs  % MACs  Capas Acc sin FT     Acc
+--------------------------------------------------------------------------------------------
+Estándar               —                      29,066   1,924,992    100%      4          —  0.8944
+Estándar + FT          —                      29,066   1,924,992    100%      4          —  0.9055
+Tucker-2 (25%)         después de entrenar     9,066     356,992     19%      8     0.8160  0.8917
+Tucker-2 (50%)         después de entrenar    14,986     821,120     43%      8     0.8863  0.9028
+Tucker-2 (75%)         después de entrenar    23,786   1,511,040     78%      8     0.8917  0.9067
+Depthwise separable    diseño                  9,018     361,696     19%      6          —  0.8877
+Espacial 3×1 + 1×3     diseño                 17,546   1,021,824     53%      6          —  0.9017
 
 [CONCLUSIÓN]
-  Tucker-2 descompone W^(C_out×C_in×kH×kW) en tres Conv2d:
-    (C_in→R_in, 1×1) → (R_in→R_out, kH×kW) → (R_out→C_out, 1×1)
-  Relación con script01.py:
-    - SVD Dense: descompone matrices 2D
-    - Tucker-2:  extiende SVD a tensores 4D preservando la estructura espacial
-    - Depthwise: caso extremo de Tucker con R_in=C_in, R_out=1
-  Con ratio=0.5: 41.6% menos MACs con fine-tuning de 3 epochs.
+  Tucker-2 comprime un modelo ya entrenado, pero sin fine-tuning pierde accuracy.
+  Depthwise y espacial se eligen al diseñar la red y se entrenan desde cero.
+  Todas reducen MACs y parámetros, pero agregan capas: más metadatos, bias y buffers
+  intermedios, y una recuantización más cuando el modelo se pasa a int8.
+
+[INFO] Gráfico guardado en 'outputs/convs_resultados.png'
+[INFO] Resultados guardados en 'outputs/convs_resultados.json'
+TIEMPO 550.50 s

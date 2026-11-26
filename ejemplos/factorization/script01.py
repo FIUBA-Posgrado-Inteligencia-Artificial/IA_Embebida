@@ -1,15 +1,28 @@
 """
-Sección 8 — Factorización
-==========================
-Demuestra dos formas de factorización en redes neuronales:
+Sección 11 — Factorización: SVD en las capas densas de un MLP
+==============================================================
+Aproxima la matriz de pesos W (m × n) de cada capa densa con la SVD truncada a rango r:
 
-  Parte A — SVD en capas Dense (MLP):
-    Descompone W = U Σ Vᵀ y aproxima la capa con dos capas más delgadas.
-    Muestra la relación entre el rango de aproximación y la pérdida de accuracy.
+    W ≈ U_r · Σ_r · V_rᵀ
 
-  Parte B — Convolución Separable por Profundidad (Depthwise Separable Conv):
-    Reemplaza Conv2d(k_in→k_out, 3×3) por DepthwiseConv + PointwiseConv,
-    reduciendo los MACs teóricos en un factor de ≈ 1/k_out + 1/9.
+y reemplaza la capa por dos capas más delgadas: Linear(n→r) con V_rᵀ y Linear(r→m) con U_r·Σ_r.
+
+Dos formas de ejecutar una capa factorizada:
+  - Dos capas encadenadas (lo que hace este script): se guardan r·(m+n) pesos y se hacen
+    r·(m+n) MACs. Ahorra parámetros Y operaciones.
+  - Reconstruir W = U_r·Σ_r·V_rᵀ y multiplicar: se guardan los mismos r·(m+n) pesos, pero para
+    ejecutar hace falta la matriz entera en RAM y se hacen los m·n MACs del original. Solo ahorra
+    almacenamiento (en un microcontrolador, peor: la RAM es más escasa que la flash).
+
+Factorizar conviene solo si r·(m+n) < m·n, es decir, si r < m·n/(m+n) (el rango límite).
+Una capa con un rango por encima de su límite queda sin factorizar.
+
+Flujo:
+  1. Entrena el MLP baseline.
+  2. Muestra el rango límite de cada capa y cuánta energía (Σσ²) junta la SVD de la primera.
+  3. Para cada rango: factoriza, evalúa sin fine-tuning y con un fine-tuning corto.
+     El baseline recibe el mismo fine-tuning, así la comparación es pareja.
+  4. Compara las dos formas de ejecutar para r = 16.
 
 Uso:
     cd examples/factorization
@@ -20,7 +33,6 @@ import copy
 import os
 
 import matplotlib.pyplot as plt
-import numpy as np
 import torch
 import torch.nn as nn
 
@@ -30,25 +42,27 @@ from pytorch_utils import (
     evaluate,
     get_dataloaders,
     get_device,
-    model_size_kb,
-    print_model_stats,
     save_results,
+    set_reproducibility,
     train,
 )
 
-OUTPUT_DIR   = "outputs"
-EPOCHS_TRAIN = 10
-EPOCHS_FT    = 3
-BATCH_SIZE   = 256
-LR           = 1e-3
+OUTPUT_DIR      = "outputs"
+EPOCHS_TRAIN    = 10
+EPOCHS_FT       = 3
+BATCH_SIZE      = 256
+LR              = 1e-3
+RANGOS          = [4, 8, 16, 32]
+RANGO_EJECUCION = 16
+NOMBRES         = ["fc1", "fc2", "fc3", "fc4"]
 
 
 # ---------------------------------------------------------------------------
-# Arquitecturas
+# Arquitectura
 # ---------------------------------------------------------------------------
 
 class MLP(nn.Module):
-    """MLP: Flatten → Linear(784→64) → Linear(64→32) → Linear(32→16) → Linear(16→10)"""
+    """MLP: Flatten → Linear(784→64) → Linear(64→32) → Linear(32→16) → Linear(16→10), con ReLU."""
     def __init__(self):
         super().__init__()
         self.net = nn.Sequential(
@@ -58,112 +72,72 @@ class MLP(nn.Module):
             nn.Linear(32, 16),  nn.ReLU(),
             nn.Linear(16, 10),
         )
+
     def forward(self, x):
         return self.net(x)
 
 
-class CNN(nn.Module):
-    """CNN estándar: Conv2d(1→6, 5×5) → MaxPool → Conv2d(6→16, 5×5) → MaxPool → FC."""
-    def __init__(self):
-        super().__init__()
-        self.features = nn.Sequential(
-            nn.Conv2d(1, 6, 5), nn.ReLU(), nn.MaxPool2d(2),
-            nn.Conv2d(6, 16, 5), nn.ReLU(), nn.MaxPool2d(2),
-        )
-        self.classifier = nn.Sequential(
-            nn.Flatten(),
-            nn.Linear(256, 120), nn.ReLU(),
-            nn.Linear(120, 84),  nn.ReLU(),
-            nn.Linear(84, 10),
-        )
-    def forward(self, x):
-        return self.classifier(self.features(x))
-
-
-class CNNSeparable(nn.Module):
-    """
-    CNN con convoluciones separables:
-    DepthwiseConv(1→1, 5×5) + PointwiseConv(1→6, 1×1) (en lugar de Conv2d(1→6, 5×5))
-    DepthwiseConv(6→6, 5×5) + PointwiseConv(6→16, 1×1) (en lugar de Conv2d(6→16, 5×5))
-    El resto igual.
-    """
-    def __init__(self):
-        super().__init__()
-        self.features = nn.Sequential(
-            # Bloque 1: depthwise (1→1, 5×5) + pointwise (1→6, 1×1)
-            nn.Conv2d(1, 1,  kernel_size=5, groups=1),  # depthwise (in=1, trivialmente igual)
-            nn.Conv2d(1, 6,  kernel_size=1),              # pointwise
-            nn.ReLU(),
-            nn.MaxPool2d(2),
-            # Bloque 2: depthwise (6→6, 5×5) + pointwise (6→16, 1×1)
-            nn.Conv2d(6, 6,  kernel_size=5, groups=6),   # depthwise separada
-            nn.Conv2d(6, 16, kernel_size=1),              # pointwise
-            nn.ReLU(),
-            nn.MaxPool2d(2),
-        )
-        self.classifier = nn.Sequential(
-            nn.Flatten(),
-            nn.Linear(256, 120), nn.ReLU(),
-            nn.Linear(120, 84),  nn.ReLU(),
-            nn.Linear(84, 10),
-        )
-    def forward(self, x):
-        return self.classifier(self.features(x))
-
-
 # ---------------------------------------------------------------------------
-# Parte A — SVD en capas Linear
+# SVD
 # ---------------------------------------------------------------------------
 
-def factorize_linear_layer(linear: nn.Linear, rank: int) -> nn.Sequential:
+def rango_limite(m: int, n: int) -> float:
+    """Rango a partir del cual factorizar no ahorra nada: r·(m+n) = m·n."""
+    return m * n / (m + n)
+
+
+def factorizar_linear(linear: nn.Linear, rango: int) -> nn.Sequential:
     """
-    Factoriza una capa Linear(in→out) en dos capas delgadas usando SVD truncado:
-        W ≈ U[:, :rank] @ diag(S[:rank]) @ Vt[:rank, :]
-    Retorna nn.Sequential(Linear(in→rank, no bias), Linear(rank→out, con bias)).
+    Reemplaza Linear(n→m) por Linear(n→r, sin bias) + Linear(r→m, con el bias original),
+    con los pesos de la SVD truncada: V_rᵀ en la primera y U_r·Σ_r en la segunda.
     """
-    W = linear.weight.data  # shape: (out, in)
+    W = linear.weight.data                                  # (m, n)
     U, S, Vt = torch.linalg.svd(W, full_matrices=False)
-    # Truncar
-    U_r  = U[:, :rank]
-    S_r  = S[:rank]
-    Vt_r = Vt[:rank, :]
-    # Primera capa: Vt_r  (rank × in)
-    # Segunda capa: U_r @ diag(S_r)  (out × rank)
-    W1 = Vt_r                               # (rank, in)
-    W2 = U_r * S_r.unsqueeze(0)             # (out, rank)
-
-    fc1 = nn.Linear(linear.in_features,  rank, bias=False)
-    fc2 = nn.Linear(rank, linear.out_features, bias=linear.bias is not None)
+    capa1 = nn.Linear(linear.in_features, rango, bias=False)
+    capa2 = nn.Linear(rango, linear.out_features, bias=linear.bias is not None)
     with torch.no_grad():
-        fc1.weight.copy_(W1)
-        fc2.weight.copy_(W2)
+        capa1.weight.copy_(Vt[:rango, :])                   # (r, n)
+        capa2.weight.copy_(U[:, :rango] * S[:rango])        # (m, r)
         if linear.bias is not None:
-            fc2.bias.copy_(linear.bias.data)
-    return nn.Sequential(fc1, fc2)
+            capa2.bias.copy_(linear.bias.data)
+    return nn.Sequential(capa1, capa2).to(W.device)
 
 
-def apply_svd_to_mlp(mlp: nn.Module, rank: int) -> nn.Module:
-    """Reemplaza todos los nn.Linear internos del MLP por factorizaciones SVD de rango `rank`."""
-    mlp_svd = copy.deepcopy(mlp)
-    # La red tiene: Flatten, Linear×4 con ReLU entre ellas
-    # Iteramos sobre los módulos directos de mlp_svd.net
-    new_layers = []
-    for layer in mlp_svd.net:
-        if isinstance(layer, nn.Linear):
-            # Sólo factorizamos si rank < min(in, out)
-            if rank < min(layer.in_features, layer.out_features):
-                new_layers.append(factorize_linear_layer(layer, rank))
-            else:
-                new_layers.append(layer)
+def aplicar_svd(mlp: MLP, rango: int) -> nn.Module:
+    """Copia el MLP y factoriza cada Linear cuyo rango límite supere `rango`."""
+    copia = copy.deepcopy(mlp)
+    capas = []
+    for capa in copia.net:
+        if isinstance(capa, nn.Linear) and rango < rango_limite(capa.out_features, capa.in_features):
+            capas.append(factorizar_linear(capa, rango))
         else:
-            new_layers.append(layer)
-    mlp_svd.net = nn.Sequential(*new_layers)
-    return mlp_svd
+            capas.append(capa)
+    copia.net = nn.Sequential(*capas)
+    return copia
 
 
-def count_params_svd_mlp(mlp_svd: nn.Module) -> int:
-    """Cuenta parámetros de un MLP con bloques SVD (puede tener Sequential anidados)."""
-    return sum(p.numel() for p in mlp_svd.parameters() if p.requires_grad)
+def lineales(mlp: MLP) -> list[nn.Linear]:
+    return [c for c in mlp.net if isinstance(c, nn.Linear)]
+
+
+def capas_factorizadas(mlp: MLP, rango: int) -> list[str]:
+    return [nombre for nombre, c in zip(NOMBRES, lineales(mlp))
+            if rango < rango_limite(c.out_features, c.in_features)]
+
+
+def energia_capturada(S: torch.Tensor, k: int) -> float:
+    """Fracción de la energía (Σσ²) que juntan los k valores singulares más grandes."""
+    energia = S ** 2
+    return float(energia[:k].sum() / energia.sum())
+
+
+def valores_singulares(linear: nn.Linear) -> torch.Tensor:
+    return torch.linalg.svdvals(linear.weight.detach().cpu())
+
+
+def kb(params: int) -> float:
+    """Tamaño de `params` pesos en FP32."""
+    return params * 4 / 1024
 
 
 # ---------------------------------------------------------------------------
@@ -171,179 +145,150 @@ def count_params_svd_mlp(mlp_svd: nn.Module) -> int:
 # ---------------------------------------------------------------------------
 
 def main():
+    set_reproducibility(42)
     device = get_device()
     train_loader, test_loader = get_dataloaders(BATCH_SIZE)
     os.makedirs(OUTPUT_DIR, exist_ok=True)
-    results = {}
 
-    # ======================================================================
-    # PARTE A — SVD en capas Dense del MLP
-    # ======================================================================
-    print("\n" + "="*60)
-    print("PARTE A — SVD en capas Dense del MLP")
-    print("="*60)
-
+    # ------------------------------------------------------------------
+    # 1. Baseline
+    # ------------------------------------------------------------------
+    print("\n" + "=" * 70)
+    print("PASO 1 — MLP baseline")
+    print("=" * 70)
     mlp = MLP().to(device)
-    print(f"Entrenando MLP baseline ({EPOCHS_TRAIN} epochs)...")
+    S_inicial = valores_singulares(mlp.net[1])
     train(mlp, train_loader, test_loader, epochs=EPOCHS_TRAIN, lr=LR, device=device)
-    base_acc_mlp = evaluate(mlp, test_loader, device)
-    print_model_stats(mlp, "MLP Baseline")
+    base_acc = evaluate(mlp, test_loader, device)
+    base_params = count_parameters(mlp)
+    base_macs = count_macs(mlp)
+    S_entrenada = valores_singulares(mlp.net[1])
 
-    results["mlp_baseline"] = {
-        "acc": round(base_acc_mlp, 4),
-        "params": count_parameters(mlp),
-        "macs": count_macs(mlp, (1, 1, 28, 28)),
-    }
+    # El baseline recibe el mismo fine-tuning que los modelos factorizados
+    mlp_ft = copy.deepcopy(mlp)
+    train(mlp_ft, train_loader, test_loader, epochs=EPOCHS_FT, lr=LR / 5, device=device, verbose=False)
+    base_acc_ft = evaluate(mlp_ft, test_loader, device)
+    print(f"\n  Baseline: acc={base_acc:.4f}  (+{EPOCHS_FT} épocas de FT: {base_acc_ft:.4f})"
+          f"  params={base_params:,}  MACs={base_macs:,}")
 
-    # Espectro de valores singulares de la primera Linear (784→64)
-    W0 = mlp.net[1].weight.data.cpu()  # (64, 784)
-    _, S0, _ = torch.linalg.svd(W0, full_matrices=False)
-    S0_np = S0.numpy()
+    # ------------------------------------------------------------------
+    # 2. Rango límite y energía
+    # ------------------------------------------------------------------
+    print("\n" + "=" * 70)
+    print("PASO 2 — Rango límite de cada capa: factorizar conviene si r < m·n/(m+n)")
+    print("=" * 70)
+    limites = {}
+    for nombre, capa in zip(NOMBRES, lineales(mlp)):
+        limites[nombre] = rango_limite(capa.out_features, capa.in_features)
+        print(f"  {nombre}  Linear({capa.in_features:>3}→{capa.out_features:<3})  límite = {limites[nombre]:5.1f}")
 
-    # Experimento SVD para distintos rangos
-    ranks = [4, 8, 16, 32]
-    svd_accs_before_ft = []
-    svd_accs_after_ft  = []
+    print(f"\n  Energía (Σσ²) que juntan los {RANGO_EJECUCION} valores singulares más grandes de fc1 (64 en total):")
+    print(f"    pesos iniciales (aleatorios): {energia_capturada(S_inicial, RANGO_EJECUCION):.1%}")
+    print(f"    pesos entrenados:             {energia_capturada(S_entrenada, RANGO_EJECUCION):.1%}")
 
-    for rank in ranks:
-        mlp_svd = apply_svd_to_mlp(mlp, rank).to(device)
-        acc_bf = evaluate(mlp_svd, test_loader, device)
-        svd_accs_before_ft.append(acc_bf)
-        print(f"  SVD rank={rank:2d}  acc (sin FT)={acc_bf:.4f}  params={count_params_svd_mlp(mlp_svd):,}")
-
-        # Fine-tuning breve
-        train(mlp_svd, train_loader, test_loader, epochs=EPOCHS_FT, lr=LR/5, device=device, verbose=False)
-        acc_af = evaluate(mlp_svd, test_loader, device)
-        svd_accs_after_ft.append(acc_af)
-        print(f"           acc (con FT)={acc_af:.4f}")
-
-        results[f"mlp_svd_rank{rank}"] = {
-            "acc_no_ft": round(acc_bf, 4),
-            "acc_ft":    round(acc_af, 4),
-            "params":    count_params_svd_mlp(mlp_svd),
+    # ------------------------------------------------------------------
+    # 3. SVD para distintos rangos
+    # ------------------------------------------------------------------
+    print("\n" + "=" * 70)
+    print(f"PASO 3 — SVD a rango r, sin fine-tuning y con {EPOCHS_FT} épocas de fine-tuning")
+    print("=" * 70)
+    resultados_rangos = {}
+    for r in RANGOS:
+        modelo = aplicar_svd(mlp, r).to(device)
+        acc_sin_ft = evaluate(modelo, test_loader, device)
+        train(modelo, train_loader, test_loader, epochs=EPOCHS_FT, lr=LR / 5, device=device, verbose=False)
+        acc_ft = evaluate(modelo, test_loader, device)
+        resultados_rangos[str(r)] = {
+            "acc_sin_ft": round(acc_sin_ft, 4),
+            "acc_ft": round(acc_ft, 4),
+            "params": count_parameters(modelo),
+            "macs": count_macs(modelo),
+            "capas_factorizadas": capas_factorizadas(mlp, r),
         }
+        fact = ", ".join(resultados_rangos[str(r)]["capas_factorizadas"])
+        print(f"  r={r:>2}  acc sin FT={acc_sin_ft:.4f}  con FT={acc_ft:.4f}  factoriza: {fact}")
 
-    # ======================================================================
-    # PARTE B — Convolución Separable por Profundidad en CNN
-    # ======================================================================
-    print("\n" + "="*60)
-    print("PARTE B — Convolución Separable por Profundidad (CNN)")
-    print("="*60)
-
-    # CNN estándar
-    cnn = CNN().to(device)
-    print(f"Entrenando CNN estándar ({EPOCHS_TRAIN} epochs)...")
-    train(cnn, train_loader, test_loader, epochs=EPOCHS_TRAIN, lr=LR, device=device)
-    base_acc_cnn = evaluate(cnn, test_loader, device)
-    print_model_stats(cnn, "CNN Estándar")
-
-    results["cnn_baseline"] = {
-        "acc": round(base_acc_cnn, 4),
-        "params": count_parameters(cnn),
-        "macs": count_macs(cnn),
+    # ------------------------------------------------------------------
+    # 4. Dos formas de ejecutar (r = RANGO_EJECUCION)
+    # ------------------------------------------------------------------
+    r_ej = resultados_rangos[str(RANGO_EJECUCION)]
+    ejecucion = {
+        "dos_capas":   {"pesos_kb": round(kb(r_ej["params"]), 1), "ram_pesos_kb": round(kb(r_ej["params"]), 1),
+                        "macs": r_ej["macs"]},
+        "reconstruir": {"pesos_kb": round(kb(r_ej["params"]), 1), "ram_pesos_kb": round(kb(base_params), 1),
+                        "macs": base_macs},
     }
 
-    # CNN separable (sin pesos del baseline — entrenada desde cero)
-    cnn_sep = CNNSeparable().to(device)
-    acc_sep_before = evaluate(cnn_sep, test_loader, device)
-    print(f"\nCNN Separable (sin entrenar) acc={acc_sep_before:.4f}")
-
-    print(f"Entrenando CNN Separable ({EPOCHS_TRAIN} epochs)...")
-    train(cnn_sep, train_loader, test_loader, epochs=EPOCHS_TRAIN, lr=LR, device=device)
-    acc_sep = evaluate(cnn_sep, test_loader, device)
-    print_model_stats(cnn_sep, "CNN Separable")
-
-    results["cnn_separable"] = {
-        "acc": round(acc_sep, 4),
-        "params": count_parameters(cnn_sep),
-        "macs": count_macs(cnn_sep),
-    }
-
-    macs_std = results["cnn_baseline"]["macs"]
-    macs_sep = results["cnn_separable"]["macs"]
-    print(f"\n  CNN estándar:   {macs_std:,} MACs  ({count_parameters(cnn):,} params)")
-    print(f"  CNN separable:  {macs_sep:,} MACs  ({count_parameters(cnn_sep):,} params)")
-    print(f"  Reducción MACs: {1 - macs_sep/macs_std:.1%}")
-
-    # ======================================================================
-    # Figuras
-    # ======================================================================
-
-    fig, axes = plt.subplots(1, 3, figsize=(14, 4))
-
-    # (a) Espectro de valores singulares
-    ax = axes[0]
-    ax.bar(range(len(S0_np)), S0_np, color="#4C72B0")
-    ax.axvline(x=15.5, color="red", linestyle="--", label="rank=16")
-    ax.set_xlabel("Índice del valor singular")
-    ax.set_ylabel("Valor singular")
-    ax.set_title("Espectro SVD: capa Linear(784→64)")
-    ax.legend()
-    # Anotar energía capturada por top-16
-    energy_16 = S0_np[:16].sum() / S0_np.sum()
-    ax.text(20, S0_np[0]*0.8, f"Top-16 captura\n{energy_16:.1%} de la energía",
-            fontsize=8, color="red")
-
-    # (b) Accuracy SVD vs rango
-    ax = axes[1]
-    ax.axhline(base_acc_mlp, color="gray", linestyle="--", label="Baseline MLP")
-    ax.plot(ranks, svd_accs_before_ft, "o--", label="Sin fine-tuning", color="#DD8452")
-    ax.plot(ranks, svd_accs_after_ft,  "s-",  label="Con fine-tuning", color="#55A868")
-    ax.set_xlabel("Rango SVD")
-    ax.set_ylabel("Accuracy")
-    ax.set_title("Parte A: Accuracy vs Rango SVD (MLP)")
-    ax.legend()
-    ax.set_xticks(ranks)
-
-    # (c) CNN estándar vs separable
-    ax = axes[2]
-    labels = ["CNN\nEstándar", "CNN\nSeparable"]
-    accs_b = [results["cnn_baseline"]["acc"], results["cnn_separable"]["acc"]]
-    macs_b = [results["cnn_baseline"]["macs"] / 1e6, results["cnn_separable"]["macs"] / 1e6]
-    x = np.arange(len(labels))
-    width = 0.35
-    bars1 = ax.bar(x - width/2, accs_b,  width, label="Accuracy",   color="#4C72B0")
-    ax2b  = ax.twinx()
-    bars2 = ax2b.bar(x + width/2, macs_b, width, label="MACs (M)",   color="#DD8452", alpha=0.8)
-    ax.set_ylabel("Accuracy")
-    ax2b.set_ylabel("MACs (millones)")
-    ax.set_title("Parte B: CNN Estándar vs Separable")
-    ax.set_xticks(x)
-    ax.set_xticklabels(labels)
-    lines1, labels1 = ax.get_legend_handles_labels()
-    lines2, labels2 = ax2b.get_legend_handles_labels()
-    ax.legend(lines1 + lines2, labels1 + labels2, loc="upper right", fontsize=8)
-
-    fig.suptitle("Factorización: SVD (Dense) + Convolución Separable (CNN)", fontsize=12)
-    plt.tight_layout()
-    plot_path = os.path.join(OUTPUT_DIR, "factorizacion_resultados.png")
-    plt.savefig(plot_path, dpi=120, bbox_inches="tight")
-    print(f"\n[INFO] Gráfico guardado en '{plot_path}'")
-    plt.close()
-
-    save_results(os.path.join(OUTPUT_DIR, "factorizacion_resultados.json"), results)
-
-    # ======================================================================
-    # Tabla final
-    # ======================================================================
-    print(f"\n{'='*60}")
+    # ------------------------------------------------------------------
+    # Tablas
+    # ------------------------------------------------------------------
+    print("\n" + "=" * 70)
     print("TABLA COMPARATIVA")
-    print("="*60)
-    print(f"{'Modelo':<30} {'Acc':>7} {'Paráms':>10} {'MACs':>12}")
-    print("-" * 63)
-    def row(name, acc, params, macs):
-        print(f"{name:<30} {acc:>7.4f} {params:>10,} {macs:>12,}")
+    print("=" * 70)
+    print(f"{'Modelo':<34} {'Acc sin FT':>10} {'Acc':>7} {'Paráms':>8} {'MACs':>8}")
+    print("-" * 70)
+    print(f"{'MLP baseline':<34} {'—':>10} {base_acc:>7.4f} {base_params:>8,} {base_macs:>8,}")
+    print(f"{'MLP baseline + FT':<34} {'—':>10} {base_acc_ft:>7.4f} {base_params:>8,} {base_macs:>8,}")
+    for r in RANGOS:
+        d = resultados_rangos[str(r)]
+        nombre = f"SVD r={r} ({', '.join(d['capas_factorizadas'])}) + FT"
+        print(f"{nombre:<34} {d['acc_sin_ft']:>10.4f} {d['acc_ft']:>7.4f} {d['params']:>8,} {d['macs']:>8,}")
 
-    row("MLP Baseline",         results["mlp_baseline"]["acc"],        results["mlp_baseline"]["params"],        results["mlp_baseline"]["macs"])
-    for r in ranks:
-        row(f"  MLP SVD rank={r} (FT)", results[f"mlp_svd_rank{r}"]["acc_ft"], results[f"mlp_svd_rank{r}"]["params"],  results["mlp_baseline"]["macs"])
-    row("CNN Estándar",         results["cnn_baseline"]["acc"],         results["cnn_baseline"]["params"],         results["cnn_baseline"]["macs"])
-    row("CNN Separable",        results["cnn_separable"]["acc"],        results["cnn_separable"]["params"],        results["cnn_separable"]["macs"])
+    print(f"\nDos formas de ejecutar el modelo con r={RANGO_EJECUCION} (misma accuracy: es la misma función)")
+    print(f"{'Forma':<16} {'Pesos guardados':>16} {'Pesos en RAM':>14} {'MACs':>8}")
+    print("-" * 57)
+    for etiqueta, clave in (("Dos capas", "dos_capas"), ("Reconstruir W", "reconstruir")):
+        e = ejecucion[clave]
+        print(f"{etiqueta:<16} {e['pesos_kb']:>13.1f} KB {e['ram_pesos_kb']:>11.1f} KB {e['macs']:>8,}")
 
-    print(f"\n[CONCLUSIÓN]")
-    print(f"  SVD: rango bajo → menos parámetros, pero se recupera con fine-tuning.")
-    print(f"  Separable: {1 - macs_sep/macs_std:.1%} menos MACs, accuracy comparable.")
-    print(f"  La factorización es más efectiva cuando los pesos tienen estructura de bajo rango.")
+    print("\n[CONCLUSIÓN]")
+    print(f"  Como dos capas, la SVD reduce parámetros Y MACs mientras r < m·n/(m+n):")
+    print(f"  con r={RANGO_EJECUCION}, {1 - r_ej['macs'] / base_macs:.0%} menos MACs y "
+          f"{r_ej['acc_ft']:.4f} de accuracy (baseline + FT: {base_acc_ft:.4f}).")
+    print("  Reconstruir W solo ahorra almacenamiento: la RAM y los MACs son los del original.")
+
+    # ------------------------------------------------------------------
+    # Figura y JSON
+    # ------------------------------------------------------------------
+    fig, axes = plt.subplots(1, 2, figsize=(11, 4))
+    ax = axes[0]
+    k = torch.arange(1, len(S_entrenada) + 1)
+    for S, etiqueta, color in ((S_entrenada, "Pesos entrenados", "#4C72B0"),
+                               (S_inicial, "Pesos iniciales", "#999999")):
+        acumulada = torch.cumsum(S ** 2, 0) / (S ** 2).sum()
+        ax.plot(k, acumulada, label=etiqueta, color=color)
+    ax.axvline(RANGO_EJECUCION, color="red", linestyle="--", label=f"r = {RANGO_EJECUCION}")
+    ax.axvline(limites["fc1"], color="black", linestyle=":", label=f"límite ≈ {limites['fc1']:.0f}")
+    ax.set_xlabel("Cantidad de valores singulares (k)")
+    ax.set_ylabel("Energía acumulada (Σσ²)")
+    ax.set_title("fc1: Linear(784→64)")
+    ax.legend(fontsize=8)
+
+    ax = axes[1]
+    ax.axhline(base_acc_ft, color="gray", linestyle="--", label="Baseline + FT")
+    ax.plot(RANGOS, [resultados_rangos[str(r)]["acc_sin_ft"] for r in RANGOS], "o--", label="Sin FT")
+    ax.plot(RANGOS, [resultados_rangos[str(r)]["acc_ft"] for r in RANGOS], "s-", label="Con FT")
+    ax.set_xlabel("Rango r")
+    ax.set_ylabel("Accuracy")
+    ax.set_xticks(RANGOS)
+    ax.set_title("Accuracy vs. rango")
+    ax.legend(fontsize=8)
+    fig.suptitle("SVD en las capas densas del MLP")
+    fig.tight_layout()
+    ruta_png = os.path.join(OUTPUT_DIR, "svd_resultados.png")
+    fig.savefig(ruta_png, dpi=120, bbox_inches="tight")
+    plt.close(fig)
+    print(f"\n[INFO] Gráfico guardado en '{ruta_png}'")
+
+    save_results(os.path.join(OUTPUT_DIR, "svd_resultados.json"), {
+        "baseline": {"acc": round(base_acc, 4), "acc_ft": round(base_acc_ft, 4),
+                     "params": base_params, "macs": base_macs},
+        "rango_limite": {n: round(v, 2) for n, v in limites.items()},
+        "espectro": {"inicial": [round(float(s), 5) for s in S_inicial],
+                     "entrenada": [round(float(s), 5) for s in S_entrenada]},
+        "rangos": resultados_rangos,
+        f"ejecucion_r{RANGO_EJECUCION}": ejecucion,
+    })
 
 
 if __name__ == "__main__":

@@ -1,0 +1,96 @@
+{
+    "modelos": [
+        {
+            "nombre": "Estándar",
+            "cuando": "—",
+            "params": 29066,
+            "macs": 1924992,
+            "capas": 4,
+            "acc": 0.8944
+        },
+        {
+            "nombre": "Estándar + FT",
+            "cuando": "—",
+            "params": 29066,
+            "macs": 1924992,
+            "capas": 4,
+            "acc": 0.9055
+        },
+        {
+            "nombre": "Tucker-2 (25%)",
+            "cuando": "después de entrenar",
+            "params": 9066,
+            "macs": 356992,
+            "capas": 8,
+            "acc": 0.8917,
+            "acc_sin_ft": 0.816,
+            "ratio": 0.25,
+            "rangos": {
+                "conv2": [
+                    4,
+                    8
+                ],
+                "conv3": [
+                    8,
+                    16
+                ]
+            }
+        },
+        {
+            "nombre": "Tucker-2 (50%)",
+            "cuando": "después de entrenar",
+            "params": 14986,
+            "macs": 821120,
+            "capas": 8,
+            "acc": 0.9028,
+            "acc_sin_ft": 0.8863,
+            "ratio": 0.5,
+            "rangos": {
+                "conv2": [
+                    8,
+                    16
+                ],
+                "conv3": [
+                    16,
+                    32
+                ]
+            }
+        },
+        {
+            "nombre": "Tucker-2 (75%)",
+            "cuando": "después de entrenar",
+            "params": 23786,
+            "macs": 1511040,
+            "capas": 8,
+            "acc": 0.9067,
+            "acc_sin_ft": 0.8917,
+            "ratio": 0.75,
+            "rangos": {
+                "conv2": [
+                    12,
+                    24
+                ],
+                "conv3": [
+                    24,
+                    48
+                ]
+            }
+        },
+        {
+            "nombre": "Depthwise separable",
+            "cuando": "diseño",
+            "params": 9018,
+            "macs": 361696,
+            "capas": 6,
+            "acc": 0.8877
+        },
+        {
+            "nombre": "Espacial 3×1 + 1×3",
+            "cuando": "diseño",
+            "params": 17546,
+            "macs": 1021824,
+            "capas": 6,
+            "acc": 0.9017
+        }
+    ]
+}

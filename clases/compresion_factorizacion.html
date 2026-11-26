@@ -2,146 +2,201 @@
 <section>
     <section>
         <h2 class="gradient-text">11. Factorización</h2>
-        <p>Comprimiendo tensores sin perder su esencia matemática</p>
+        <p>Reemplazar una capa grande por varias más chicas</p>
+        <ul style="font-size: 0.75em; text-align: left; max-width: 750px; margin: 1.2rem auto;">
+            <li style="margin-bottom: 0.3rem;">Rango bajo y repaso de la SVD</li>
+            <li style="margin-bottom: 0.3rem;">Dos formas de ejecutar una capa factorizada</li>
+            <li style="margin-bottom: 0.3rem;">Qué se factoriza y cuándo: SVD, Tucker-2, convoluciones separables, LoRA</li>
+            <li style="margin-bottom: 0.3rem;">Ejemplo en código: SVD en un MLP y convoluciones factorizadas</li>
+            <li>Lo que no se ve en los MACs, y qué sirve para el TP</li>
+        </ul>
+        <aside class="notes">
+            <p>Factorizar es aproximar una matriz (o un tensor) de pesos por un producto de piezas más chicas. Cada pieza se ejecuta como una capa, así que una capa grande pasa a ser dos o tres capas chicas.</p>
+            <p>Es matemática anterior al machine learning (compresión de imágenes, análisis de datos), pero en redes aparece de dos maneras: aplicada a un modelo ya entrenado, o directamente en el diseño de la arquitectura (MobileNet).</p>
+        </aside>
     </section>
 
-    <!-- 1. Concepto Central -->
     <section>
-        <h3>El Concepto: Rango (Rank) y Redundancia</h3>
-        <div style="font-size: 0.75em; text-align: left;">
-            <p>Las redes neuronales tienen gigantescas matrices de pesos, pero suelen ser de <strong>rango bajo (low-rank)</strong>. Gran parte de la información es redundante o linealmente dependiente.</p>
-            <div style="background: rgba(255,255,255,0.1); padding: 0.8rem; border-radius: 0.5rem; text-align: center; margin: 0.8rem 0; font-size: 1.1em;">
-                <code>W ≈ U × V</code>
-            </div>
-            <p>Se aproxima la gran matriz <strong>W (m × n)</strong> multiplicando dos más chicas: <strong>U (m × r)</strong> y <strong>V (r × n)</strong>, donde el rango <em>r ≪ m, n</em>.</p>
-            <p style="margin-top: 1rem;"><strong style="color: #50fa7b;">El gran ahorro:</strong></p>
-            <ul style="margin-top: 0.5rem; padding-left: 1.2rem;">
-                <li style="margin-bottom: 0.3rem;">En vez de calcular <em>m · n</em> parámetros, procesamos <em>r · (m + n)</em>.</li>
-                <li>Si m=1000, n=1000 y r=10: Pasamos de <strong>1.000.000</strong> a solo <strong>20.000</strong> parámetros.</li>
-            </ul>
-        </div>
-    </section>
-
-    <!-- 2. Técnicas Clásicas -->
-    <section>
-        <h3>Técnicas Clásicas en la Realidad</h3>
-        <div style="display: flex; gap: 1.5rem; margin-top: 1rem; font-size: 0.7em; text-align: left;">
-            <div style="flex: 1; background: rgba(189,147,249,0.1); padding: 0.8rem; border-radius: 0.5rem;">
-                <h4 style="color: #bd93f9; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.1em;">A. SVD Truncado</h4>
-                <p>Descompone la matriz en tres (<code>W = U Σ V<sup>T</sup></code>) y desecha los valores singulares más pequeños en la diagonal de <em>Σ</em>.</p>
-                <p style="margin-top: 0.8rem;"><strong style="color: #bd93f9;">Uso Real:</strong> Compresión de enormes capas de <em>Embeddings</em> en NLP y recomendadores (vocabulario gigante y ralo).</p>
-            </div>
-            <div style="flex: 1; background: rgba(80,250,123,0.1); padding: 0.8rem; border-radius: 0.5rem;">
-                <h4 style="color: #50fa7b; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.1em;">B. Descomposición Espacial</h4>
-                <p>Factorización de Tensores. Matemáticamente complejo (Tucker/CP), pero en la práctica significa <strong>separar convoluciones</strong>.</p>
-                <p style="margin-top: 0.8rem;"><strong style="color: #50fa7b;">Uso Real:</strong> Reemplazar Conv 3x3 por 3x1 seguida de 1x3 (Edge). Reduce drásticamente FLOPs manteniendo el campo receptor.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- 3. LoRA -->
-    <section>
-        <h3>Estado del Arte en Cloud: LoRA</h3>
-        <div style="font-size: 0.7em; text-align: left;">
-            <p><strong>LoRA (Low-Rank Adaptation):</strong> La técnica que salvaguardó la revolución de los LLMs democratizando el Fine-Tuning.</p>
-            <div style="margin-top: 1rem;">
-                <p style="color: #ff5555; margin-bottom: 0.3rem;"><strong>El Problema:</strong></p>
-                <p>Actualizar un modelo masivo genera gastos inasumibles de memoria VRAM (costo por cálculos sobre miles de millones).</p>
-                
-                <p style="color: #50fa7b; margin-top: 1rem; margin-bottom: 0.3rem;"><strong>La Solución Factorizada:</strong></p>
-                <ol style="margin-top: 0.5rem; line-height: 1.4;">
-                    <li style="margin-bottom: 0.4rem;">Congela la matriz original <code>W<sub>0</sub></code>.</li>
-                    <li style="margin-bottom: 0.4rem;">Asume que la <em>actualización</em> de pesos (<code>ΔW</code>) tiene rango muy bajo.</li>
-                    <li>Inyecta y entrena solo dos matrices muy diminutas (A y B): <code>W<sub>nueva</sub> = W<sub>0</sub> + (A × B)</code>.</li>
-                </ol>
-                <p style="margin-top: 1rem;"><strong style="color: #bd93f9;">Impacto Real:</strong> De actualizar Gigabytes a solo Megabytes. Permite personalizar LLMs en GPUs hogareñas convencionales.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- 4. Factorización Binaria -->
-    <section>
-        <h3>Extremo del Edge: Factorización Binaria</h3>
-        <div style="font-size: 0.7em; text-align: left;">
-            <p>Para MCU con minúsculas baterías o cosecha de energía (Harvesting), la factorización de rango clásico sigue siendo limitante.</p>
-            <div style="margin-top: 1rem;">
-                <p style="color: #ffb86c; margin-bottom: 0.3rem;"><strong>El Concepto:</strong></p>
-                <p>Aproximar <code>W</code> por matrices de valores únicamente <strong>+1 o -1</strong>, compensados por un escalar: <code>W ≈ α · B</code>.</p>
-                
-                <p style="color: #50fa7b; margin-top: 1rem; margin-bottom: 0.3rem;"><strong>El Milagro en Hardware:</strong></p>
-                <ul style="margin-top: 0.5rem; line-height: 1.4; padding-left: 1.2rem;">
-                    <li style="margin-bottom: 0.4rem;">Poniendo entradas y pesos en {-1,+1}, se eluden las onerosas operaciones de multiplicación y suma fraccional reales (MAC).</li>
-                    <li style="margin-bottom: 0.4rem;">Los cálculos se ejecutan usando compuertas <strong>XNOR</strong> bit a bit, junto a un veloz <strong>Popcount</strong> (conteo de de '1's).</li>
-                    <li><strong style="color: #8be9fd;">Uso Real:</strong> Micro-sensores IoT ("Oye Siri", vibración) a costa de ínfimos microvatios (µW).</li>
-                </ul>
-            </div>
-        </div>
-    </section>
-
-    <!-- 5. Ejemplo en código: script01.py -->
-    <section>
-        <h3>Ejemplo en Código: SVD + Conv. Separable</h3>
+        <h3>Rango bajo: W ≈ U · V</h3>
         <div style="font-size: 0.72em; text-align: left;">
-            <p style="margin-bottom: 0.8rem;">El script <code>examples/factorization/script01.py</code> demuestra los dos tipos de factorización clásica sobre Fashion MNIST:</p>
-            <div style="display: flex; gap: 1rem; margin-bottom: 0.8rem;">
-                <div style="flex: 1; background: rgba(189,147,249,0.1); padding: 0.7rem; border-radius: 0.5rem;">
-                    <p style="color: #bd93f9; margin: 0 0 0.3rem;"><strong>Parte A — SVD en MLP</strong></p>
-                    <ul style="padding-left: 1rem; line-height: 1.4;">
-                        <li>Entrena MLP baseline</li>
-                        <li>Factoriza cada Linear con SVD truncado a rango r ∈ {4, 8, 16, 32}</li>
-                        <li>Mide accuracy antes y después de fine-tuning</li>
-                        <li>Visualiza el espectro de valores singulares</li>
+            <p>Una capa densa con <em>n</em> entradas y <em>m</em> salidas es una matriz <strong>W (m × n)</strong>.
+                Si su rango efectivo es bajo, se puede aproximar con dos matrices más chicas:</p>
+            <div style="background: rgba(255,255,255,0.1); padding: 0.8rem; border-radius: 0.5rem; text-align: center; margin: 0.8rem 0; font-size: 1.1em;">
+                <code>W<sub>(m×n)</sub> ≈ U<sub>(m×r)</sub> · V<sub>(r×n)</sub></code>, con <em>r</em> ≪ <em>m</em>, <em>n</em>
+            </div>
+            <ul>
+                <li style="margin-bottom: 0.4rem;">Se guardan <strong>r · (m + n)</strong> valores en lugar de <strong>m · n</strong>.</li>
+                <li style="margin-bottom: 0.4rem;">Ejemplo: m = n = 1000 y r = 10 → de 1 000 000 a 20 000 parámetros.</li>
+                <li>El rango <em>r</em> fija el compromiso entre compresión y error de aproximación.</li>
+            </ul>
+            <p class="fragment" style="margin-top: 0.8rem; color: #ffb86c;">¿Por qué una matriz entrenada tendría rango
+                bajo? ¿Y esto ahorra solo memoria, o también operaciones?</p>
+        </div>
+        <aside class="notes">
+            <p>El rango es la cantidad de direcciones independientes que usa la matriz. Una matriz de rango r se puede escribir exactamente como U·V con r columnas en U.</p>
+            <p>Las matrices entrenadas no son de rango bajo exacto, pero suelen concentrar casi toda la "energía" en pocas direcciones. Lo vamos a medir en el ejemplo: en la primera capa del MLP, 16 de 64 valores singulares juntan el 83.5 % de la energía; con los pesos aleatorios del inicio, solo el 34.6 %. El entrenamiento genera esa estructura.</p>
+            <p>La segunda pregunta es la que se respondió mal en la edición pasada; la vemos dos diapos más adelante.</p>
+        </aside>
+    </section>
+
+    <section>
+        <h3>Repaso: descomposición en valores singulares (SVD)</h3>
+        <div style="font-size: 0.66em; text-align: left;">
+            <p>Toda matriz se descompone como <code>W = U Σ V<sup>T</sup></code>: U y V tienen columnas ortonormales
+                (direcciones) y Σ es diagonal, con los <strong>valores singulares</strong> ordenados σ<sub>1</sub> ≥
+                σ<sub>2</sub> ≥ … ≥ 0.</p>
+            <ul style="margin-top: 0.3rem;">
+                <li style="margin-bottom: 0.3rem;">Quedarse con los <em>k</em> más grandes da la <strong>mejor
+                    aproximación de rango k</strong> (teorema de Eckart–Young).</li>
+                <li>La energía de la matriz es Σσ<sup>2</sup>: lo que se pierde es la energía de los σ descartados.</li>
+            </ul>
+            <div style="text-align: center; margin-top: 0.5rem;">
+                <img src="figures/factorizacion-svd_imagen.png" style="max-height: 250px; margin: 0;">
+            </div>
+        </div>
+        <aside class="notes">
+            <p>Para CESE, que quizás no la vieron: es una generalización de la diagonalización a matrices no cuadradas. Los valores singulares cumplen el papel de los autovalores: miden cuánto "estira" la matriz en cada dirección.</p>
+            <p>La foto es la del gato de la demo de la clase 1, en grises (96 × 96). Con rango 8 ya se reconoce la forma; con 24 (que guarda la mitad de los números) se ve casi igual. Guardar la versión de rango k cuesta k·(96 + 96) valores.</p>
+            <p>Con una capa de la red pasa lo mismo: si los σ caen rápido, con pocos se aproxima bien.</p>
+        </aside>
+    </section>
+
+    <section>
+        <h3>Dos formas de ejecutar una factorización</h3>
+        <div style="font-size: 0.66em; text-align: left;">
+            <div style="display: flex; gap: 1rem;">
+                <div style="flex: 1; background: rgba(255,85,85,0.1); padding: 0.7rem; border-radius: 0.5rem;">
+                    <p style="margin: 0 0 0.3rem;"><strong style="color: #ff5555;">Reconstruir W y multiplicar</strong></p>
+                    <p style="margin: 0 0 0.3rem;"><code>W̃ = U · V</code>, después <code>y = W̃ x</code></p>
+                    <ul style="margin: 0;">
+                        <li>Guarda r · (m + n) valores.</li>
+                        <li>Para ejecutar necesita W̃ entera en RAM y hace <strong>m · n</strong> MACs.</li>
+                        <li>Solo ahorra almacenamiento. En un micro, donde la RAM es más escasa que la flash, es peor.</li>
                     </ul>
                 </div>
                 <div style="flex: 1; background: rgba(80,250,123,0.1); padding: 0.7rem; border-radius: 0.5rem;">
-                    <p style="color: #50fa7b; margin: 0 0 0.3rem;"><strong>Parte B — Conv. Separable en CNN</strong></p>
-                    <ul style="padding-left: 1rem; line-height: 1.4;">
-                        <li>CNN estándar: Conv2d(k, 5×5)</li>
-                        <li>CNN separable: DepthwiseConv(5×5) + PointwiseConv(1×1)</li>
-                        <li>Compara MACs y accuracy</li>
+                    <p style="margin: 0 0 0.3rem;"><strong style="color: #50fa7b;">Dos capas encadenadas</strong></p>
+                    <p style="margin: 0 0 0.3rem;"><code>y = U (V x)</code>: Linear(n→r) y Linear(r→m)</p>
+                    <ul style="margin: 0;">
+                        <li>Guarda r · (m + n) valores.</li>
+                        <li>Hace <strong>r · (m + n)</strong> MACs: ahorra parámetros y operaciones.</li>
+                        <li>Es lo que se usa en la práctica.</li>
                     </ul>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <!-- 5.1. Output de script01.py -->
-    <section>
-        <h3>Ejemplo en Código: SVD + Conv. Separable</h3>
-        <h4>Output de script01.py</h4>
-        <div style="font-size: 0.72em; text-align: left; width: 100%;">
-            <pre style="margin: 0; box-shadow: none; background: rgba(0,0,0,0.2);"><code id="log-fact-script01" style="font-family: monospace; font-size: 0.85em; max-height: 500px; overflow-y: auto; padding: 1rem; border-radius: 0.5rem; color: #f8f8f2;">Cargando...</code></pre>
-            <div style="display:none">
-                <img src="load-trigger-fact1" onerror="
-                    fetch('outputs/factorization_log_script01.txt')
-                    .then(r => r.ok ? r.text() : Promise.reject(r.status))
-                    .then(t => document.getElementById('log-fact-script01').textContent = t)
-                    .catch(e => document.getElementById('log-fact-script01').textContent = 'Error al cargar: ' + e);
-                ">
+            <div style="background: rgba(255,255,255,0.1); padding: 0.6rem; border-radius: 0.5rem; text-align: center; margin-top: 0.8rem; font-size: 1.1em;">
+                Conviene si r · (m + n) &lt; m · n, es decir, si <code>r &lt; m · n / (m + n)</code> (rango límite)
             </div>
         </div>
+        <aside class="notes">
+            <p>Respuesta a la pregunta anterior: si se ejecuta como dos capas, la factorización ahorra operaciones además de memoria.</p>
+            <p>Ojo: en la edición pasada se dijo que la SVD no reducía MACs y que por eso servía más en la nube. Era un error que venía de un bug del script: en la tabla imprimía los MACs del baseline para todos los modelos factorizados. Ya está corregido.</p>
+            <p>Reconstruir W tiene sentido para guardar o transmitir el modelo comprimido (por ejemplo, descargarlo), no para ejecutarlo en un micro: necesita la matriz entera en RAM. Si además se reconstruye en cada inferencia, se suman r · m · n MACs más.</p>
+            <p>El rango límite es el punto en que las dos matrices ocupan lo mismo que la original. Por encima, factorizar empeora todo.</p>
+        </aside>
     </section>
 
-    <!-- 5.2. Resultados -->
     <section>
-        <h3>Ejemplo en Código: SVD + Conv. Separable</h3>
-        <h4>Resultados</h4>
-        <div style="display: flex; justify-content: center; align-items: center; margin-top: 1rem;">
-            <img src="outputs/factorization_resultados.png" alt="Factorization Results"
-                style="max-height: 480px; border-radius: 0.5rem;" onerror="this.style.display='none';">
-        </div>
-    </section>
-
-    <!-- 6. Ejemplo avanzado: script02.py — Tucker-2 -->
-    <section>
-        <h3>Avanzado: Tucker-2 Decomposition en Conv2d</h3>
+        <h3>Ejercicio: ¿hasta qué rango conviene?</h3>
         <div style="font-size: 0.72em; text-align: left;">
-            <p style="margin-bottom: 0.6rem;">El script <code>examples/factorization/script02.py</code> extiende SVD a tensores 4D usando <strong>HOSVD</strong> (Higher-Order SVD):</p>
-            <!-- Fórmula -->
-            <div style="background: rgba(255,255,255,0.08); padding: 0.6rem 1rem; border-radius: 0.5rem; text-align: center; font-size: 1.05em; margin-bottom: 0.8rem;">
-                <code>W<sup>(C<sub>out</sub>×C<sub>in</sub>×kH×kW)</sup> ≈ G ×₁ U<sub>out</sub> ×₂ U<sub>in</sub></code>
+            <p>La primera capa del MLP del ejemplo es <strong>Linear(784 → 64)</strong>: 50 176 pesos y 50 176 MACs.</p>
+            <ol style="margin-top: 0.5rem;">
+                <li style="margin-bottom: 0.4rem;">¿A partir de qué rango deja de convenir factorizarla?</li>
+                <li>Con r = 16, ¿cuántos MACs hace la capa factorizada?</li>
+            </ol>
+            <div class="fragment" style="margin-top: 0.8rem; background: rgba(80,250,123,0.1); padding: 0.6rem 0.8rem; border-radius: 0.5rem;">
+                <p style="margin: 0;">1. Rango límite: 784 · 64 / (784 + 64) = 50 176 / 848 ≈ <strong>59</strong>.</p>
             </div>
-            <!-- Diagrama de las 3 capas -->
+            <div class="fragment" style="margin-top: 0.5rem; background: rgba(80,250,123,0.1); padding: 0.6rem 0.8rem; border-radius: 0.5rem;">
+                <p style="margin: 0;">2. 16 · (784 + 64) = <strong>13 568</strong> MACs, un 73 % menos.</p>
+            </div>
+            <p class="fragment" style="margin-top: 0.8rem; color: #ffb86c;">¿Y la última capa, Linear(16 → 10)? Su límite es
+                ≈ 6: casi no hay nada que ganar.</p>
+        </div>
+        <aside class="notes">
+            <p>Dos o tres minutos, que cada uno lo calcule antes de mostrar la respuesta.</p>
+            <p>La cuenta del límite sale de igualar r·(m + n) con m·n. Cuanto más "rectangular" la matriz, más cerca queda el límite del lado chico: acá 59 de 64.</p>
+            <p>Las capas chicas casi no se pueden factorizar. Por eso el script solo factoriza una capa si el rango elegido está por debajo de su límite: con r = 16, solo fc1 y fc2.</p>
+        </aside>
+    </section>
+
+    <section>
+        <h3>Qué se factoriza y cuándo</h3>
+        <div style="font-size: 0.56em;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 2px solid #44475a;">
+                        <th style="text-align: left; padding: 0.3rem;">Técnica</th>
+                        <th style="text-align: left; padding: 0.3rem;">Qué factoriza</th>
+                        <th style="text-align: left; padding: 0.3rem;">Cuándo</th>
+                        <th style="text-align: left; padding: 0.3rem;">Dónde aparece</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td style="padding: 0.3rem;"><strong style="color: #bd93f9;">SVD truncada</strong></td><td style="padding: 0.3rem;">La matriz de una capa densa</td><td style="padding: 0.3rem;">Después de entrenar (+ FT)</td><td style="padding: 0.3rem;">Capas densas grandes</td></tr>
+                    <tr><td style="padding: 0.3rem;"><strong style="color: #ffb86c;">Tucker-2</strong></td><td style="padding: 0.3rem;">Los canales de entrada y de salida de una conv</td><td style="padding: 0.3rem;">Después de entrenar (+ FT)</td><td style="padding: 0.3rem;">Kim et al., 2016</td></tr>
+                    <tr><td style="padding: 0.3rem;"><strong style="color: #ffb86c;">CP</strong></td><td style="padding: 0.3rem;">Todas las dimensiones del kernel</td><td style="padding: 0.3rem;">Después de entrenar (+ FT)</td><td style="padding: 0.3rem;">Lebedev et al., 2015</td></tr>
+                    <tr><td style="padding: 0.3rem;"><strong style="color: #50fa7b;">Espacial k×1 + 1×k</strong></td><td style="padding: 0.3rem;">El kernel en el espacio</td><td style="padding: 0.3rem;">Al diseñar (o después)</td><td style="padding: 0.3rem;">Inception-v3; Jaderberg et al., 2014</td></tr>
+                    <tr><td style="padding: 0.3rem;"><strong style="color: #50fa7b;">Depthwise separable</strong></td><td style="padding: 0.3rem;">Espacio y canales por separado</td><td style="padding: 0.3rem;">Al diseñar</td><td style="padding: 0.3rem;">MobileNet, EfficientNet</td></tr>
+                    <tr><td style="padding: 0.3rem;"><strong style="color: #8be9fd;">LoRA</strong></td><td style="padding: 0.3rem;">La actualización ΔW del fine-tuning</td><td style="padding: 0.3rem;">Al adaptar un modelo</td><td style="padding: 0.3rem;">LLMs</td></tr>
+                </tbody>
+            </table>
+            <p style="margin-top: 0.8rem; text-align: left;">En el extremo, <code>W ≈ Σ α<sub>i</sub> · B<sub>i</sub></code> con
+                B<sub>i</sub> ∈ {−1, +1}: una combinación de matrices binarias (ABC-Net). Las redes binarias se ven en
+                <strong>cuantización</strong>.</p>
+        </div>
+        <aside class="notes">
+            <p>Dos preguntas ordenan todo: qué dimensión del peso se factoriza y en qué momento.</p>
+            <ul>
+                <li>Después de entrenar: se toma un modelo ya entrenado, se descompone, y casi siempre hace falta un fine-tuning corto para recuperar la accuracy.</li>
+                <li>Al diseñar: la arquitectura ya viene factorizada y se entrena desde cero. No hay una matriz "original" que aproximar.</li>
+            </ul>
+            <p>Tucker-2 y la espacial suelen confundirse: Tucker-2 reduce canales, no toca el tamaño del kernel; la espacial cambia un kernel 3×3 por un 3×1 seguido de un 1×3.</p>
+            <p>Sobre la binaria: con dos matrices de ±1 sin escalares, la suma vale −2, 0 o +2 (no −1 ni +1, como se dijo en la edición pasada). Con escalares α<sub>1</sub> y α<sub>2</sub>, cada peso toma uno de 4 valores ±α<sub>1</sub> ± α<sub>2</sub> (ABC-Net, 2017). Para XNOR y conteo de bits también hay que binarizar las activaciones: está en la sección de cuantización.</p>
+        </aside>
+    </section>
+
+    <section>
+        <h3>Convolución separable en profundidad (depthwise separable)</h3>
+        <div style="font-size: 0.64em; text-align: left;">
+            <p>Reemplaza una conv k×k de C<sub>in</sub> a C<sub>out</sub> canales por dos:</p>
+            <div style="display: flex; gap: 1rem; margin: 0.5rem 0;">
+                <div style="flex: 1; background: rgba(139,233,253,0.1); padding: 0.6rem; border-radius: 0.5rem;">
+                    <p style="margin: 0 0 0.3rem;"><strong style="color: #8be9fd;">Depthwise k×k</strong></p>
+                    <p style="margin: 0;">Una conv por canal (<code>groups = C<sub>in</sub></code>): filtra en el espacio, no
+                        mezcla canales.</p>
+                </div>
+                <div style="flex: 1; background: rgba(80,250,123,0.1); padding: 0.6rem; border-radius: 0.5rem;">
+                    <p style="margin: 0 0 0.3rem;"><strong style="color: #50fa7b;">Pointwise 1×1</strong></p>
+                    <p style="margin: 0;">Mezcla los canales: C<sub>in</sub> → C<sub>out</sub>.</p>
+                </div>
+            </div>
+            <table style="width: 100%; font-size: 0.95em; margin-top: 0.4rem;">
+                <tr><td>Estándar</td><td><code>H · W · C<sub>out</sub> · C<sub>in</sub> · k<sup>2</sup></code> MACs</td></tr>
+                <tr><td>Separable</td><td><code>H · W · C<sub>in</sub> · (k<sup>2</sup> + C<sub>out</sub>)</code> MACs → una fracción
+                    <code>1/C<sub>out</sub> + 1/k<sup>2</sup></code></td></tr>
+            </table>
+            <p style="margin-top: 0.6rem;">Ejemplo: 32 → 64 canales, 3×3: <strong>1/64 + 1/9 ≈ 13 %</strong> de los MACs.
+                El kernel equivalente es <code>W[o, i] = P[o, i] · D[i]</code>: rango 1 por canal de entrada.</p>
+        </div>
+        <aside class="notes">
+            <p>Es el bloque de MobileNet. En una conv estándar, cada filtro de salida combina el espacio y todos los canales a la vez; la separable lo hace en dos pasos.</p>
+            <p>Lo de "rango 1 por canal" quiere decir que, para cada canal de entrada i, todos los filtros de salida usan el mismo patrón espacial D[i], escalado por P[o, i]. Es una restricción fuerte, y por eso se entrena desde cero en lugar de aproximar una conv ya entrenada.</p>
+            <p>Si preguntan por la relación con Tucker-2: la separable equivale a un Tucker-2 con U<sub>in</sub> = identidad, R<sub>out</sub> = C<sub>in</sub> y un núcleo diagonal en los canales. No a uno con R<sub>out</sub> = 1, como decía la versión anterior del script.</p>
+            <p>La primera capa de la red suele quedar estándar: con 1 o 3 canales de entrada no hay casi nada que separar.</p>
+            <p>MobileNet pone BatchNorm y ReLU entre las dos convs. En el ejemplo no, para que el bloque sea exactamente una conv factorizada.</p>
+        </aside>
+    </section>
+
+    <section>
+        <h3>Tucker-2 en una Conv2d</h3>
+        <div style="font-size: 0.68em; text-align: left;">
+            <p style="margin-bottom: 0.6rem;">Extiende la SVD a un kernel 4D: reduce los canales de entrada (C<sub>in</sub> →
+                R<sub>in</sub>) y de salida (R<sub>out</sub> → C<sub>out</sub>) con la SVD de cada "desplegado" del tensor
+                (HOSVD), y deja intacto el tamaño del kernel.</p>
+            <div style="background: rgba(255,255,255,0.08); padding: 0.6rem 1rem; border-radius: 0.5rem; text-align: center; font-size: 1.05em; margin-bottom: 0.8rem;">
+                <code>W<sub>(C<sub>out</sub>×C<sub>in</sub>×k×k)</sub> ≈ G ×₁ U<sub>out</sub> ×₂ U<sub>in</sub></code>
+            </div>
             <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.8rem; font-size: 0.9em;">
                 <div style="background: rgba(80,250,123,0.15); border: 1px solid #50fa7b; padding: 0.4rem 0.6rem; border-radius: 0.4rem; text-align: center; min-width: 5.5rem;">
                     <div style="color: #50fa7b; font-weight: bold;">Conv 1×1</div>
@@ -150,7 +205,7 @@
                 </div>
                 <div style="color: #aaa; font-size: 1.4em;">→</div>
                 <div style="background: rgba(189,147,249,0.15); border: 1px solid #bd93f9; padding: 0.4rem 0.6rem; border-radius: 0.4rem; text-align: center; min-width: 5.5rem;">
-                    <div style="color: #bd93f9; font-weight: bold;">Conv kH×kW</div>
+                    <div style="color: #bd93f9; font-weight: bold;">Conv k×k</div>
                     <div style="font-size: 0.85em; color: #ccc;">R<sub>in</sub> → R<sub>out</sub></div>
                     <div style="font-size: 0.75em; color: #aaa;">núcleo G</div>
                 </div>
@@ -161,49 +216,279 @@
                     <div style="font-size: 0.75em; color: #aaa;">U<sub>out</sub></div>
                 </div>
                 <div style="flex: 1; padding-left: 0.8rem; color: #ccc; font-size: 0.85em;">
-                    <p style="margin: 0 0 0.3rem;"><strong style="color: #8be9fd;">Rank ratio</strong> controla el tradeoff:</p>
-                    <p style="margin: 0;">ratio=0.5 → R = C/2<br>→ ~50% menos MACs</p>
+                    <p style="margin: 0 0 0.3rem;">La conv k×k cara pasa a trabajar con R<sub>in</sub> y R<sub>out</sub>
+                        canales.</p>
+                    <p style="margin: 0;">El stride y el padding van en la k×k.</p>
                 </div>
             </div>
         </div>
+        <aside class="notes">
+            <p>HOSVD: se "aplana" el tensor de pesos de dos maneras (una fila por canal de salida, o una fila por canal de entrada) y se toma la SVD de cada una. Los primeros vectores singulares son U<sub>out</sub> y U<sub>in</sub>; el núcleo G es lo que queda al proyectar W sobre ellos.</p>
+            <p>Con rango completo (R = C) la descomposición es exacta; el script tiene un test que lo verifica.</p>
+            <p>En el ejemplo, con la mitad de los canales (R = C/2) en conv2 y conv3 la red hace el 43 % de los MACs: la primera conv y la densa final no se tocan.</p>
+            <p>Detalle que estaba mal en la versión anterior del script: el stride tiene que ir en la conv k×k. Si va en la primera 1×1, submuestrea antes de filtrar y ya no equivale a la conv original.</p>
+        </aside>
     </section>
 
-    <!-- 6.1. Output de script02.py -->
+    <!-- ===================== EJEMPLO EN CÓDIGO ===================== -->
+
     <section>
-        <h3>Avanzado: Tucker-2 Decomposition en Conv2d</h3>
-        <h4>Output de script02.py</h4>
-        <div style="font-size: 0.72em; text-align: left; width: 100%;">
-            <pre style="margin: 0; box-shadow: none; background: rgba(0,0,0,0.2);"><code id="log-fact-script02" style="font-family: monospace; font-size: 0.85em; max-height: 500px; overflow-y: auto; padding: 1rem; border-radius: 0.5rem; color: #f8f8f2;">Cargando...</code></pre>
-            <div style="display:none">
-                <img src="load-trigger-fact2" onerror="
-                    fetch('outputs/factorization_log_script02.txt')
-                    .then(r => r.ok ? r.text() : Promise.reject(r.status))
-                    .then(t => document.getElementById('log-fact-script02').textContent = t)
-                    .catch(e => document.getElementById('log-fact-script02').textContent = 'Error al cargar: ' + e);
-                ">
+        <h3>El ejemplo y los scripts</h3>
+        <div style="font-size: 0.64em; text-align: left;">
+            <p style="margin-top: 0;">En <code>examples/factorization/</code>, sobre Fashion MNIST:</p>
+            <ul style="list-style-type: none; padding: 0; margin: 0;">
+                <li style="margin-bottom: 0.5rem;"><code>script01.py</code>: SVD en las capas densas de un MLP
+                    (784→64→32→16→10, el mismo de cuantización), con r = 4, 8, 16 y 32. Unos 2 minutos en CPU.</li>
+                <li><code>script02.py</code> <span style="color: #ffb86c;">(avanzado)</span>: una CNN de tres convs en cuatro
+                    versiones: estándar, Tucker-2, depthwise separable y espacial 3×1 + 1×3. Unos 9 minutos en CPU;
+                    está pre-corrido.</li>
+            </ul>
+            <div style="margin-top: 1rem; background: rgba(255,255,255,0.05); padding: 0.7rem 1rem; border-radius: 0.5rem;">
+                <p style="margin: 0;"><code>cd examples/factorization &amp;&amp; uv run python script01.py</code>, y lo mismo con
+                    <code>script02.py</code>.</p>
+                <p style="margin: 0.4rem 0 0;">Comparación pareja: todos los modelos reciben el mismo entrenamiento (10
+                    épocas) y el mismo fine-tuning (3 épocas). Semilla fija: en la misma máquina dan siempre los mismos números.</p>
             </div>
         </div>
+        <aside class="notes">
+            <p>Lo de la comparación pareja importa: en la versión anterior, el baseline no recibía las 3 épocas extra de fine-tuning, y por eso algún modelo factorizado "le ganaba". Ahora el baseline hace el mismo fine-tuning ("baseline + FT") y es la referencia justa.</p>
+            <p>Los tiempos son en una CPU de escritorio de 16 hilos. <code>script02</code> entrena cuatro redes, por eso es avanzado.</p>
+            <p>Los tests de las funciones de factorización: <code>uv run --with pytest python -m pytest tests -q</code>.</p>
+        </aside>
     </section>
 
-    <!-- 6.2. Resultados -->
     <section>
-        <h3>Avanzado: Tucker-2 Decomposition en Conv2d</h3>
-        <h4>Resultados</h4>
-        <div style="display: flex; justify-content: center; align-items: center; margin-top: 1rem;">
-            <img src="outputs/factorization_tucker_resultados.png" alt="Tucker-2 Results"
-                style="max-height: 550px; border-radius: 0.5rem;" onerror="this.style.display='none';">
+        <h3>script01.py: el espectro de la primera capa</h3>
+        <img src="figures/factorizacion-espectro.png" style="max-height: 400px; margin: 0;">
+        <p style="font-size: 0.6em; margin-top: 0.3rem;">fc1, Linear(784 → 64): con 16 de 64 valores singulares, los pesos
+            entrenados juntan el 83.5 % de la energía; los iniciales, el 34.6 %.</p>
+        <aside class="notes">
+            <p>Esta es la respuesta a "¿por qué una matriz entrenada tendría rango bajo?": el entrenamiento concentra la energía en pocas direcciones. La matriz aleatoria del inicio la reparte casi parejo.</p>
+            <p>Pregunta antes de ver el resultado siguiente: si r = 16 conserva el 83.5 % de la energía de fc1, ¿cuánta accuracy esperan perder sin fine-tuning?</p>
+        </aside>
+    </section>
+
+    <section>
+        <h3>script01.py: accuracy, MACs y parámetros vs. rango</h3>
+        <img src="figures/factorizacion-svd_mlp.png" style="max-height: 360px; margin: 0;">
+        <p style="font-size: 0.6em; margin-top: 0.3rem;">Baseline: 86.1 % (87.4 % con el mismo fine-tuning), 53.0 k parámetros y
+            52.9 k MACs. Con r = 16: 83.9 % sin FT, 86.7 % con FT, y el 30 % de los MACs.</p>
+        <aside class="notes">
+            <p>Qué mirar:</p>
+            <ul>
+                <li>Sin fine-tuning, r = 16 pierde poco más de 2 puntos; r = 4 se cae al 22 %.</li>
+                <li>Con 3 épocas de fine-tuning se recupera casi todo: r = 16 queda a menos de 1 punto del baseline con el mismo FT y hace el 30 % de los MACs.</li>
+                <li>Los MACs bajan igual que los parámetros: en una capa densa, cada peso es un MAC.</li>
+            </ul>
+            <p>Ninguna versión factorizada supera al baseline cuando la comparación es pareja.</p>
+        </aside>
+    </section>
+
+    <section>
+        <h3>script01.py: dos capas vs. reconstruir</h3>
+        <div style="font-size: 0.7em;">
+            <p style="text-align: left;">El mismo modelo con r = 16 (misma función, misma accuracy), ejecutado de las dos
+                formas:</p>
+            <table style="width: 90%; margin: 0.6rem auto; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 2px solid #44475a;">
+                        <th style="text-align: left; padding: 0.3rem;">Forma</th>
+                        <th style="text-align: right; padding: 0.3rem;">Pesos guardados</th>
+                        <th style="text-align: right; padding: 0.3rem;">Pesos en RAM</th>
+                        <th style="text-align: right; padding: 0.3rem;">MACs</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td style="padding: 0.3rem; color: #50fa7b;">Dos capas</td><td style="text-align: right; padding: 0.3rem;">62.1 KB</td><td style="text-align: right; padding: 0.3rem;">62.1 KB</td><td style="text-align: right; padding: 0.3rem;">15 776</td></tr>
+                    <tr><td style="padding: 0.3rem; color: #ff5555;">Reconstruir W</td><td style="text-align: right; padding: 0.3rem;">62.1 KB</td><td style="text-align: right; padding: 0.3rem;">207.1 KB</td><td style="text-align: right; padding: 0.3rem;">52 896</td></tr>
+                </tbody>
+            </table>
+            <p style="text-align: left; margin-top: 0.6rem;">Reconstruir solo ahorra almacenamiento: la RAM y los MACs son los
+                del modelo original. En FP32; en int8 los KB se dividen por 4.</p>
         </div>
+        <aside class="notes">
+            <p>Es la tabla que aclara el error de la edición pasada: los MACs del modelo factorizado bajan de 52.9 k a 15.8 k si se ejecuta como dos capas.</p>
+            <p>"Pesos en RAM" supone que los pesos se copian a RAM para ejecutar. En un micro también se pueden leer directo de la flash (más lento); con reconstruir no hay opción: la matriz entera tiene que estar en RAM.</p>
+        </aside>
     </section>
 
-    <!-- 7. Resumen -->
     <section>
-        <h3>Resumen (Cloud vs. Edge)</h3>
-        <div style="font-size: 0.75em; text-align: left;">
-            <ul style="line-height: 1.5;">
-                <li style="margin-bottom: 0.8rem;"><strong style="color: #bd93f9;">En el Cloud:</strong> La factorización arrasa para entrenar/adaptar masivamente bajo costo (<strong>LoRA</strong>) o aliviar formidables Embeddings (<strong>SVD</strong>).</li>
-                <li style="margin-bottom: 0.8rem;"><strong style="color: #8be9fd;">En el Edge Móvil:</strong> La factorización espacial/de tensores (Conv separables, como 3x1 + 1x3) se ha consagrado como el cimiento de arquitecturas de tiempo real eficientes.</li>
-                <li style="margin-bottom: 0.8rem;"><strong style="color: #50fa7b;">En el Edge Extremo (IoT):</strong> La <strong>Factorización Binaria</strong> reforma por completo las imposiciones matemáticas previas, abaratando transistores en una lógica llana y ultrarrápida.</li>
+        <h3>script02.py: convoluciones factorizadas</h3>
+        <img src="figures/factorizacion-convs.png" style="max-height: 380px; margin: 0;">
+        <p style="font-size: 0.6em; margin-top: 0.3rem;">CNN: conv(1→16) → conv(16→32) → conv(32→64) → densa(576→10), 29.1 k
+            parámetros y 1.92 M MACs. Se factorizan conv2 y conv3.</p>
+        <aside class="notes">
+            <p>Antes de mostrar: ¿cuál esperan que pierda más accuracy, la depthwise o Tucker-2 con el 25 % de los canales? Hacen casi los mismos MACs.</p>
+            <p>Las convs tienen el 80 % de los parámetros y casi todos los MACs: a propósito, para que factorizarlas importe.</p>
+            <p>Ojo con la escala vertical: va de 88.75 % a 90.75 %. Todas las versiones quedan a menos de 2 puntos del baseline con FT.</p>
+        </aside>
+    </section>
+
+    <section>
+        <h3>script02.py: la tabla</h3>
+        <div style="font-size: 0.56em;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 2px solid #44475a;">
+                        <th style="text-align: left; padding: 0.3rem;">Modelo</th>
+                        <th style="text-align: left; padding: 0.3rem;">Cuándo</th>
+                        <th style="text-align: right; padding: 0.3rem;">Parámetros</th>
+                        <th style="text-align: right; padding: 0.3rem;">MACs</th>
+                        <th style="text-align: right; padding: 0.3rem;">Capas</th>
+                        <th style="text-align: right; padding: 0.3rem;">Acc sin FT</th>
+                        <th style="text-align: right; padding: 0.3rem;">Acc</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td style="padding: 0.25rem;">Estándar + FT</td><td>—</td><td style="text-align: right;">29.1 k</td><td style="text-align: right;">1.92 M (100 %)</td><td style="text-align: right;">4</td><td style="text-align: right;">—</td><td style="text-align: right;">90.6 %</td></tr>
+                    <tr style="color: #ffb86c;"><td style="padding: 0.25rem;">Tucker-2 (25 %)</td><td>después de entrenar</td><td style="text-align: right;">9.1 k</td><td style="text-align: right;">0.36 M (19 %)</td><td style="text-align: right;">8</td><td style="text-align: right;">81.6 %</td><td style="text-align: right;">89.2 %</td></tr>
+                    <tr style="color: #ffb86c;"><td style="padding: 0.25rem;">Tucker-2 (50 %)</td><td>después de entrenar</td><td style="text-align: right;">15.0 k</td><td style="text-align: right;">0.82 M (43 %)</td><td style="text-align: right;">8</td><td style="text-align: right;">88.6 %</td><td style="text-align: right;">90.3 %</td></tr>
+                    <tr style="color: #ffb86c;"><td style="padding: 0.25rem;">Tucker-2 (75 %)</td><td>después de entrenar</td><td style="text-align: right;">23.8 k</td><td style="text-align: right;">1.51 M (78 %)</td><td style="text-align: right;">8</td><td style="text-align: right;">89.2 %</td><td style="text-align: right;">90.7 %</td></tr>
+                    <tr style="color: #50fa7b;"><td style="padding: 0.25rem;">Depthwise separable</td><td>al diseñar</td><td style="text-align: right;">9.0 k</td><td style="text-align: right;">0.36 M (19 %)</td><td style="text-align: right;">6</td><td style="text-align: right;">—</td><td style="text-align: right;">88.8 %</td></tr>
+                    <tr style="color: #50fa7b;"><td style="padding: 0.25rem;">Espacial 3×1 + 1×3</td><td>al diseñar</td><td style="text-align: right;">17.5 k</td><td style="text-align: right;">1.02 M (53 %)</td><td style="text-align: right;">6</td><td style="text-align: right;">—</td><td style="text-align: right;">90.2 %</td></tr>
+                </tbody>
+            </table>
+            <p style="margin-top: 0.7rem; text-align: left;">Sin fine-tuning, el estándar da 89.4 %. Todas las factorizaciones
+                <strong>suman capas</strong>: de 4 a 6 u 8.</p>
+        </div>
+        <aside class="notes">
+            <p>Lecturas:</p>
+            <ul>
+                <li>Tucker-2 al 25 % y la depthwise hacen casi los mismos MACs (19 %) y dan casi lo mismo (89.2 % y 88.8 %). Tucker-2 parte de un modelo entrenado y necesita FT: sin él, cae al 81.6 %.</li>
+                <li>Tucker-2 al 75 % queda incluso un poco arriba del baseline con FT (90.7 % contra 90.6 %): son diferencias de una décima, dentro del ruido de una sola corrida.</li>
+                <li>La espacial ahorra menos: con C<sub>out</sub> = 2·C<sub>in</sub> y k = 3, la fracción es (C<sub>in</sub> + C<sub>out</sub>)/(C<sub>out</sub>·k) = 1/2.</li>
+            </ul>
+            <p>La columna de capas es la que no se ve en los MACs: la vemos en la próxima diapo.</p>
+        </aside>
+    </section>
+
+    <section>
+        <h3>Lo que no se ve en los MACs</h3>
+        <div style="font-size: 0.64em; text-align: left;">
+            <ul>
+                <li style="margin-bottom: 0.5rem;"><strong>Más capas.</strong> Cada capa suma metadatos, bias y una llamada
+                    al runtime. En el TP, el <code>.espdl</code> incluye unos 24 KB de metadatos y bias: tener menos capas
+                    también cuenta.</li>
+                <li style="margin-bottom: 0.5rem;"><strong>Un tensor intermedio más.</strong> Si no tiene más canales que la
+                    entrada y la salida (Tucker-2 con R ≤ C<sub>in</sub> y R ≤ C<sub>out</sub>; depthwise con C<sub>out</sub> ≥
+                    C<sub>in</sub>), el pico de RAM no sube. Si los <em>expande</em> (el bloque invertido de MobileNetV2 los
+                    multiplica por 6; en el TP, por 4), sí.</li>
+                <li style="margin-bottom: 0.5rem;"><strong>Una recuantización más.</strong> En int8, cada capa redondea su
+                    salida: más capas, más error acumulado.</li>
+                <li style="margin-bottom: 0.5rem;"><strong>Fine-tuning.</strong> Factorizar después de entrenar casi siempre
+                    lo necesita.</li>
+                <li><strong>Menos MACs no es proporcionalmente menos tiempo.</strong> La depthwise hace pocas cuentas por cada
+                    dato que lee y suele aprovechar peor el SIMD: el tiempo baja menos que los MACs.</li>
+            </ul>
+            <p style="margin-top: 0.6rem; color: #ffb86c;">Moraleja, como en cuantización: medir en la plataforma de destino.</p>
+        </div>
+        <aside class="notes">
+            <p>Los MACs son una buena primera aproximación del costo, pero no la única.</p>
+            <p>El pico de RAM de activaciones es lo que vive a la vez: la entrada y la salida de cada capa (más lo que espera para un atajo residual). Si la factorización mete un tensor intermedio con no más canales que la entrada y la salida, ese par nunca supera al original. Ojo: en el ejemplo, Tucker-2 al 75 % tiene R<sub>out</sub> = 24 en conv2, más que C<sub>in</sub> = 16, y ahí el par sube un poco (24 + 32 contra 16 + 32 canales), aunque el pico de toda la red no cambia. El bloque invertido de MobileNetV2 hace lo contrario a propósito: expande primero (×6 en MobileNetV2, ×4 en el TP), y ese tensor expandido puede ser el pico de toda la red.</p>
+            <p>Sobre el SIMD: una conv estándar reutiliza cada dato de entrada en C<sub>out</sub> filtros; la depthwise lo usa en uno solo. Con pocas cuentas por byte leído, la memoria limita antes que las unidades de cálculo.</p>
+        </aside>
+    </section>
+
+    <section>
+        <h3>LoRA: factorizar la actualización</h3>
+        <div style="font-size: 0.66em; text-align: left;">
+            <p>Para adaptar un modelo grande a una tarea, LoRA (low-rank adaptation) congela los pesos originales
+                W<sub>0</sub> y entrena solo una actualización de rango bajo:</p>
+            <div style="background: rgba(255,255,255,0.1); padding: 0.6rem; border-radius: 0.5rem; text-align: center; margin: 0.6rem 0; font-size: 1.1em;">
+                <code>W = W<sub>0</sub> + B · A</code>, con B (m × r) y A (r × n), r de 4 a 64
+            </div>
+            <ul>
+                <li style="margin-bottom: 0.4rem;">Se entrenan y se guardan solo A y B: megabytes en lugar de gigabytes, y mucha
+                    menos memoria para entrenar.</li>
+                <li style="margin-bottom: 0.4rem;">En inferencia, B · A se suma a W<sub>0</sub>: <strong>no ahorra
+                    cuentas</strong>. Es una técnica de adaptación, no de compresión del modelo.</li>
+                <li>En el dispositivo: un solo modelo base y un <em>adapter</em> chico por tarea, que se carga y se cambia en
+                    tiempo de ejecución. Es lo que hace Apple con su modelo de ~3 B parámetros en el teléfono (adapters de
+                    rango 16, decenas de MB).</li>
             </ul>
         </div>
+        <aside class="notes">
+            <p>La hipótesis de LoRA es que el cambio que necesita el fine-tuning (ΔW) tiene rango bajo, aunque W<sub>0</sub> no lo tenga.</p>
+            <p>Para embebidos el interés es el último punto: en lugar de guardar un modelo entero por tarea (resumir, responder mails, etc.), se guarda un modelo base y varios adapters. El modelo base de Apple además está cuantizado a 2 y 4 bits (3.7 bits por peso en promedio). Fuente: "Introducing Apple's On-Device and Server Foundation Models", Apple Machine Learning Research, junio de 2024.</p>
+        </aside>
     </section>
+
+    <section>
+        <h3>Factorización en el TP</h3>
+        <div style="font-size: 0.66em; text-align: left;">
+            <div style="display: flex; gap: 1rem;">
+                <div style="flex: 1; background: rgba(80,250,123,0.1); padding: 0.7rem; border-radius: 0.5rem;">
+                    <p style="margin: 0 0 0.3rem;"><strong style="color: #50fa7b;">Al diseñar</strong></p>
+                    <p style="margin: 0;"><code>modelos.py</code> ya trae dos bloques factorizados:</p>
+                    <ul style="margin: 0.3rem 0 0;">
+                        <li><code>"dws"</code>: depthwise separable (dw 3×3 → 1×1).</li>
+                        <li><code>"ir"</code>: el bloque invertido de MobileNetV2 (1×1 que expande → dw 3×3 → 1×1 que
+                            proyecta).</li>
+                    </ul>
+                </div>
+                <div style="flex: 1; background: rgba(255,184,108,0.1); padding: 0.7rem; border-radius: 0.5rem;">
+                    <p style="margin: 0 0 0.3rem;"><strong style="color: #ffb86c;">Después de entrenar</strong></p>
+                    <p style="margin: 0;">Partir del baseline (ResNet-56) y factorizar sus convs, por ejemplo con Tucker-2,
+                        seguido de un fine-tuning.</p>
+                </div>
+            </div>
+            <ul style="margin-top: 0.8rem;">
+                <li style="margin-bottom: 0.3rem;">ESP-DL ejecuta convs depthwise (<code>groups = C<sub>in</sub></code>): la depthwise
+                    está permitida. Otros valores de <code>groups</code> no están soportados.</li>
+                <li>El score premia pesos y MACs; los requisitos también miran el pico de activaciones. Midan cada variante
+                    con <code>evaluar.py</code>.</li>
+            </ul>
+        </div>
+        <aside class="notes">
+            <p>No hay una receta: el punto es que sepan que las dos familias existen y qué costo tiene cada una.</p>
+            <p>Recordar lo de la diapo anterior: el bloque invertido expande los canales, así que puede subir el pico de activaciones aunque baje los MACs. Y cada capa extra suma metadatos al <code>.espdl</code>.</p>
+            <p>Combinar con las otras técnicas es lo habitual: factorizar, después cuantizar a int8 (obligatorio en el TP), y eventualmente destilar desde el baseline.</p>
+        </aside>
+    </section>
+
+    <section>
+        <h3>Resumen: factorización</h3>
+        <ul style="font-size: 0.65em; text-align: left; max-width: 820px; margin: 1rem auto;">
+            <li style="margin-bottom: 0.4rem;">Factorizar es aproximar un peso por un producto de piezas más chicas. Las
+                matrices entrenadas concentran la energía en pocas direcciones.</li>
+            <li style="margin-bottom: 0.4rem;">Ejecutada como <strong>varias capas</strong>, una factorización reduce
+                parámetros <strong>y</strong> MACs, mientras el rango esté por debajo del límite m · n / (m + n).</li>
+            <li style="margin-bottom: 0.4rem;">Dos familias: <strong>después de entrenar</strong> (SVD, Tucker-2, CP, con
+                fine-tuning) y <strong>al diseñar</strong> (depthwise y espacial separables, MobileNet).</li>
+            <li style="margin-bottom: 0.4rem;">Suma capas: más metadatos, más recuantizaciones y, si expande canales, más RAM.
+                Menos MACs no garantiza proporcionalmente menos tiempo.</li>
+            <li>LoRA factoriza la actualización del fine-tuning: sirve para adaptar modelos, no para ejecutarlos más
+                rápido.</li>
+        </ul>
+        <aside class="notes">
+            <p>Conexión con lo que sigue: la factorización al diseñar es, en el fondo, una decisión de arquitectura. NAS es buscar esas decisiones automáticamente.</p>
+        </aside>
+    </section>
+
+    <section>
+        <h3>Referencias</h3>
+        <ul style="font-size: 0.5em; text-align: left; max-width: 900px; margin: 0.6rem auto;">
+            <li>Eckart y Young, <em>The approximation of one matrix by another of lower rank</em>, Psychometrika, 1936.</li>
+            <li>Denton et al., <em>Exploiting linear structure within convolutional networks for efficient evaluation</em>,
+                NeurIPS 2014.</li>
+            <li>Jaderberg, Vedaldi y Zisserman, <em>Speeding up convolutional neural networks with low rank expansions</em>,
+                BMVC 2014.</li>
+            <li>Lebedev et al., <em>Speeding-up convolutional neural networks using fine-tuned CP-decomposition</em>, ICLR
+                2015.</li>
+            <li>Kim et al., <em>Compression of deep convolutional neural networks for fast and low power mobile
+                applications</em>, ICLR 2016 (Tucker-2).</li>
+            <li>Szegedy et al., <em>Rethinking the Inception architecture for computer vision</em>, CVPR 2016.</li>
+            <li>Howard et al., <em>MobileNets: efficient convolutional neural networks for mobile vision applications</em>,
+                2017.</li>
+            <li>Sandler et al., <em>MobileNetV2: inverted residuals and linear bottlenecks</em>, CVPR 2018.</li>
+            <li>Lin, Zhao y Pan, <em>Towards accurate binary convolutional neural network</em> (ABC-Net), NeurIPS 2017.</li>
+            <li>Hu et al., <em>LoRA: low-rank adaptation of large language models</em>, ICLR 2022.</li>
+            <li>Apple, <em>Introducing Apple's on-device and server foundation models</em>, Apple Machine Learning Research,
+                2024.</li>
+        </ul>
+        <aside class="notes">
+            <p>Kim et al. 2016 es la referencia práctica de Tucker-2 en convs; Lebedev et al. 2015, la de CP. Jaderberg et al. 2014 propone la separación espacial (k×1 + 1×k) aplicada a modelos entrenados.</p>
+        </aside>
+    </section>
+
 </section>

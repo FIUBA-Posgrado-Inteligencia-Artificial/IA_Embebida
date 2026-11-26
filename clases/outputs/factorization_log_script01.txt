@@ -1,80 +1,63 @@
 [INFO] Usando dispositivo: cpu
 
-============================================================
-PARTE A — SVD en capas Dense del MLP
-============================================================
-Entrenando MLP baseline (10 epochs)...
-  Epoch  1/10  loss=0.9209  train_acc=0.6750  test_acc=0.8050  (2.5s)
-  Epoch  2/10  loss=0.4847  train_acc=0.8281  test_acc=0.8278  (2.3s)
-  Epoch  3/10  loss=0.4299  train_acc=0.8470  test_acc=0.8343  (2.4s)
-  Epoch  4/10  loss=0.3992  train_acc=0.8583  test_acc=0.8512  (2.5s)
-  Epoch  5/10  loss=0.3779  train_acc=0.8642  test_acc=0.8508  (2.9s)
-  Epoch  6/10  loss=0.3619  train_acc=0.8708  test_acc=0.8537  (2.4s)
-  Epoch  7/10  loss=0.3475  train_acc=0.8755  test_acc=0.8564  (2.5s)
-  Epoch  8/10  loss=0.3327  train_acc=0.8806  test_acc=0.8643  (2.7s)
-  Epoch  9/10  loss=0.3235  train_acc=0.8835  test_acc=0.8652  (3.0s)
-  Epoch 10/10  loss=0.3141  train_acc=0.8876  test_acc=0.8611  (2.3s)
-  [MLP Baseline] Parámetros: 53,018  |  MACs: 52,896  |  Tamaño: 207.1 KB
-  SVD rank= 4  acc (sin FT)=0.1685  params=4,194
-           acc (con FT)=0.7750
-  SVD rank= 8  acc (sin FT)=0.7637  params=8,266
-           acc (con FT)=0.8458
-  SVD rank=16  acc (sin FT)=0.8358  params=15,898
-           acc (con FT)=0.8619
-  SVD rank=32  acc (sin FT)=0.8580  params=29,978
-           acc (con FT)=0.8701
+======================================================================
+PASO 1 — MLP baseline
+======================================================================
+  Epoch  1/10  loss=0.8602  train_acc=0.6872  test_acc=0.7822  (2.6s)
+  Epoch  2/10  loss=0.4883  train_acc=0.8239  test_acc=0.8241  (3.7s)
+  Epoch  3/10  loss=0.4313  train_acc=0.8454  test_acc=0.8381  (4.0s)
+  Epoch  4/10  loss=0.4052  train_acc=0.8534  test_acc=0.8472  (3.9s)
+  Epoch  5/10  loss=0.3802  train_acc=0.8630  test_acc=0.8524  (4.1s)
+  Epoch  6/10  loss=0.3625  train_acc=0.8697  test_acc=0.8518  (4.6s)
+  Epoch  7/10  loss=0.3490  train_acc=0.8751  test_acc=0.8568  (3.8s)
+  Epoch  8/10  loss=0.3356  train_acc=0.8791  test_acc=0.8640  (4.0s)
+  Epoch  9/10  loss=0.3262  train_acc=0.8821  test_acc=0.8663  (4.3s)
+  Epoch 10/10  loss=0.3165  train_acc=0.8844  test_acc=0.8606  (4.5s)
 
-============================================================
-PARTE B — Convolución Separable por Profundidad (CNN)
-============================================================
-Entrenando CNN estándar (10 epochs)...
-  Epoch  1/10  loss=0.9038  train_acc=0.6704  test_acc=0.7722  (3.4s)
-  Epoch  2/10  loss=0.5208  train_acc=0.8045  test_acc=0.8171  (4.0s)
-  Epoch  3/10  loss=0.4416  train_acc=0.8387  test_acc=0.8496  (3.7s)
-  Epoch  4/10  loss=0.3919  train_acc=0.8574  test_acc=0.8508  (3.4s)
-  Epoch  5/10  loss=0.3617  train_acc=0.8679  test_acc=0.8658  (3.7s)
-  Epoch  6/10  loss=0.3395  train_acc=0.8752  test_acc=0.8709  (3.4s)
-  Epoch  7/10  loss=0.3212  train_acc=0.8812  test_acc=0.8722  (3.6s)
-  Epoch  8/10  loss=0.3093  train_acc=0.8851  test_acc=0.8768  (4.1s)
-  Epoch  9/10  loss=0.2962  train_acc=0.8902  test_acc=0.8794  (3.6s)
-  Epoch 10/10  loss=0.2883  train_acc=0.8936  test_acc=0.8821  (3.6s)
-  [CNN Estándar] Parámetros: 44,426  |  MACs: 281,640  |  Tamaño: 173.5 KB
+  Baseline: acc=0.8606  (+3 épocas de FT: 0.8736)  params=53,018  MACs=52,896
 
-CNN Separable (sin entrenar) acc=0.1415
-Entrenando CNN Separable (10 epochs)...
-  Epoch  1/10  loss=1.1478  train_acc=0.5802  test_acc=0.7095  (4.1s)
-  Epoch  2/10  loss=0.6698  train_acc=0.7416  test_acc=0.7604  (3.9s)
-  Epoch  3/10  loss=0.5947  train_acc=0.7762  test_acc=0.7825  (3.9s)
-  Epoch  4/10  loss=0.5443  train_acc=0.7981  test_acc=0.8036  (4.4s)
-  Epoch  5/10  loss=0.5122  train_acc=0.8106  test_acc=0.8082  (4.2s)
-  Epoch  6/10  loss=0.4887  train_acc=0.8200  test_acc=0.8141  (3.8s)
-  Epoch  7/10  loss=0.4694  train_acc=0.8258  test_acc=0.8259  (3.6s)
-  Epoch  8/10  loss=0.4537  train_acc=0.8312  test_acc=0.8253  (3.8s)
-  Epoch  9/10  loss=0.4426  train_acc=0.8358  test_acc=0.8246  (3.5s)
-  Epoch 10/10  loss=0.4275  train_acc=0.8419  test_acc=0.8374  (4.3s)
-  [CNN Separable] Parámetros: 42,160  |  MACs: 75,240  |  Tamaño: 164.7 KB
+======================================================================
+PASO 2 — Rango límite de cada capa: factorizar conviene si r < m·n/(m+n)
+======================================================================
+  fc1  Linear(784→64 )  límite =  59.2
+  fc2  Linear( 64→32 )  límite =  21.3
+  fc3  Linear( 32→16 )  límite =  10.7
+  fc4  Linear( 16→10 )  límite =   6.2
 
-  CNN estándar:   281,640 MACs  (44,426 params)
-  CNN separable:  75,240 MACs  (42,160 params)
-  Reducción MACs: 73.3%
+  Energía (Σσ²) que juntan los 16 valores singulares más grandes de fc1 (64 en total):
+    pesos iniciales (aleatorios): 34.6%
+    pesos entrenados:             83.5%
 
-[INFO] Gráfico guardado en 'outputs/factorizacion_resultados.png'
-[INFO] Resultados guardados en 'outputs/factorizacion_resultados.json'
+======================================================================
+PASO 3 — SVD a rango r, sin fine-tuning y con 3 épocas de fine-tuning
+======================================================================
+  r= 4  acc sin FT=0.2199  con FT=0.7568  factoriza: fc1, fc2, fc3, fc4
+  r= 8  acc sin FT=0.7232  con FT=0.8468  factoriza: fc1, fc2, fc3
+  r=16  acc sin FT=0.8392  con FT=0.8672  factoriza: fc1, fc2
+  r=32  acc sin FT=0.8554  con FT=0.8711  factoriza: fc1
 
-============================================================
+======================================================================
 TABLA COMPARATIVA
-============================================================
-Modelo                             Acc     Paráms         MACs
----------------------------------------------------------------
-MLP Baseline                    0.8611     53,018       52,896
-  MLP SVD rank=4 (FT)           0.7750      4,194       52,896
-  MLP SVD rank=8 (FT)           0.8458      8,266       52,896
-  MLP SVD rank=16 (FT)          0.8619     15,898       52,896
-  MLP SVD rank=32 (FT)          0.8701     29,978       52,896
-CNN Estándar                    0.8821     44,426      281,640
-CNN Separable                   0.8374     42,160       75,240
+======================================================================
+Modelo                             Acc sin FT     Acc   Paráms     MACs
+----------------------------------------------------------------------
+MLP baseline                                —  0.8606   53,018   52,896
+MLP baseline + FT                           —  0.8736   53,018   52,896
+SVD r=4 (fc1, fc2, fc3, fc4) + FT      0.2199  0.7568    4,194    4,072
+SVD r=8 (fc1, fc2, fc3) + FT           0.7232  0.8468    8,218    8,096
+SVD r=16 (fc1, fc2) + FT               0.8392  0.8672   15,898   15,776
+SVD r=32 (fc1) + FT                    0.8554  0.8711   29,978   29,856
+
+Dos formas de ejecutar el modelo con r=16 (misma accuracy: es la misma función)
+Forma             Pesos guardados   Pesos en RAM     MACs
+---------------------------------------------------------
+Dos capas                 62.1 KB        62.1 KB   15,776
+Reconstruir W             62.1 KB       207.1 KB   52,896
 
 [CONCLUSIÓN]
-  SVD: rango bajo → menos parámetros, pero se recupera con fine-tuning.
-  Separable: 73.3% menos MACs, accuracy comparable.
-  La factorización es más efectiva cuando los pesos tienen estructura de bajo rango.
+  Como dos capas, la SVD reduce parámetros Y MACs mientras r < m·n/(m+n):
+  con r=16, 70% menos MACs y 0.8672 de accuracy (baseline + FT: 0.8736).
+  Reconstruir W solo ahorra almacenamiento: la RAM y los MACs son los del original.
+
+[INFO] Gráfico guardado en 'outputs/svd_resultados.png'
+[INFO] Resultados guardados en 'outputs/svd_resultados.json'

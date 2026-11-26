@@ -4,6 +4,7 @@ Utilidades compartidas para los scripts de PyTorch (secciones 7-11).
 Provee:
 - get_dataloaders()      : DataLoaders de Fashion MNIST
 - get_device()           : cuda / cpu
+- set_reproducibility()  : fija las semillas (mismos números en cada corrida)
 - train_epoch()          : un epoch de entrenamiento
 - evaluate()             : accuracy en un DataLoader
 - train()                : loop completo de entrenamiento con reporte por epoch
@@ -15,6 +16,7 @@ Provee:
 
 import json
 import os
+import random
 import time
 from pathlib import Path
 
@@ -48,8 +50,8 @@ def get_dataloaders(batch_size: int = 256, data_dir: Path | str | None = None) -
     ])
     train_ds = datasets.FashionMNIST(data_dir, train=True,  download=True, transform=transform)
     test_ds  = datasets.FashionMNIST(data_dir, train=False, download=True, transform=transform)
-    train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True,  num_workers=2, pin_memory=True)
-    test_loader  = DataLoader(test_ds,  batch_size=batch_size, shuffle=False, num_workers=2, pin_memory=True)
+    train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True,  num_workers=2, pin_memory=torch.cuda.is_available())
+    test_loader  = DataLoader(test_ds,  batch_size=batch_size, shuffle=False, num_workers=2, pin_memory=torch.cuda.is_available())
     return train_loader, test_loader
 
 
@@ -62,6 +64,15 @@ def get_device() -> torch.device:
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"[INFO] Usando dispositivo: {device}")
     return device
+
+
+def set_reproducibility(seed: int = 42) -> None:
+    """Fija las semillas de Python, NumPy y PyTorch: cada corrida en CPU da los mismos números."""
+    import numpy as np
+
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
 
 
 # ---------------------------------------------------------------------------
