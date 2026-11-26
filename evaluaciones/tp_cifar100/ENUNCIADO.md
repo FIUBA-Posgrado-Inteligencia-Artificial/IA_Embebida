@@ -109,7 +109,7 @@ El script también deja el `.espdl`, que es el archivo que se flashea en la plac
 
 | Fecha | Qué |
 |---|---|
-| Jueves 26/11 | Publicación del enunciado y del baseline |
+| Jueves 19/11 | Publicación del enunciado y del baseline |
 | Jueves 3/12 y 10/12 | Entregas intermedias opcionales: suben su `.onnx` y publicamos un **leaderboard** |
 | Miércoles 16/12, 23:59 | Entrega final |
 | Jueves 17/12 | Presentaciones, defensa y demo en vivo del ganador |
@@ -146,7 +146,7 @@ Cuenta el nivel más alto alcanzado. Dentro de cada rango decide la calidad del 
 
 ## Alternativa: propuesta propia
 
-Como dijimos en la clase 1, quien prefiera trabajar con un problema propio (por ejemplo, relacionado con su trabajo final) puede proponerlo en lugar de este enunciado. Tiene que incluir compresión de un modelo y, si es posible, un despliegue o un benchmark en hardware real. Esas entregas no compiten: se evalúan con el informe y la defensa. Escríbannos antes del **jueves 3/12** con la propuesta.
+Como dijimos en la clase 1, quien prefiera trabajar con un problema propio (por ejemplo, relacionado con su trabajo final) puede proponerlo en lugar de este enunciado. Tiene que incluir compresión de un modelo y, si es posible, un despliegue o un benchmark en hardware real. Esas entregas no compiten: se evalúan con el informe y la defensa. Escríbannos antes del **jueves 26/11** con la propuesta.
 
 ## Pistas
 
