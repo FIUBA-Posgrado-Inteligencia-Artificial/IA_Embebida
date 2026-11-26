@@ -15,7 +15,8 @@ Qué hace, en orden:
   4. Cuantiza a int8 con esp-ppq para el ESP32-S3 (PTQ, configuración fija,
      calibración con las primeras 512 imágenes de val) y exporta el .espdl.
      Tamaño de pesos = tamaño del archivo .espdl (lo que va a la flash).
-  5. Mide la accuracy top-1 del modelo int8 SIMULADO sobre el test oficial
+  5. Mide (en CPU: en GPU la simulación int8 da décimas distintas) la accuracy
+     top-1 del modelo int8 SIMULADO sobre el test oficial
      (10 000 imágenes) y, como referencia, la del modelo float (onnxruntime).
   6. Informa el nivel alcanzado (los niveles son independientes: puntos de la
      frontera de Pareto), si compite por el 10 (cumple la fila de Bronce) y el score.
@@ -36,7 +37,9 @@ consumo real de ESP-DL, sino una medida simple y reproducible):
 from __future__ import annotations
 
 import argparse
+import contextlib
 import json
+import os
 import sys
 import tempfile
 from pathlib import Path
@@ -201,6 +204,39 @@ def contar_parametros(modelo: onnx.ModelProto) -> int:
 # Cuantización y accuracy
 # ---------------------------------------------------------------------------
 
+@contextlib.contextmanager
+def silencio(activo: bool = True):
+    """Manda a un archivo temporal todo lo que se imprima (también lo que
+    escriben esp-ppq, tqdm y las bibliotecas en C). Si algo falla, muestra el
+    log capturado para poder ver el error."""
+    if not activo:
+        yield
+        return
+    sys.stdout.flush()
+    sys.stderr.flush()
+    with tempfile.TemporaryFile(mode="w+b") as log:
+        guardados = [os.dup(1), os.dup(2)]
+        os.dup2(log.fileno(), 1)
+        os.dup2(log.fileno(), 2)
+        try:
+            yield
+        except BaseException:
+            sys.stdout.flush()
+            sys.stderr.flush()
+            os.dup2(guardados[0], 1)
+            os.dup2(guardados[1], 2)
+            log.seek(0)
+            sys.stderr.write(log.read().decode(errors="replace"))
+            raise
+        finally:
+            sys.stdout.flush()
+            sys.stderr.flush()
+            os.dup2(guardados[0], 1)
+            os.dup2(guardados[1], 2)
+            for fd in guardados:
+                os.close(fd)
+
+
 def cuantizar(ruta_onnx: Path, ruta_espdl: Path, calib: list, device: str):
     from esp_ppq.api import espdl_quantize_onnx
     graph = espdl_quantize_onnx(
@@ -295,7 +331,10 @@ def main() -> int:
     ap.add_argument("--espdl", type=Path, help="dónde guardar el .espdl (default: junto al .onnx)")
     ap.add_argument("--n-test", type=int, default=10000, help="imágenes de test (default: todas)")
     ap.add_argument("--sin-float", action="store_true", help="no medir la accuracy float")
-    ap.add_argument("--device", default=None)
+    ap.add_argument("--device", default="cpu",
+                    help="cpu (default, el oficial) o cuda: en GPU es más rápido pero la accuracy int8 "
+                         "difiere en décimas; el resultado oficial es el de CPU")
+    ap.add_argument("--verbose", action="store_true", help="mostrar el log completo de esp-ppq")
     args = ap.parse_args()
 
     modelo = onnx.load(str(args.onnx))
@@ -324,7 +363,7 @@ def main() -> int:
     if not args.rapido and not errores:
         import torch
         from datos import cargar_splits, normalizar
-        device = args.device or ("cuda" if torch.cuda.is_available() else "cpu")
+        device = args.device
         d = cargar_splits()
         xv = normalizar(d["val"][0][:N_CALIB])
         calib = [xv[i:i + 32] for i in range(0, N_CALIB, 32)]
@@ -334,16 +373,20 @@ def main() -> int:
         with tempfile.TemporaryDirectory() as tmp:
             ruta_simpl = Path(tmp) / "simpl.onnx"
             onnx.save(modelo, str(ruta_simpl))
-            graph = cuantizar(ruta_simpl, ruta_espdl, calib, device)
-            r["pesos_bytes"] = ruta_espdl.stat().st_size
-            r["acc_int8"] = accuracy_ppq(graph, xt, yt, device)
-            if not args.sin_float:
-                r["acc_float"] = accuracy_float(ruta_simpl, xt, yt)
+            print(f"Cuantizando a int8 con esp-ppq y midiendo accuracy en {len(xt)} imágenes de test...",
+                  flush=True)
+            with silencio(not args.verbose):
+                graph = cuantizar(ruta_simpl, ruta_espdl, calib, device)
+                r["pesos_bytes"] = ruta_espdl.stat().st_size
+                r["acc_int8"] = accuracy_ppq(graph, xt, yt, device)
+                if not args.sin_float:
+                    r["acc_float"] = accuracy_float(ruta_simpl, xt, yt)
 
         print(f"Pesos (.espdl):        {kb(r['pesos_bytes'])}  ({ruta_espdl})")
         if "acc_float" in r:
             print(f"Accuracy float:        {100 * r['acc_float']:.2f} %")
-        print(f"Accuracy int8 (sim):   {100 * r['acc_int8']:.2f} %")
+        print(f"Accuracy int8 (sim):   {100 * r['acc_int8']:.2f} %"
+              + ("" if device == "cpu" else f"  (en {device}: NO oficial, el oficial es en CPU)"))
 
         if NIVELES:
             r["nivel"] = nivel_alcanzado(r)

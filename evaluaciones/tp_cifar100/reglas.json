@@ -6,7 +6,7 @@
     "pesos_bytes": 971776,
     "macs": 125753600,
     "pico_activaciones_bytes": 49152,
-    "acc_int8": 0.7151,
+    "acc_int8": 0.7183,
     "acc_float": 0.7206
   },
   "niveles": [

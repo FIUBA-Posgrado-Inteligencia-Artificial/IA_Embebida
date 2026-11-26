@@ -30,7 +30,7 @@ Una ResNet-56 para CIFAR (He et al., 2016), entrenada por nosotros. Está en el 
 | MACs por inferencia | 125,8 M |
 | Pico de activaciones | 48 KB |
 | Accuracy top-1 float | 72,1 % |
-| Accuracy top-1 int8 simulada | 71,5 % |
+| Accuracy top-1 int8 simulada | 71,8 % |
 
 **El baseline no cumple ninguno de los requisitos de memoria ni de cómputo.** Pasarlo a int8 no alcanza: los 949 KB ya son int8. Hay que aplicar técnicas de compresión de verdad.
 
@@ -82,9 +82,42 @@ Las métricas las calcula siempre `evaluar.py`, nunca se reportan a mano. Lo pue
 ```bash
 cd evaluaciones/tp_cifar100
 uv sync
-uv run python evaluar.py mi_modelo.onnx          # evaluación completa (minutos; más rápido con GPU)
-uv run python evaluar.py mi_modelo.onnx --rapido # sólo MACs, pico y ops (segundos)
+uv run python evaluar.py mi_modelo.onnx            # evaluación completa (un par de minutos)
+uv run python evaluar.py mi_modelo.onnx --rapido   # sólo MACs, pico y ops (segundos)
 ```
+
+Por ejemplo, con el baseline:
+
+```
+=== baseline_resnet56.onnx ===
+Parámetros:            859,492  (~839.3 KB en int8)
+MACs:                  125.75 M                                      ← (1)
+Pico de activaciones:  48.0 KB  (en Conv /features/features.1/c2/c2.0/Conv)
+                                                                     ↑ (2)
+Cuantizando a int8 con esp-ppq y midiendo accuracy en 10000 imágenes de test...
+Pesos (.espdl):        949.0 KB  (baseline_resnet56.espdl)           ← (3)
+Accuracy float:        72.06 %
+Accuracy int8 (sim):   71.83 %                                       ← (4)
+Nivel:                 ninguno
+Compite por el 10:     no (hay que cumplir la fila de Bronce)
+Score:                 1.0000  (menor es mejor)
+```
+
+Los cuatro requisitos son (1) MACs, (2) pico de activaciones, (3) pesos y (4) accuracy int8. Línea por línea:
+
+| Línea | Qué es |
+|---|---|
+| `MACs` | Requisito de MACs y la mitad del score |
+| `Pico de activaciones` | Requisito de RAM. Entre paréntesis, la capa donde ocurre el pico: es la primera que hay que atacar |
+| `Pesos (.espdl)` | Requisito de pesos y la otra mitad del score. Es el tamaño del archivo que se flashea |
+| `Accuracy int8 (sim)` | La accuracy que cuenta para los niveles |
+| `Accuracy float` | Sólo de referencia. Si la int8 cae más de 1 o 2 puntos respecto de la float, la cuantización les está costando: prueben QAT |
+| `Parámetros` | Sólo de referencia: los niveles se miden con el `.espdl`, no con los parámetros |
+| `Nivel`, `Compite por el 10`, `Score` | El resultado: el nivel más alto cuya fila se cumple completa, si compite y su score |
+
+`--rapido` imprime sólo las tres primeras métricas, sin cuantizar: sirve para iterar sobre la arquitectura en segundos. El log de esp-ppq queda oculto; con `--verbose` se ve completo.
+
+**La evaluación oficial corre en CPU** (es el default). Con `--device cuda` va más rápido, pero la simulación int8 en GPU redondea distinto y la accuracy puede diferir en algunas décimas: sirve para iterar, no para el resultado.
 
 Para exportar el modelo desde PyTorch con la interfaz correcta:
 

@@ -4,3 +4,4 @@ datasets/
 *.info
 ENUNCIADO.html
 __pycache__/
+baseline_resnet56.json
