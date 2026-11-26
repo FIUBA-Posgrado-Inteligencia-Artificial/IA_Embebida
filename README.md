@@ -36,6 +36,16 @@ ordenados de menor a mayor complejidad.
 La carpeta `ejemplos/datasets/` es un caché compartido de datasets que se
 descargan automáticamente la primera vez.
 
+## Evaluaciones
+
+Los trabajos prácticos viven bajo `evaluaciones/`. Cada uno trae su enunciado
+(`ENUNCIADO.md` y `ENUNCIADO.pdf`), su `pyproject.toml` y el código que hace
+falta para resolverlo y evaluarlo.
+
+| Carpeta | Qué es |
+|---------|--------|
+| `evaluaciones/tp_cifar100/` | TP final: competencia de compresión sobre CIFAR-100, int8 simulado para ESP32-S3 |
+
 ## Presentación
 
 Para levantar un servidor local y abrir la presentación en el navegador:

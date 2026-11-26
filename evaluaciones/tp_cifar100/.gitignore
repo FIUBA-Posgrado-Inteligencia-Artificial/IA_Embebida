@@ -1,0 +1,6 @@
+salidas/
+datasets/
+*.espdl
+*.info
+ENUNCIADO.html
+__pycache__/

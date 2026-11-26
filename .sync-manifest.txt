@@ -1112,4 +1112,16 @@ ejemplos/quantization/script03.py
 ejemplos/quantization/script04.py
 ejemplos/quantization/script06_utils.py
 ejemplos/quantization/uv.lock
+evaluaciones/tp_cifar100/.gitignore
+evaluaciones/tp_cifar100/ENUNCIADO.md
+evaluaciones/tp_cifar100/ENUNCIADO.pdf
+evaluaciones/tp_cifar100/baseline_resnet56.onnx
+evaluaciones/tp_cifar100/baseline_resnet56.pth
+evaluaciones/tp_cifar100/datos.py
+evaluaciones/tp_cifar100/entrenar.py
+evaluaciones/tp_cifar100/evaluar.py
+evaluaciones/tp_cifar100/modelos.py
+evaluaciones/tp_cifar100/pyproject.toml
+evaluaciones/tp_cifar100/reglas.json
+evaluaciones/tp_cifar100/uv.lock
 run_presentation.sh

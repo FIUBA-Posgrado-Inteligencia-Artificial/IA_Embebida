@@ -1,0 +1,25 @@
+[project]
+name = "tp-cifar100"
+version = "0.1.0"
+description = "CEIA IA Embebida - TP final: competencia de compresión sobre CIFAR-100 (int8 simulado ESP32-S3)"
+requires-python = ">=3.10,<3.12"
+dependencies = [
+    "torch>=2.0.0",
+    "torchvision>=0.15.0",
+    "numpy>=1.24.0",
+    "tqdm>=4.65.0",
+    "pyarrow>=14.0",
+    "pillow>=10.0",
+    "onnx>=1.14.0",
+    "onnxscript>=0.7.0",
+    "onnxsim>=0.4.36",
+    "onnxruntime>=1.16.0",
+    "esp-ppq @ git+https://github.com/espressif/esp-ppq.git@41687222823d42e43d0dadd67011c75d361b0c2c",
+]
+
+[tool.uv]
+managed = true
+override-dependencies = [
+    "onnx>=1.14.0",
+    "setuptools>=0.0",
+]

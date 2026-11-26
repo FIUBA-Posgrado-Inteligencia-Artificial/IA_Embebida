@@ -1,0 +1,35 @@
+{
+  "base_bytes": 971776,
+  "base_macs": 125753600,
+  "base": {
+    "parametros": 859492,
+    "pesos_bytes": 971776,
+    "macs": 125753600,
+    "pico_activaciones_bytes": 49152,
+    "acc_int8": 0.7151,
+    "acc_float": 0.7206
+  },
+  "niveles": [
+    {
+      "nombre": "Bronce",
+      "pesos_max": 163840,
+      "activ_max": 32768,
+      "macs_max": 30000000,
+      "acc_min": 0.63
+    },
+    {
+      "nombre": "Plata",
+      "pesos_max": 131072,
+      "activ_max": 24576,
+      "macs_max": 8000000,
+      "acc_min": 0.62
+    },
+    {
+      "nombre": "Oro",
+      "pesos_max": 65536,
+      "activ_max": 16384,
+      "macs_max": 2000000,
+      "acc_min": 0.52
+    }
+  ]
+}
