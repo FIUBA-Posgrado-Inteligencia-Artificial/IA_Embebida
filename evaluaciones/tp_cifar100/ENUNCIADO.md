@@ -15,7 +15,7 @@ No hace falta tener la placa. Todo se mide en la PC con **int8 simulado** (esp-p
 Un clasificador de objetos que corre en un **ESP32-S3 sin PSRAM**: sólo tiene la SRAM interna (512 KB, de los que el resto del firmware deja libres unos 300 KB) y la flash. El producto necesita:
 
 - **Calidad**: reconocer las 100 clases de CIFAR-100 con una accuracy mínima.
-- **Flash**: el modelo comparte la flash con el firmware y con las actualizaciones OTA, así que su tamaño importa.
+- **Pesos**: sin PSRAM, los pesos se leen de la flash a través de la caché, que es lento. Un modelo chico se puede copiar entero a la SRAM interna y correr más rápido, pero esa SRAM la comparte con las activaciones y con el resto de la aplicación.
 - **RAM**: las activaciones intermedias viven en la SRAM interna, compartida con la cámara, el WiFi y el resto de la aplicación.
 - **Tiempo real**: cuantas menos operaciones, más cuadros por segundo y menos energía por inferencia.
 
