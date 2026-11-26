@@ -1,9 +1,9 @@
 {
-  "base_bytes": 971776,
+  "base_bytes": 971760,
   "base_macs": 125753600,
   "base": {
     "parametros": 859492,
-    "pesos_bytes": 971776,
+    "pesos_bytes": 971760,
     "macs": 125753600,
     "pico_activaciones_bytes": 49152,
     "acc_int8": 0.7183,

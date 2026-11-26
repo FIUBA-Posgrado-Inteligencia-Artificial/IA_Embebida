@@ -18,8 +18,9 @@ Qué hace, en orden:
   5. Mide (en CPU: en GPU la simulación int8 da décimas distintas) la accuracy
      top-1 del modelo int8 SIMULADO sobre el test oficial
      (10 000 imágenes) y, como referencia, la del modelo float (onnxruntime).
-  6. Informa el nivel alcanzado (los niveles son independientes: puntos de la
-     frontera de Pareto), si compite por el 10 (cumple la fila de Bronce) y el score.
+  6. Informa qué niveles cumple (son independientes: puntos de la frontera de
+     Pareto; un modelo puede cumplir más de uno), si compite (cumple la fila de
+     Bronce) y el score.
 
 Definiciones (son las reglas del juego; no pretenden ser idénticas al
 consumo real de ESP-DL, sino una medida simple y reproducible):
@@ -297,18 +298,14 @@ def cumple(r: dict, nivel: tuple) -> bool:
             and r["macs"] <= mmax and r["acc_int8"] >= accmin)
 
 
-def nivel_alcanzado(r: dict) -> str | None:
-    """Niveles independientes (puntos de la frontera de Pareto): devuelve el
-    más alto cuya fila completa se cumple, aunque no se cumplan los anteriores."""
-    alcanzado = None
-    for nivel in NIVELES:
-        if cumple(r, nivel):
-            alcanzado = nivel[0]
-    return alcanzado
+def niveles_cumplidos(r: dict) -> list[str]:
+    """Niveles independientes (puntos de la frontera de Pareto): todos aquellos
+    cuya fila completa se cumple, aunque no se cumplan los anteriores."""
+    return [nivel[0] for nivel in NIVELES if cumple(r, nivel)]
 
 
 def compite(r: dict) -> bool:
-    """Compiten por el 10 sólo las entregas que cumplen la fila de Bronce
+    """Compiten sólo las entregas que cumplen la fila de Bronce
     (incluida su accuracy mínima)."""
     return bool(NIVELES) and cumple(r, NIVELES[0])
 
@@ -323,7 +320,18 @@ def kb(b):
     return f"{b / 1024:.1f} KB"
 
 
+def fijar_hashseed() -> None:
+    """esp-ppq recorre sets al exportar: con la aleatorización de hashes de
+    Python, el .espdl cambia unas decenas de bytes de una corrida a otra.
+    Con PYTHONHASHSEED=0 sale idéntico byte a byte (se relanza el proceso,
+    porque la semilla sólo se puede fijar al arrancar el intérprete)."""
+    if os.environ.get("PYTHONHASHSEED") != "0":
+        os.environ["PYTHONHASHSEED"] = "0"
+        os.execv(sys.executable, [sys.executable] + sys.argv)
+
+
 def main() -> int:
+    fijar_hashseed()
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("onnx", type=Path)
     ap.add_argument("--rapido", action="store_true", help="sólo métricas estáticas, sin cuantizar")
@@ -389,10 +397,11 @@ def main() -> int:
               + ("" if device == "cpu" else f"  (en {device}: NO oficial, el oficial es en CPU)"))
 
         if NIVELES:
-            r["nivel"] = nivel_alcanzado(r)
+            r["niveles"] = niveles_cumplidos(r)
+            r["nivel"] = r["niveles"][-1] if r["niveles"] else None  # el más alto
             r["compite"] = compite(r)
-            print(f"Nivel:                 {r['nivel'] or 'ninguno'}")
-            print(f"Compite por el 10:     {'sí' if r['compite'] else 'no (hay que cumplir la fila de Bronce)'}")
+            print(f"Niveles que cumple:    {', '.join(r['niveles']) or 'ninguno'}")
+            print(f"Compite:               {'sí' if r['compite'] else 'no (hay que cumplir la fila de Bronce)'}")
         s = score(r)
         if s is not None:
             r["score"] = s

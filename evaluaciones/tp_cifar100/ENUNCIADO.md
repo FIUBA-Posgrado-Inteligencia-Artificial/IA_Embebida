@@ -6,7 +6,7 @@
 
 Les damos un modelo que clasifica imágenes de CIFAR-100 y que es demasiado grande y lento para un microcontrolador. Su trabajo es **comprimirlo** con las técnicas de la materia (cuantización, pruning, factorización, NAS, knowledge distillation, optimización algorítmica) hasta que entre en un **ESP32-S3** cumpliendo los requisitos de la aplicación.
 
-Es una **competencia**: entre los modelos que cumplen los requisitos, gana el más comprimido. El ganador se lleva un **10**.
+Hay tres **niveles** de requisitos y la nota depende de cuántos alcancen: con los tres, un **10**. Además hay una **competencia**: entre los modelos que cumplen los requisitos de Bronce gana el más comprimido, y los tres mejores se llevan un premio.
 
 No hace falta tener la placa. Todo se mide en la PC con **int8 simulado** (esp-ppq, el cuantizador oficial de Espressif para ESP-DL). El modelo ganador lo desplegamos en vivo en un ESP32-S3 el día de la presentación.
 
@@ -38,7 +38,7 @@ Pueden usar el baseline como punto de partida (podarlo, factorizarlo, cuantizarl
 
 ## Requisitos y niveles
 
-Los niveles son **independientes**: cada uno es un punto distinto del compromiso entre tamaño y calidad (la frontera de Pareto). Un nivel se alcanza cumpliendo **todas las columnas de su fila**; no hace falta cumplir los anteriores. Por ejemplo, un modelo de 60 KB, 1,5 M de MACs, 12 KB de pico y 53 % es Oro, aunque no llegue a la accuracy de Bronce.
+Los niveles son **independientes**: cada uno es un punto distinto del compromiso entre tamaño y calidad (la frontera de Pareto). Un nivel se alcanza cumpliendo **todas las columnas de su fila**; no hace falta cumplir los anteriores. Por ejemplo, un modelo de 60 KB, 1,5 M de MACs, 12 KB de pico y 53 % es Oro, aunque no llegue a la accuracy de Bronce. Pueden entregar un modelo distinto para cada nivel, y un mismo modelo puede cumplir más de uno.
 
 | Nivel | Pesos (`.espdl`) | Pico de activaciones | MACs | Accuracy int8 |
 |---|---:|---:|---:|---:|
@@ -63,17 +63,19 @@ Existe al menos un modelo de referencia, entrenado por nosotros sin optimizarlo 
 
 ## La competencia
 
-Compiten por el 10 las entregas que **cumplen la fila de Bronce**, incluida su accuracy mínima (≥ 63 %). La idea es comprimir lo más posible **sin resignar calidad**: un modelo Oro con menos accuracy aprueba con buena nota, pero no compite.
+La competencia no cambia la nota, pero vale la pena: los **tres mejores** se mencionan en la presentación y cada uno se lleva un **premio** (a definir).
 
-Entre las que compiten, gana el **menor score**:
+Compiten los modelos que **cumplen la fila de Bronce**, incluida su accuracy mínima (≥ 63 %). La idea es comprimir lo más posible **sin resignar calidad**: un modelo Oro con menos accuracy suma para la nota, pero no compite.
+
+Entre los que compiten, gana el **menor score**:
 
 ```
 score = ½ · pesos / pesos_baseline  +  ½ · MACs / MACs_baseline
 ```
 
-Con pesos y MACs medidos como arriba. El baseline tiene score 1. Si hay empate a 4 decimales, gana la mayor accuracy int8, y si sigue el empate, la entrega más temprana.
+Con pesos y MACs medidos como arriba. El baseline tiene score 1. Cada grupo compite con su modelo de menor score. Si hay empate a 4 decimales, gana la mayor accuracy int8, y si sigue el empate, la entrega más temprana.
 
-Además de la competencia hay **menciones** (sin nota extra): mayor accuracy dentro del nivel Oro y menor pico de activaciones con nivel Plata o superior.
+También hay **menciones** (sin premio): mayor accuracy dentro del nivel Oro y menor pico de activaciones con nivel Plata o superior.
 
 ## Cómo se evalúa
 
@@ -91,15 +93,14 @@ Por ejemplo, con el baseline:
 ```
 === baseline_resnet56.onnx ===
 Parámetros:            859,492  (~839.3 KB en int8)
-MACs:                  125.75 M                                      ← (1)
-Pico de activaciones:  48.0 KB  (en Conv /features/features.1/c2/c2.0/Conv)
-                                                                     ↑ (2)
+MACs:                  125.75 M                                                 ← (1)
+Pico de activaciones:  48.0 KB  (en Conv /features/features.1/c2/c2.0/Conv)     ← (2)
 Cuantizando a int8 con esp-ppq y midiendo accuracy en 10000 imágenes de test...
-Pesos (.espdl):        949.0 KB  (baseline_resnet56.espdl)           ← (3)
+Pesos (.espdl):        949.0 KB  (baseline_resnet56.espdl)                      ← (3)
 Accuracy float:        72.06 %
-Accuracy int8 (sim):   71.83 %                                       ← (4)
-Nivel:                 ninguno
-Compite por el 10:     no (hay que cumplir la fila de Bronce)
+Accuracy int8 (sim):   71.83 %                                                  ← (4)
+Niveles que cumple:    ninguno
+Compite:               no (hay que cumplir la fila de Bronce)
 Score:                 1.0000  (menor es mejor)
 ```
 
@@ -113,7 +114,7 @@ Los cuatro requisitos son (1) MACs, (2) pico de activaciones, (3) pesos y (4) ac
 | `Accuracy int8 (sim)` | La accuracy que cuenta para los niveles |
 | `Accuracy float` | Sólo de referencia. Si la int8 cae más de 1 o 2 puntos respecto de la float, la cuantización les está costando: prueben QAT |
 | `Parámetros` | Sólo de referencia: los niveles se miden con el `.espdl`, no con los parámetros |
-| `Nivel`, `Compite por el 10`, `Score` | El resultado: el nivel más alto cuya fila se cumple completa, si compite y su score |
+| `Niveles que cumple`, `Compite`, `Score` | El resultado: los niveles cuya fila se cumple completa, si compite y su score |
 
 `--rapido` imprime sólo las tres primeras métricas, sin cuantizar: sirve para iterar sobre la arquitectura en segundos. El log de esp-ppq queda oculto; con `--verbose` se ve completo.
 
@@ -143,13 +144,13 @@ El script también deja el `.espdl`, que es el archivo que se flashea en la plac
 | Fecha | Qué |
 |---|---|
 | Jueves 19/11 | Publicación del enunciado y del baseline |
-| Jueves 3/12 y 10/12 | Entregas intermedias opcionales: suben su `.onnx` y publicamos un **leaderboard** |
+| Jueves 3/12 y 10/12 | Entregas intermedias opcionales: suben sus `.onnx` y publicamos un **leaderboard** |
 | Miércoles 16/12, 23:59 | Entrega final |
 | Jueves 17/12 | Presentaciones, defensa y demo en vivo del ganador |
 
 La entrega final es un repositorio (o un `.zip`) con:
 
-- `modelo.onnx`: el modelo que compite.
+- Un `.onnx` por cada nivel que quieran acreditar, por ejemplo `bronce.onnx`, `plata.onnx` y `oro.onnx` (si un mismo modelo cumple dos niveles, alcanza con uno). En la competencia participa el de menor score entre los que cumplen la fila de Bronce.
 - El **código** completo para reproducirlo: entrenamiento, compresión y export.
 - Un **informe breve** (puede ser el `README.md`) que cuente el camino: qué técnicas probaron, en qué orden, qué funcionó, qué no y por qué, con los resultados de `evaluar.py` de cada paso. Un gráfico de accuracy contra score (su propia frontera de Pareto) suma mucho.
 
@@ -157,7 +158,7 @@ La entrega final es un repositorio (o un `.zip`) con:
 
 Cada grupo presenta en ~10 minutos el camino que siguió. **No hace falta tener una placa ni desplegar.**
 
-Al **ganador** le pedimos que muestre en vivo la cadena completa:
+Al **ganador de la competencia** le pedimos que muestre en vivo la cadena completa:
 
 1. Correr `evaluar.py` sobre su entrega y mostrar el resultado.
 2. Explicar cómo llegó al modelo (sin reentrenar en vivo).
@@ -167,15 +168,14 @@ Si no tienen placa, el paso 3 lo hacemos nosotros. La accuracy en la placa es **
 
 ## Nota
 
-| Resultado | Nota |
+| Niveles alcanzados | Nota |
 |---|---|
-| Ganador de la competencia | **10** |
-| Oro | 8 a 9 |
-| Plata | 7 a 8 |
-| Bronce | 6 a 7 |
-| No alcanza ningún nivel | No aprueba con este enunciado (se puede reentregar) |
+| Los tres (Bronce, Plata y Oro) | **10** |
+| Dos | **8** |
+| Uno | **6** |
+| Ninguno | No aprueba con este enunciado (se puede reentregar) |
 
-Cuenta el nivel más alto alcanzado. Dentro de cada rango decide la calidad del informe y de la defensa: que expliquen qué hicieron y por qué, no sólo el número final. El 2.º y el 3.º puesto de la competencia suman 1 punto (con máximo 10).
+Un nivel está alcanzado si alguno de los modelos entregados cumple su fila completa según `evaluar.py`. La nota requiere el informe y la defensa: tienen que poder explicar qué hicieron y por qué, no sólo mostrar el número final. La competencia no suma nota: se premia aparte.
 
 ## Alternativa: propuesta propia
 
